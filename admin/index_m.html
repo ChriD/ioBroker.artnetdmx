@@ -23,8 +23,12 @@
         function load(settings, onChange) {
     
             let objID = 'artnetdmx.0.devices';
-            servConn.getStates(objID, (error, states) => {
-                let stateValue = states[objID];
+            //servConn.getStates(objID, (error, states) => {
+            //    let stateValue = states[objID];
+            //});
+            socket.emit('getObject', objID, function (err, obj) {
+                console.log("HURAY?");
+                console.log(objID);
             });
 
             // example: select elements with id=key and class=value and insert value
