@@ -22,12 +22,23 @@
         // This will be called by the admin adapter when the settings page loads
         function load(settings, onChange) {
     
-            let objID = 'artnetdmx.0.devices';
+            let objID = 'artnetdmx.0.lights.Bedrom';
             //servConn.getStates(objID, (error, states) => {
             //    let stateValue = states[objID];
             //});
             socket.emit('getObject', objID, function (err, obj) {
                 console.log("HURAY?");
+                console.log(err);
+                console.log(obj);
+            });
+
+            objID = 'artnetdmx.0.lights';
+            //servConn.getStates(objID, (error, states) => {
+            //    let stateValue = states[objID];
+            //});
+            socket.emit('getObject', objID, function (err, obj) {
+                console.log("HURAY2?");
+                console.log(err);
                 console.log(obj);
             });
 

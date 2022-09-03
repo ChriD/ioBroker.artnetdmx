@@ -54,30 +54,24 @@ class Artnetdmx extends utils.Adapter {
         For every state in the system there has to be also an object of type state
         Here a simple template for a boolean variable named "testVariable"
         Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
-        */
-        await this.setObjectNotExistsAsync('devices.Kitchen.fadeTime', {
-            type: 'state',
+        */     
+        await this.setObjectNotExistsAsync('lights.Kitchen', {
+            type: 'device',
             common: {
-                name: 'fadeTime',
-                type: 'boolean',
-                role: 'state',
-                read: true,
-                write: true,
+                name: 'Kitchen Light Surroundings'                
             },
             native: {},
         });
 
-        await this.setObjectNotExistsAsync('devices.Bedroom.fadeTime', {
-            type: 'state',
+        await this.setObjectNotExistsAsync('lights.Bedrom', {
+            type: 'device',
             common: {
-                name: 'fadeTime',
-                type: 'number',
-                role: 'state',
-                read: true,
-                write: true,
+                name: 'Bedroom Main Light'                
             },
             native: {},
         });
+
+
 
         await this.setObjectNotExistsAsync('testVariable', {
             type: 'state',
