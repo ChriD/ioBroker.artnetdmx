@@ -61,9 +61,104 @@
         }
     </script>
 
+<!--
+<style>
+    .sub-title {
+        margin-top: 2rem!important;
+        padding: 0.5rem;
+        background: #64b5f6;
+        color: white;
+    }
+    .main-page {
+        height: 100%;
+        overflow: hidden;
+        margin-bottom: 0 !important;
+    }
+    .page {
+        height: calc(100% - 34px) !important;
+    }
+</style>
+-->
+
 </head>
 
+<!-- Put your content here -->
+        <!-- 
+            Host
+            Port
+            Universe
+            Buffer refresh Period
+            Default fade Time
+        -->
+
+        <!-- For example columns with settings: -->
+
 <body>
+
+    <div class="m adapter-container">
+        <div class="main-page row">
+            <div class="col s12">
+                <ul class="tabs">
+                    <li class="tab col s4"><a href="#tab-main" class="translate active">General</a></li>
+                    <li class="tab col s4"><a href="#tab-devices" class="translate">Devices</a></li>
+                </ul>
+            </div>
+
+            <div id="tab-main" class="col s12 page">
+                <div class="row">
+                    <div class="col s6">
+                        <img src="artnetdmx.png" class="logo">
+                    </div>
+                </div>
+
+                <h6 class="translate sub-title">Connection settings</h6>
+                <div class="row">
+                    <div class="input-field col s12 m6 l4">
+                        <input type="text" id="nodeip" class="value" />
+                        <label class="translate" for="nodeip">Node IP:</label>
+                    </div>
+                    <div class="input-field col s12 m6 l4">
+                        <input id="nodeport" type="number" min="1" max="65565" class="value" />
+                        <label class="translate" for="nodeport">Port:</label>
+                    </div>
+                </div>
+
+                <h6 class="translate sub-title">Artnet/DMX Settings</h6>
+                <div class="row">                    
+                    <div class="input-field col s12 m6 l4">
+                        <input id="universe" type="number" min="0" max="32768" class="value" />
+                        <label class="translate" for="pass">Universe:</label>
+                    </div>
+                    <div class="input-field col s12 m6 l4">
+                        <input id="framesPerSec" type="number" min="1" max="44" class="value" />
+                        <label class="translate" for="framesPerSec">Frames:</label>
+                    </div>
+                    <div class="input-field col s12 m6 l4">
+                        <input id="fullRefreshPeriod" type="number" min="0" max="60" class="value" />
+                        <label class="translate" for="fullRefreshPeriod">Refresh Period:</label>
+                    </div>
+                    <div class="input-field col s12 m6 l4">                        
+                        <input id="defaultFadeTime" type="number" min="0" max="60000" class="value" />
+                        <label class="translate" for="defaultFadeTime">Default fade time:</label>
+                    </div>
+                </div>                
+            </div>
+
+
+            <div id="tab-devices" class="col s12 page">
+                <div class="row">
+                    <div class="col s6">
+                        <img src="artnetdmx.png" class="logo">
+                    </div>
+                </div>
+
+                <h6 class="translate sub-title">Devices</h6>
+                
+            </div>
+        </div>
+    </div>
+
+    <!--
 
     <div class="m adapter-container">
 
@@ -74,16 +169,7 @@
         </div>
 
 
-        <!-- Put your content here -->
-        <!-- 
-            Host
-            Port
-            Universe
-            Buffer refresh Period
-            Default fade Time
-        -->
-
-        <!-- For example columns with settings: -->
+        
         <div class="row">
             <div class="col s6 input-field">
                 <input type="checkbox" class="value" id="option1" />
@@ -97,6 +183,8 @@
         </div>
 
     </div>
+
+    -->
 
 </body>
 
