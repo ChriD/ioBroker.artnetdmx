@@ -42,6 +42,16 @@
                 console.log(obj);
             });
 
+            let selector = $('channel[state.id=artnetdmx.0.lights.Bedrom.*]'); 
+            selector.each(function (id, i) {
+                log("State: " + id + " - Wert: " + getState(id).val);
+            });
+
+            selector = $('device[state.id=artnetdmx.0.lights.Bedrom.*]'); 
+            selector.each(function (id, i) {
+                log("State: " + id + " - Wert: " + getState(id).val);
+            });
+
             // example: select elements with id=key and class=value and insert value
             if (!settings) return;
             $('.value').each(function () {
