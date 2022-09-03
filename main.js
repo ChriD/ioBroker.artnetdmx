@@ -219,6 +219,14 @@ class Artnetdmx extends utils.Adapter {
         if (typeof obj === 'object') {
             switch (obj.command) {
                 case 'message':
+
+                let selector = $('artnetdmx.0.lights.*'); 
+                    selector.each(function (id, i) {
+                        this.log.info(id);
+                    });
+        
+
+
                             if (obj.callback) {
                                 this.sendTo(obj.from, obj.command, { 'test' : 'this is a test' }, obj.callback);
                             }
