@@ -1,0 +1,125 @@
+{
+    "common": {
+        "name": "artnetdmx",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "Artnet-DMX",
+        "titleLang": {
+            "en": "Artnet-DMX",
+            "de": "Artnet-DMX",
+            "ru": "Артнет-DMX",
+            "pt": "Artnet-DMX",
+            "nl": "Artnet-DMX",
+            "fr": "Artnet-DMX",
+            "it": "Artnet-DMX",
+            "es": "Artnet-DMX",
+            "pl": "Artnet-DMX",
+            "zh-cn": "Artnet-DMX"
+        },
+        "desc": {
+            "en": "artnetdmx",
+            "de": "artnetdmx",
+            "ru": "артнетдмкс",
+            "pt": "artnetdmx",
+            "nl": "artnetdmx",
+            "fr": "artnetdmx",
+            "it": "artnetdmx",
+            "es": "artnetdmx",
+            "pl": "artnetdmx",
+            "zh-cn": "artnetdmx"
+        },
+        "authors": [
+            "ChriD <chris_d85@hotmail.com>"
+        ],
+        "keywords": [
+            "artnet",
+            "dmx",
+            "light"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "main.js",
+        "icon": "artnetdmx.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/ChriD/ioBroker.artnetdmx/main/admin/artnetdmx.png",
+        "readme": "https://github.com/ChriD/ioBroker.artnetdmx/blob/main/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "lighting",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "poll",
+        "adminUI": {
+            "config": "materialize",
+            "tab": "materialize"
+        },
+        "adminTab": {
+            "singleton": true,
+            "name": {
+                "en": "Artnet-DMX",
+                "de": "Artnet-DMX",
+                "ru": "Артнет-DMX",
+                "pt": "Artnet-DMX",
+                "nl": "Artnet-DMX",
+                "fr": "Artnet-DMX",
+                "it": "Artnet-DMX",
+                "es": "Artnet-DMX",
+                "pl": "Artnet-DMX",
+                "zh-cn": "Artnet-DMX"
+            },
+            "link": "",
+            "fa-icon": "info"
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=3.3.22"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=5.0.0"
+            }
+        ]
+    },
+    "native": {
+        "option1": true,
+        "option2": "42"
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}

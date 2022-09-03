@@ -1,0 +1,49 @@
+{
+    "cli": true,
+    "target": "directory",
+    "adapterName": "artnetdmx",
+    "title": "Artnet-DMX",
+    "keywords": [
+        "artnet",
+        "dmx",
+        "light"
+    ],
+    "contributors": [
+        "ChriD"
+    ],
+    "expert": "yes",
+    "features": [
+        "adapter"
+    ],
+    "adminFeatures": [
+        "tab"
+    ],
+    "type": "lighting",
+    "startMode": "daemon",
+    "connectionType": "local",
+    "dataSource": "poll",
+    "connectionIndicator": "yes",
+    "language": "JavaScript",
+    "nodeVersion": "16",
+    "adminUi": "html",
+    "tabReact": "no",
+    "tools": [
+        "ESLint",
+        "type checking"
+    ],
+    "i18n": "words.js",
+    "releaseScript": "yes",
+    "devServer": "no",
+    "indentation": "Space (4)",
+    "quotes": "single",
+    "es6class": "yes",
+    "authorName": "ChriD",
+    "authorGithub": "ChriD",
+    "authorEmail": "chris_d85@hotmail.com",
+    "gitRemoteProtocol": "HTTPS",
+    "gitCommit": "no",
+    "defaultBranch": "main",
+    "license": "MIT License",
+    "dependabot": "no",
+    "creatorVersion": "2.2.0"
+}
