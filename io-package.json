@@ -62,6 +62,8 @@
         "compact": true,
         "connectionType": "local",
         "dataSource": "poll",
+        "messagebox": true,
+        "subscribe": "messagebox",
         "adminUI": {
             "config": "materialize",
             "tab": "materialize"
