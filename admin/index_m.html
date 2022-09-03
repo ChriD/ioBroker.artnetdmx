@@ -101,7 +101,7 @@
         {
             console.log("***REQUEST***")
             window.isProcessingRequest = true; // add Timeout
-            sendTo(null, "requestLightObjects", null, function (_result) {
+            sendTo(null, "message", null, function (_result) {
                     console.log("***RESPONSE***")
                        console.log(_result)
                     });

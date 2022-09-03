@@ -32,7 +32,10 @@ class Artnetdmx extends utils.Adapter {
      * Is called when databases are connected and adapter received configuration.
      */
     async onReady() {
+
         // Initialize your adapter here
+
+        // Subscribe to every state and fill internal state info object for the devices
 
         // Reset the connection indicator during startup
         this.setState('info.connection', false, true);
@@ -212,9 +215,10 @@ class Artnetdmx extends utils.Adapter {
      // New message arrived. obj is array with current messages
     // triggered from admin page read in knx project
     onMessage(obj) {
+        this.log.info('incoming message');
         if (typeof obj === 'object') {
             switch (obj.command) {
-                case 'requestLightObjects':
+                case 'message':
                             if (obj.callback) {
                                 this.sendTo(obj.from, obj.command, { 'test' : 'this is a test' }, obj.callback);
                             }
