@@ -45,6 +45,8 @@ class Artnetdmx extends utils.Adapter {
 
 
         // TEST: @@@
+
+        // TODO:        
         
 
 
@@ -69,7 +71,7 @@ class Artnetdmx extends utils.Adapter {
             type: 'state',
             common: {
                 name: 'fadeTime',
-                type: 'boolean',
+                type: 'number',
                 role: 'state',
                 read: true,
                 write: true,
@@ -81,7 +83,7 @@ class Artnetdmx extends utils.Adapter {
             type: 'state',
             common: {
                 name: 'testVariable',
-                type: 'boolean',
+                type: 'number',
                 role: 'indicator',
                 read: true,
                 write: true,

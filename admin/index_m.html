@@ -18,8 +18,15 @@
     <script type="text/javascript" src="words.js"></script>
 
     <script type="text/javascript">
+
         // This will be called by the admin adapter when the settings page loads
         function load(settings, onChange) {
+    
+            let objID = 'artnetdmx.0.devices';
+            servConn.getStates(objID, (error, states) => {
+                let stateValue = states[objID];
+            });
+
             // example: select elements with id=key and class=value and insert value
             if (!settings) return;
             $('.value').each(function () {
@@ -59,9 +66,12 @@
             });
             callback(obj);
         }
+
+        
     </script>
 
-<!--
+
+
 <style>
     .sub-title {
         margin-top: 2rem!important;
@@ -78,7 +88,7 @@
         height: calc(100% - 34px) !important;
     }
 </style>
--->
+
 
 </head>
 
