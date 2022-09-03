@@ -36,21 +36,24 @@
             //servConn.getStates(objID, (error, states) => {
             //    let stateValue = states[objID];
             //});
-            socket.emit('getObject', objID + ".*", function (err, obj) {
+            socket.emit('getObject', "artnetdmx.0.lights", function (err, obj) {
                 console.log("HURAY2?");
                 console.log(err);
                 console.log(obj);
             });
 
-            let selector = $('channel[state.id=artnetdmx.0.lights.Bedrom.*]'); 
+            let selector = $('artnetdmx.0.lights.*'); 
             selector.each(function (id, i) {
                 log("State: " + id + " - Wert: " + getState(id).val);
             });
 
-            selector = $('device[state.id=artnetdmx.0.lights.Bedrom.*]'); 
+            selector = $('artnetdmx.0.lights.Bedrom.*]'); 
             selector.each(function (id, i) {
                 log("State: " + id + " - Wert: " + getState(id).val);
             });
+
+
+            requestLightObjects();
 
             // example: select elements with id=key and class=value and insert value
             if (!settings) return;
@@ -90,6 +93,15 @@
                 }
             });
             callback(obj);
+        }
+
+
+        function requestLightObjects()
+        {
+            window.isProcessingRequest = true; // add Timeout
+            sendTo(null, "requestLightObjects", null, function (_result) {
+                       console.log(_result)
+                    });
         }
 
         

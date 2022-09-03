@@ -208,6 +208,22 @@ class Artnetdmx extends utils.Adapter {
     //     }
     // }
 
+
+     // New message arrived. obj is array with current messages
+    // triggered from admin page read in knx project
+    onMessage(obj) {
+        if (typeof obj === 'object') {
+            switch (obj.command) {
+                case 'requestLightObjects':
+                            if (obj.callback) {
+                                this.sendTo(obj.from, obj.command, { 'test' : 'this is a test' }, obj.callback);
+                            }
+                    break;            
+            }
+        }
+        return true;
+    }
+
 }
 
 if (require.main !== module) {
