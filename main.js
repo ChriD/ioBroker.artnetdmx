@@ -33,6 +33,34 @@ class Artnetdmx extends utils.Adapter {
 
     async buildDeviceSettingsFromAdapterObjects()
     {
+        try
+        {
+            let devices = this.getDevicesAsync();
+            for (const device of devices)
+            {
+                let states = this.getStatesAsync(device._id + '.settings.*');
+
+                let settingsObject = {};
+                for (const [key, state] of Object.entries(states)){
+                    settingsObject[key.split('.').pop()] = state ? state.val : null;
+                }
+
+                this.deviceSettings.push({
+                    'id' : device._id,
+                    'deviceId' : (device._id).split('.').pop(),
+                    'name' : device.common.name,
+                    'settings' : settingsObject
+                });
+
+                this.log.warn(JSON.stringify(this.deviceSettings));
+            }
+        }
+        catch(_error)
+        {
+            this.log.error(_error.message);
+        }
+
+        /*
         return new Promise((_resolve, _reject) => {
             // TODO: @@@getDevicesAsync
             this.getDevices(async (_err, _devices) => {
@@ -75,6 +103,7 @@ class Artnetdmx extends utils.Adapter {
                 }
             });
          });
+         */
     }
 
     /**
