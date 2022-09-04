@@ -33,6 +33,10 @@ class Artnetdmx extends utils.Adapter {
      */
     async onReady() {
 
+        this.getDevices((_result) => {
+            this.log.warn(_result);
+        });
+
         // Initialize your adapter here
 
         // Subscribe to every state and fill internal state info object for the devices
@@ -49,7 +53,7 @@ class Artnetdmx extends utils.Adapter {
 
         // TEST: @@@
 
-        // TODO:        
+        // TODO: channel     
         
 
 
@@ -219,11 +223,18 @@ class Artnetdmx extends utils.Adapter {
         if (typeof obj === 'object') {
             switch (obj.command) {
                 case 'message':
-
+                /*
                 let selector = $('artnetdmx.0.lights.*'); 
                     selector.each(function (id, i) {
                         this.log.info(id);
                     });
+                    */
+                    //https://github.com/ioBroker/ioBroker.simple-api/blob/master/lib/simpleapi.js
+                    // this.getForeignStates()
+
+                    //https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterdev.md
+                    //getDevices(**)
+                    // -> getStates()
         
 
 
