@@ -45,12 +45,21 @@ class Artnetdmx extends utils.Adapter {
                         for (const device of _devices)
                         {
                             this.log.warn(JSON.stringify(device));
-                            this.getStates(device._id + '.Settings.*', (_err, _states) => {
-                                this.log.warn(JSON.stringify(_states));
+                            this.getStates(device._id + '.settings.*', (_err, _states) => {
+
+                                let settingsObject;
+                                for (const [key, state] of Object.entries(_states)){
+                                    console.log(`${key}: ${state}`);
+                                    settingsObject[key.split('.').pop()] = state.val;
+                                }
+
                                 this.deviceSettings.push({
                                     'id' : device._id,
-                                    'name' : device.common.name
+                                    'name' : device.common.name,
+                                    'settings' : settingsObject
                                 });
+
+                                this.log.warn(JSON.stringify(this.deviceSettings));
                             });
                         }
                     }
@@ -106,7 +115,7 @@ class Artnetdmx extends utils.Adapter {
             native: {},
         });
 
-        await this.setObjectNotExistsAsync('lights.Kitchen.Settings', {
+        await this.setObjectNotExistsAsync('lights.Kitchen.settings', {
             type: 'channel',
             common: {
                 name: 'Settings'                
@@ -122,7 +131,7 @@ class Artnetdmx extends utils.Adapter {
             native: {},
         });
 
-        await this.setObjectNotExistsAsync('lights.Bedrom.Settings', {
+        await this.setObjectNotExistsAsync('lights.Bedrom.settings', {
             type: 'channel',
             common: {
                 name: 'Settings'                
@@ -131,7 +140,7 @@ class Artnetdmx extends utils.Adapter {
         });
 
 
-        await this.setObjectNotExistsAsync('lights.Kitchen.Settings.fadeTime', {
+        await this.setObjectNotExistsAsync('lights.Kitchen.settings.fadeTime', {
             type: 'state',
             common: {
                 name: 'fadeTime',
@@ -143,7 +152,7 @@ class Artnetdmx extends utils.Adapter {
             native: {},
         });
 
-        await this.setObjectNotExistsAsync('lights.Bedrom.Settings.fadeTime', {
+        await this.setObjectNotExistsAsync('lights.Bedrom.settings.fadeTime', {
             type: 'state',
             common: {
                 name: 'fadeTime',
