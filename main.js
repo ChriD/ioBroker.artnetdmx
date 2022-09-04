@@ -49,7 +49,7 @@ class Artnetdmx extends utils.Adapter {
 
                                 let settingsObject = {};
                                 for (const [key, state] of Object.entries(_states)){
-                                    settingsObject[key.split('.').pop()] = states[key].val;
+                                    settingsObject[key.split('.').pop()] = _states[key].val;
                                 }
 
                                 this.deviceSettings.push({
