@@ -33,8 +33,10 @@ class Artnetdmx extends utils.Adapter {
      */
     async onReady() {
 
-        this.getDevices((_result) => {
-            this.log.warn(_result);
+        var self = this;
+        this.getDevices(function (err, devices) {
+            self.log.warn(devices);
+            self.log.warn(err);
         });
 
         // Initialize your adapter here
