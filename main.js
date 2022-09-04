@@ -44,7 +44,8 @@ class Artnetdmx extends utils.Adapter {
                     {
                         for (const device of _devices)
                         {
-                            this.getStates(device._id + '.settings.*', (_err, _states) => {
+                            this.log.warn(JSON.stringify(device));
+                            this.getStates(device._id + '.Settings.*', (_err, _states) => {
                                 this.log.warn(JSON.stringify(_states));
                                 this.deviceSettings.push({
                                     'id' : device._id,
