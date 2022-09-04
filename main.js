@@ -35,10 +35,10 @@ class Artnetdmx extends utils.Adapter {
     {
         try
         {
-            let devices = this.getDevicesAsync();
+            let devices = await this.getDevicesAsync();
             for (const device of devices)
             {
-                let states = this.getStatesAsync(device._id + '.settings.*');
+                let states = await this.getStatesAsync(device._id + '.settings.*');
 
                 let settingsObject = {};
                 for (const [key, state] of Object.entries(states)){
