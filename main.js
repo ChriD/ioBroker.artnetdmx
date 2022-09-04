@@ -47,10 +47,12 @@ class Artnetdmx extends utils.Adapter {
                             this.log.warn(JSON.stringify(device));
                             this.getStates(device._id + '.settings.*', (_err, _states) => {
 
+                                this.log.warn(JSON.stringify(_states));
+
                                 let settingsObject = {};
-                                for (const [key, state] of Object.entries(_states)){
-                                    settingsObject[key.split('.').pop()] = _states[key].val;
-                                }
+                                //for (const [key, state] of Object.entries(_states)){
+                                //    settingsObject[key.split('.').pop()] = _states[key].val;
+                                //}
 
                                 this.deviceSettings.push({
                                     'id' : device._id,
@@ -58,7 +60,7 @@ class Artnetdmx extends utils.Adapter {
                                     'settings' : settingsObject
                                 });
 
-                                this.log.warn(JSON.stringify(this.deviceSettings));
+                                //this.log.warn(JSON.stringify(this.deviceSettings));
                             });
                         }
                     }
