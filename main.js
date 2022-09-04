@@ -47,10 +47,12 @@ class Artnetdmx extends utils.Adapter {
                             this.log.warn(JSON.stringify(device));
                             this.getStates(device._id + '.settings.*', (_err, _states) => {
 
-                                let settingsObject;
+                                let settingsObject = {};
                                 for (const [key, state] of Object.entries(_states)){
-                                    console.log(`${key}: ${state}`);
-                                    settingsObject[key.split('.').pop()] = state.val;
+                                    this.log.warn(key);
+                                    this.log.warn(state);
+                                    //console.log(`${key}: ${state}`);
+                                    //settingsObject[key.split('.').pop()] = state.val;
                                 }
 
                                 this.deviceSettings.push({
