@@ -21,6 +21,9 @@ class Artnetdmx extends utils.Adapter {
             ...options,
             name: 'artnetdmx',
         });
+
+        this.deviceSettings = {};
+
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('objectChange', this.onObjectChange.bind(this));
@@ -28,16 +31,30 @@ class Artnetdmx extends utils.Adapter {
         this.on('unload', this.onUnload.bind(this));
     }
 
+    async buildDeviceSettings()
+    {
+        return new Promise((_resolve, _reject) => {
+            this.getDevices((_err, _devices) => {
+                if(_err)
+                {
+                    _reject(_err);
+                }
+                {
+                    this.log.warn(JSON.stringify(_devices));
+                    _resolve();
+                }
+            });            
+         });
+    }
+
     /**
      * Is called when databases are connected and adapter received configuration.
      */
     async onReady() {
-
-        var self = this;
-        this.getDevices(function (err, devices) {
-            self.log.warn(devices);
-            self.log.warn(err);
-        });
+        
+        // build device settings object for the admin page (the device list will be created from the devices 
+        // in the object list)
+        await this.buildDeviceSettings();
 
         // Initialize your adapter here
 
