@@ -31,9 +31,10 @@ class Artnetdmx extends utils.Adapter {
         this.on('unload', this.onUnload.bind(this));
     }
 
-    async buildDeviceSettings()
+    async buildDeviceSettingsFromAdapterObjects()
     {
         return new Promise((_resolve, _reject) => {
+            // TODO: @@@getDevicesAsync
             this.getDevices(async (_err, _devices) => {
                 if(_err)
                 {
@@ -45,6 +46,7 @@ class Artnetdmx extends utils.Adapter {
                         for (const device of _devices)
                         {
                             this.log.warn(JSON.stringify(device));
+                            // TODO: getStatesAsync
                             this.getStates(device._id + '.settings.*', (_err, _states) => {
 
                                 //this.log.warn(JSON.stringify(_states));
@@ -56,6 +58,7 @@ class Artnetdmx extends utils.Adapter {
 
                                 this.deviceSettings.push({
                                     'id' : device._id,
+                                    'deviceId' : (device._id).split('.').pop(),
                                     'name' : device.common.name,
                                     'settings' : settingsObject
                                 });
@@ -168,9 +171,13 @@ class Artnetdmx extends utils.Adapter {
 
 
 
-        // build device settings object for the admin page (the device list will be created from the devices 
-        // in the object list)
-        await this.buildDeviceSettings();
+        // build device settings object for the admin page (the device list will be created from the devices in the object list)
+        // the admin page will show the devices defined in the object list and the values of the settings given in the "settings"
+        // channel of the device
+        await this.buildDeviceSettingsFromAdapterObjects();
+
+        // subscribe to all 'settings' states in the adapter
+        this.subscribeStates('*');
 
 
         // In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
