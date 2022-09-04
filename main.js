@@ -40,26 +40,26 @@ class Artnetdmx extends utils.Adapter {
                     _reject(_err);
                 }
                 {
-                    
-                    
-                    for (const device of _devices){
-
-                        const states = await this.getStates(device._id + '.settings')
-                        this.log.warn(JSON.stringify(states));
-                        // get settings channel
-
-                        // get values channel (R,G,B,W,brightness)
-
-                        this.deviceSettings.push({
-                            'id' : device._id,
-                            'name' : device.common.name
-                        });
+                    try
+                    {
+                        for (const device of _devices)
+                        {
+                            this.getStates(device._id + '.settings.*', (_err, _states) => {
+                                this.log.warn(JSON.stringify(_states));
+                                this.deviceSettings.push({
+                                    'id' : device._id,
+                                    'name' : device.common.name
+                                });
+                            });
+                        }
                     }
-                    
-                    this.log.warn(JSON.stringify(this.deviceSettings));
+                    catch (err)
+                    {
+                        this.log.error(JSON.stringify(err));
+                    }
                     _resolve();
                 }
-            });            
+            });
          });
     }
 
