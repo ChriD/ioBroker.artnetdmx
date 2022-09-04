@@ -34,7 +34,7 @@ class Artnetdmx extends utils.Adapter {
     async buildDeviceSettings()
     {
         return new Promise((_resolve, _reject) => {
-            this.getDevices((_err, _devices) => {
+            this.getDevices(async (_err, _devices) => {
                 if(_err)
                 {
                     _reject(_err);
@@ -53,7 +53,7 @@ class Artnetdmx extends utils.Adapter {
                         this.deviceSettings.push({
                             'id' : device._id,
                             'name' : device.common.name
-                        }) 
+                        });
                     }
                     
                     this.log.warn(JSON.stringify(this.deviceSettings));
