@@ -22,7 +22,7 @@ class Artnetdmx extends utils.Adapter {
             name: 'artnetdmx',
         });
 
-        this.deviceSettings = {};
+        this.deviceSettings = [];
 
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
@@ -40,7 +40,23 @@ class Artnetdmx extends utils.Adapter {
                     _reject(_err);
                 }
                 {
-                    this.log.warn(JSON.stringify(_devices));
+                    
+                    
+                    for (const device of _devices){
+
+                        const states = await this.getStates(device._id + '.settings')
+                        this.log.warn(JSON.stringify(states));
+                        // get settings channel
+
+                        // get values channel (R,G,B,W,brightness)
+
+                        this.deviceSettings.push({
+                            'id' : device._id,
+                            'name' : device.common.name
+                        }) 
+                    }
+                    
+                    this.log.warn(JSON.stringify(this.deviceSettings));
                     _resolve();
                 }
             });            
@@ -52,9 +68,7 @@ class Artnetdmx extends utils.Adapter {
      */
     async onReady() {
         
-        // build device settings object for the admin page (the device list will be created from the devices 
-        // in the object list)
-        await this.buildDeviceSettings();
+        
 
         // Initialize your adapter here
 
@@ -91,6 +105,14 @@ class Artnetdmx extends utils.Adapter {
             native: {},
         });
 
+        await this.setObjectNotExistsAsync('lights.Kitchen.Settings', {
+            type: 'channel',
+            common: {
+                name: 'Settings'                
+            },
+            native: {},
+        });
+
         await this.setObjectNotExistsAsync('lights.Bedrom', {
             type: 'device',
             common: {
@@ -99,8 +121,16 @@ class Artnetdmx extends utils.Adapter {
             native: {},
         });
 
+        await this.setObjectNotExistsAsync('lights.Bedrom.Settings', {
+            type: 'channel',
+            common: {
+                name: 'Settings'                
+            },
+            native: {},
+        });
 
-        await this.setObjectNotExistsAsync('lights.Kitchen.fadeTime', {
+
+        await this.setObjectNotExistsAsync('lights.Kitchen.Settings.fadeTime', {
             type: 'state',
             common: {
                 name: 'fadeTime',
@@ -112,7 +142,7 @@ class Artnetdmx extends utils.Adapter {
             native: {},
         });
 
-        await this.setObjectNotExistsAsync('lights.Bedrom.fadeTime', {
+        await this.setObjectNotExistsAsync('lights.Bedrom.Settings.fadeTime', {
             type: 'state',
             common: {
                 name: 'fadeTime',
@@ -125,20 +155,15 @@ class Artnetdmx extends utils.Adapter {
         });
 
 
-        await this.setObjectNotExistsAsync('testVariable', {
-            type: 'state',
-            common: {
-                name: 'testVariable',
-                type: 'number',
-                role: 'indicator',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
+
+
+        // build device settings object for the admin page (the device list will be created from the devices 
+        // in the object list)
+        await this.buildDeviceSettings();
+
 
         // In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
-        this.subscribeStates('testVariable');
+        //this.subscribeStates('testVariable');
         // You can also add a subscription for multiple states. The following line watches all states starting with "lights."
         // this.subscribeStates('lights.*');
         // Or, if you really must, you can also watch all states. Don't do this if you don't need to. Otherwise this will cause a lot of unnecessary load on the system:
@@ -149,21 +174,21 @@ class Artnetdmx extends utils.Adapter {
             you will notice that each setState will cause the stateChange event to fire (because of above subscribeStates cmd)
         */
         // the variable testVariable is set to true as command (ack=false)
-        await this.setStateAsync('testVariable', true);
+        //await this.setStateAsync('testVariable', true);
 
         // same thing, but the value is flagged "ack"
         // ack should be always set to true if the value is received from or acknowledged from the target system
-        await this.setStateAsync('testVariable', { val: true, ack: true });
+        //await this.setStateAsync('testVariable', { val: true, ack: true });
 
         // same thing, but the state is deleted after 30s (getState will return null afterwards)
-        await this.setStateAsync('testVariable', { val: true, ack: true, expire: 30 });
+       // await this.setStateAsync('testVariable', { val: true, ack: true, expire: 30 });
 
         // examples for the checkPassword/checkGroup functions
-        let result = await this.checkPasswordAsync('admin', 'iobroker');
-        this.log.info('check user admin pw iobroker: ' + result);
+        //let result = await this.checkPasswordAsync('admin', 'iobroker');
+        //this.log.info('check user admin pw iobroker: ' + result);
 
-        result = await this.checkGroupAsync('admin', 'admin');
-        this.log.info('check group user admin group admin: ' + result);
+        //result = await this.checkGroupAsync('admin', 'admin');
+        //this.log.info('check group user admin group admin: ' + result);
     }
 
     /**
