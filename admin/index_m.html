@@ -100,9 +100,19 @@
         function requestDeviceSettings()
         {            
             window.isProcessingRequest = true; // TODO: @@@ add Timeout
-            sendTo(null, "requestDeviceSettings", [{ "test" : "abc" }], function (_result) {
-                        console.log("***RESPONSE***")
+            sendTo(null, "requestDeviceSettings", null, function (_result) {
+                        console.log(_result);
+                        window.deviceSettings = _result;
+                        window.isProcessingRequest = false;
+                    });
+        }
+
+        function updateDeviceSettings()
+        {
+            window.isProcessingRequest = true; // TODO: @@@ add Timeout
+            sendTo(null, "updateDeviceSettings", window.deviceSettings, function (_result) {
                         console.log(_result)
+                        window.isProcessingRequest = false;
                     });
         }
 
@@ -202,6 +212,7 @@
                 </div>
 
                 <h6 class="translate sub-title">Devices</h6>
+                <button onclick="updateDeviceSettings()"></button>
                 
             </div>
         </div>

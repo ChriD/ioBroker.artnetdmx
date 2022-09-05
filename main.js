@@ -220,7 +220,7 @@ class Artnetdmx extends utils.Adapter {
                     }
                     break;
 
-                case 'addOrUpdateDevice':
+                case 'updateDeviceSettings':
                     // TODO: add or update the states
                     this.log.warn(obj.message);
                     //this.addOrUpdateDevice();
