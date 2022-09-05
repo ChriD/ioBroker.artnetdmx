@@ -245,14 +245,10 @@ class Artnetdmx extends utils.Adapter {
         // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}
         this.log.warn(JSON.stringify(_device));
 
-        //const deviceIdPath = 'lights.' + _device.deviceId;
-        //const deviceIdSettingsPath = deviceIdPath + '.settings';
-
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
 
         for (const [key, value] of Object.entries( _device.settings)) {
-            console.log(`${key}: ${value}`);
             await this.setObjectHelper('lights.' + _device.deviceId + '.settings' + '.' + key, key, 'number');
             await this.setStateAsync('lights.' + _device.deviceId + '.settings' + '.' + key, { val: value, ack: true });
         }
@@ -276,7 +272,6 @@ class Artnetdmx extends utils.Adapter {
             objectContainer.common.read = true;
             objectContainer.common.write = true;
         }
-
         await this.setObjectNotExistsAsync(_id, objectContainer);
     }
 

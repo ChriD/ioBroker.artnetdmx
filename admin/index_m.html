@@ -22,38 +22,6 @@
         // This will be called by the admin adapter when the settings page loads
         function load(settings, onChange) {
     
-            /*
-            let objID = 'artnetdmx.0.lights.Bedrom';
-            //servConn.getStates(objID, (error, states) => {
-            //    let stateValue = states[objID];
-            //});
-            socket.emit('getObject', objID, function (err, obj) {
-                console.log("HURAY?");
-                console.log(err);
-                console.log(obj);
-            });
-
-            objID = 'artnetdmx.0.lights';
-            //servConn.getStates(objID, (error, states) => {
-            //    let stateValue = states[objID];
-            //});
-            socket.emit('getObject', "artnetdmx.0.lights", function (err, obj) {
-                console.log("HURAY2?");
-                console.log(err);
-                console.log(obj);
-            });
-
-            let selector = $('artnetdmx.0.lights.*'); 
-            selector.each(function (id, i) {
-                log("State: " + id + " - Wert: " + getState(id).val);
-            });
-
-            selector = $('artnetdmx.0.lights.Bedrom.*]'); 
-            selector.each(function (id, i) {
-                log("State: " + id + " - Wert: " + getState(id).val);
-            });
-            */
-
             requestDeviceSettings();
 
             // example: select elements with id=key and class=value and insert value
@@ -103,17 +71,27 @@
             sendTo(null, "requestDeviceSettings", null, function (_result) {
                         console.log(_result);
                         window.deviceSettings = _result;
+                        // draw the rows
                         window.isProcessingRequest = false;
                     });
         }
 
         function updateDeviceSettings()
         {
+            // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}                 
             window.isProcessingRequest = true; // TODO: @@@ add Timeout
             sendTo(null, "updateDeviceSettings", window.deviceSettings, function (_result) {
                         console.log(_result)
                         window.isProcessingRequest = false;
                     });
+        }
+
+        function addDeviceRow(_device)
+        {
+            const elementDeviceTableBody = $('#deviceTableBody');
+            const templateDeviceRow = $('#templateDeviceRow');
+            const newDeviceRow = elementDeviceTableBody.append(templateDeviceRow.content.cloneNode(true));
+            // TODO: @@@
         }
 
         
@@ -153,6 +131,14 @@
         <!-- For example columns with settings: -->
 
 <body>
+
+    <template id="templateDeviceRow">
+        <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+        </tr>
+    </template>
 
     <div class="m adapter-container">
         <div class="main-page row">
@@ -212,7 +198,25 @@
                 </div>
 
                 <h6 class="translate sub-title">Devices</h6>
-                <button onclick="updateDeviceSettings()"></button>
+                <button onclick="updateDeviceSettings()">Update test</button>
+                <button onclick="addDeviceRow()">Add device</button>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Id</th>
+                            <th>Fade Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deviceTableBody">
+                        <tr>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>3</td>
+                        </tr>
+                    </tbody>
+                </table>
                 
             </div>
         </div>
