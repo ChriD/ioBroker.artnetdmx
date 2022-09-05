@@ -71,7 +71,7 @@
             sendTo(null, "requestDeviceSettings", null, function (_result) {
                         console.log(_result);
                         window.deviceSettings = _result;
-                        // draw the rows
+                        // TODO: draw the rows
                         window.isProcessingRequest = false;
                     });
         }
@@ -88,8 +88,8 @@
 
         function addDeviceRow(_device)
         {
-            const elementDeviceTableBody = $('#deviceTableBody');
-            const templateDeviceRow = $('#templateDeviceRow');
+            const elementDeviceTableBody = document.getElementById('#deviceTableBody');            
+            const templateDeviceRow = document.getElementById('templateDeviceRow');
             const newDeviceRow = elementDeviceTableBody.append(templateDeviceRow.content.cloneNode(true));
             // TODO: @@@
         }
