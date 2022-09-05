@@ -211,31 +211,38 @@ class Artnetdmx extends utils.Adapter {
 
     // New message arrived. obj is array with current messages
     // triggered from admin page read in knx project
-    onMessage(obj) {
-        if (typeof obj === 'object'){
-            switch (obj.command) {
+    onMessage(_obj) 
+    {
+        this.handleMessages(_obj)
+        return true;
+    }
+
+    async handleMessages(_obj) 
+    {
+        if (typeof _obj === 'object'){
+            switch (_obj.command) {
                 case 'requestDeviceSettings':
-                    if (obj.callback) {
-                        this.sendTo(obj.from, obj.command, this.deviceSettings, obj.callback);
+                    if (_obj.callback) {
+                        this.sendTo(_obj.from, _obj.command, this.deviceSettings, _obj.callback);
                     }
                     break;
 
                 case 'updateDeviceSettings':
-                    // TODO: add or update the states
-                    this.log.warn(obj.message);
-                    //this.addOrUpdateDevice();
-                    if (obj.callback) {
-                        this.sendTo(obj.from, obj.command, {}, obj.callback);
+                    for (const deviceSetting of _obj.message){
+                        await this.addOrUpdateDevice(deviceSetting);
+                    }
+                    if (_obj.callback) {
+                        this.sendTo(_obj.from, _obj.command, {}, _obj.callback);
                     }
                     break;
             }
         }
-        return true;
     }
 
-    async addOrUpdateDevice(_deviceSettings)
+
+    async addOrUpdateDevice(_deviceSetting)
     {
-        this.log.warn(JSON.stringify(_deviceSettings));
+        this.log.warn(JSON.stringify(_deviceSetting));
         /*
         await this.setObjectNotExistsAsync('lights.Kitchen', {
             type: 'device',
