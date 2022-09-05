@@ -211,13 +211,13 @@ class Artnetdmx extends utils.Adapter {
 
     // New message arrived. obj is array with current messages
     // triggered from admin page read in knx project
-    onMessage(_obj) 
+    onMessage(_obj)
     {
-        this.handleMessages(_obj)
+        this.handleMessages(_obj);
         return true;
     }
 
-    async handleMessages(_obj) 
+    async handleMessages(_obj)
     {
         if (typeof _obj === 'object'){
             switch (_obj.command) {
@@ -240,38 +240,44 @@ class Artnetdmx extends utils.Adapter {
     }
 
 
-    async addOrUpdateDevice(_deviceSetting)
+    async addOrUpdateDevice(_device)
     {
-        this.log.warn(JSON.stringify(_deviceSetting));
-        /*
-        await this.setObjectNotExistsAsync('lights.Kitchen', {
-            type: 'device',
-            common: {
-                name: 'Kitchen Light Surroundings'
-            },
-            native: {},
-        });
+        // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}
+        this.log.warn(JSON.stringify(_device));
 
-        await this.setObjectNotExistsAsync('lights.Kitchen.settings', {
-            type: 'channel',
-            common: {
-                name: 'Settings'
-            },
-            native: {},
-        });
+        //const deviceIdPath = 'lights.' + _device.deviceId;
+        //const deviceIdSettingsPath = deviceIdPath + '.settings';
 
-        await this.setObjectNotExistsAsync('lights.Kitchen.settings.fadeTime', {
-            type: 'state',
+        await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
+
+        for (const [key, value] of Object.entries( _device.settings)) {
+            console.log(`${key}: ${value}`);
+            await this.setObjectHelper('lights.' + _device.deviceId + '.settings' + '.' + key, key, 'number');
+            await this.setStateAsync('lights.' + _device.deviceId + '.settings' + '.' + key, { val: value, ack: true });
+        }
+
+    }
+
+    async setObjectHelper(_id, _name, _type, _stateType)
+    {
+        const objectContainer = {
+            type: _type,
             common: {
-                name: 'fadeTime',
-                type: 'number',
-                role: 'state',
-                read: true,
-                write: true,
+                name: _name
             },
             native: {},
-        });
-        */
+        };
+
+        if(_stateType)
+        {
+            objectContainer.common.type = _stateType;
+            objectContainer.common.role = 'state';
+            objectContainer.common.read = true;
+            objectContainer.common.write = true;
+        }
+
+        await this.setObjectNotExistsAsync(_id, objectContainer);
     }
 
 }
