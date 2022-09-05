@@ -54,7 +54,7 @@
             });
             */
 
-            requestLightObjects();
+            requestDeviceSettings();
 
             // example: select elements with id=key and class=value and insert value
             if (!settings) return;
@@ -97,13 +97,12 @@
         }
 
 
-        function requestLightObjects()
-        {
-            console.log("***REQUEST***")
-            window.isProcessingRequest = true; // add Timeout
-            sendTo(null, "message", null, function (_result) {
-                    console.log("***RESPONSE***")
-                       console.log(_result)
+        function requestDeviceSettings()
+        {            
+            window.isProcessingRequest = true; // TODO: @@@ add Timeout
+            sendTo(null, "requestDeviceSettings", [{ "test" : "abc" }], function (_result) {
+                        console.log("***RESPONSE***")
+                        console.log(_result)
                     });
         }
 

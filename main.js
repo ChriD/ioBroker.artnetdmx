@@ -7,6 +7,7 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
+const { threadId } = require('worker_threads');
 
 // Load your modules here, e.g.:
 // const fs = require("fs");
@@ -35,12 +36,11 @@ class Artnetdmx extends utils.Adapter {
     {
         try
         {
-            let devices = await this.getDevicesAsync();
+            const devices = await this.getDevicesAsync();
             for (const device of devices)
             {
-                let states = await this.getStatesAsync(device._id + '.settings.*');
-
-                let settingsObject = {};
+                const states = await this.getStatesAsync(device._id + '.settings.*');
+                const settingsObject = {};
                 for (const [key, state] of Object.entries(states)){
                     settingsObject[key.split('.').pop()] = state ? state.val : null;
                 }
@@ -59,51 +59,6 @@ class Artnetdmx extends utils.Adapter {
         {
             this.log.error(_error.message);
         }
-
-        /*
-        return new Promise((_resolve, _reject) => {
-            // TODO: @@@getDevicesAsync
-            this.getDevices(async (_err, _devices) => {
-                if(_err)
-                {
-                    _reject(_err);
-                }
-                {
-                    try
-                    {
-                        for (const device of _devices)
-                        {
-                            this.log.warn(JSON.stringify(device));
-                            // TODO: getStatesAsync
-                            this.getStates(device._id + '.settings.*', (_err, _states) => {
-
-                                //this.log.warn(JSON.stringify(_states));
-
-                                let settingsObject = {};
-                                for (const [key, state] of Object.entries(_states)){
-                                    settingsObject[key.split('.').pop()] = state ? state.val : null;
-                                }
-
-                                this.deviceSettings.push({
-                                    'id' : device._id,
-                                    'deviceId' : (device._id).split('.').pop(),
-                                    'name' : device.common.name,
-                                    'settings' : settingsObject
-                                });
-
-                                this.log.warn(JSON.stringify(this.deviceSettings));
-                            });
-                        }
-                    }
-                    catch (err)
-                    {
-                        this.log.error(JSON.stringify(err));
-                    }
-                    _resolve();
-                }
-            });
-         });
-         */
     }
 
     /**
@@ -140,63 +95,7 @@ class Artnetdmx extends utils.Adapter {
         */
     
 
-        await this.setObjectNotExistsAsync('lights.Kitchen', {
-            type: 'device',
-            common: {
-                name: 'Kitchen Light Surroundings'                
-            },
-            native: {},
-        });
-
-        await this.setObjectNotExistsAsync('lights.Kitchen.settings', {
-            type: 'channel',
-            common: {
-                name: 'Settings'                
-            },
-            native: {},
-        });
-
-        await this.setObjectNotExistsAsync('lights.Bedrom', {
-            type: 'device',
-            common: {
-                name: 'Bedroom Main Light'                
-            },
-            native: {},
-        });
-
-        await this.setObjectNotExistsAsync('lights.Bedrom.settings', {
-            type: 'channel',
-            common: {
-                name: 'Settings'                
-            },
-            native: {},
-        });
-
-
-        await this.setObjectNotExistsAsync('lights.Kitchen.settings.fadeTime', {
-            type: 'state',
-            common: {
-                name: 'fadeTime',
-                type: 'number',
-                role: 'state',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-
-        await this.setObjectNotExistsAsync('lights.Bedrom.settings.fadeTime', {
-            type: 'state',
-            common: {
-                name: 'fadeTime',
-                type: 'number',
-                role: 'state',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-
+        
 
 
 
@@ -279,6 +178,9 @@ class Artnetdmx extends utils.Adapter {
      * @param {ioBroker.State | null | undefined} state
      */
     onStateChange(id, state) {
+
+        // TODO: @@@ If a "settings" state was changed we do update the deviceSettings for the admin gui
+
         if (state) {
             // The state was changed
             this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
@@ -307,35 +209,62 @@ class Artnetdmx extends utils.Adapter {
     // }
 
 
-     // New message arrived. obj is array with current messages
+    // New message arrived. obj is array with current messages
     // triggered from admin page read in knx project
     onMessage(obj) {
-        this.log.info('incoming message');
-        if (typeof obj === 'object') {
+        if (typeof obj === 'object'){
             switch (obj.command) {
-                case 'message':
-                /*
-                let selector = $('artnetdmx.0.lights.*'); 
-                    selector.each(function (id, i) {
-                        this.log.info(id);
-                    });
-                    */
-                    //https://github.com/ioBroker/ioBroker.simple-api/blob/master/lib/simpleapi.js
-                    // this.getForeignStates()
+                case 'requestDeviceSettings':
+                    if (obj.callback) {
+                        this.sendTo(obj.from, obj.command, this.deviceSettings, obj.callback);
+                    }
+                    break;
 
-                    //https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterdev.md
-                    //getDevices(**)
-                    // -> getStates()
-        
-
-
-                            if (obj.callback) {
-                                this.sendTo(obj.from, obj.command, { 'test' : 'this is a test' }, obj.callback);
-                            }
-                    break;            
+                case 'addOrUpdateDevice':
+                    // TODO: add or update the states
+                    this.log.warn(obj.message);
+                    //this.addOrUpdateDevice();
+                    if (obj.callback) {
+                        this.sendTo(obj.from, obj.command, {}, obj.callback);
+                    }
+                    break;
             }
         }
         return true;
+    }
+
+    async addOrUpdateDevice(_deviceSettings)
+    {
+        this.log.warn(JSON.stringify(_deviceSettings));
+        /*
+        await this.setObjectNotExistsAsync('lights.Kitchen', {
+            type: 'device',
+            common: {
+                name: 'Kitchen Light Surroundings'
+            },
+            native: {},
+        });
+
+        await this.setObjectNotExistsAsync('lights.Kitchen.settings', {
+            type: 'channel',
+            common: {
+                name: 'Settings'
+            },
+            native: {},
+        });
+
+        await this.setObjectNotExistsAsync('lights.Kitchen.settings.fadeTime', {
+            type: 'state',
+            common: {
+                name: 'fadeTime',
+                type: 'number',
+                role: 'state',
+                read: true,
+                write: true,
+            },
+            native: {},
+        });
+        */
     }
 
 }
