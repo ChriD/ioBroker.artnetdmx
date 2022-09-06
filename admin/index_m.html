@@ -135,8 +135,14 @@
         function updateDeviceSettings()
         {
             const tableValues = table2values('devices');
-            const flattedTableValues = flattenObject(tableValues);
-            const devices = unflattenObject(flattedTableValues);
+            /*const flattedTableValues = flattenObject(tableValues);
+            const devices = unflattenObject(flattedTableValues);*/arguments
+            let devices = new Array();
+            for (const device of tableValues)
+            {
+                devices.push(unflattenObject(device));  
+            }      
+
             console.log(devices);
 
             // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}                 

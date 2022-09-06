@@ -229,9 +229,9 @@ class Artnetdmx extends utils.Adapter {
 
                 case 'updateDeviceSettings':
                     this.log.warn(JSON.stringify(_obj));
-                    //for (const deviceSetting of _obj.message){
-                    //    await this.addOrUpdateDevice(deviceSetting);
-                    //}
+                    for (const deviceSetting of _obj.message){
+                        await this.addOrUpdateDevice(deviceSetting);
+                    }
                     if (_obj.callback) {
                         this.sendTo(_obj.from, _obj.command, {}, _obj.callback);
                     }
