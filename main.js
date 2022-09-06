@@ -52,7 +52,7 @@ class Artnetdmx extends utils.Adapter {
                     'settings' : settingsObject
                 });
 
-                this.log.warn(JSON.stringify(this.deviceSettings));
+                //this.log.warn(JSON.stringify(this.deviceSettings));
             }
         }
         catch(_error)
