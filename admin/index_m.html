@@ -111,7 +111,11 @@
                         
                         // prepare result for table creation
                         // TODO: @@@
-                        const devices = flattenObject(_result);                        
+                        let devices = new Array();
+                        for (const device of _result)
+                        {
+                            devices.push(flattenObject(device));  
+                        }                             
                         values2table('devices', devices, onChange);
 
 
