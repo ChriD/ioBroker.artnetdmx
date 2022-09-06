@@ -135,11 +135,12 @@
         function updateDeviceSettings()
         {
             const tableValues = table2values('devices');
-            console.log(tableValues);
+            const devices = unflattenObject(tableValues);
+            console.log(devices);
 
             // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}                 
             window.isProcessingRequest = true; // TODO: @@@ add Timeout
-            sendTo(null, "updateDeviceSettings", window.deviceSettings, function (_result) {
+            sendTo(null, "updateDeviceSettings", devices, function (_result) {
                         console.log(_result)
                         window.isProcessingRequest = false;
                     });
