@@ -36,6 +36,8 @@ class Artnetdmx extends utils.Adapter {
     {
         try
         {
+            this.deviceSettings = [];
+
             const devices = await this.getDevicesAsync();
             for (const device of devices)
             {
@@ -234,6 +236,9 @@ class Artnetdmx extends utils.Adapter {
                     for (const deviceSetting of _obj.message){
                         await this.addOrUpdateDevice(deviceSetting);
                     }
+
+                    await this.buildDeviceSettingsFromAdapterObjects();
+
                     if (_obj.callback) {
                         this.sendTo(_obj.from, _obj.command, {}, _obj.callback);
                     }
