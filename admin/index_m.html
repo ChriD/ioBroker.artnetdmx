@@ -15,7 +15,9 @@
 
     <!-- Load our own files -->
     <link rel="stylesheet" type="text/css" href="style.css" />
+    <script type="text/javascript" src="objectHelpers.js"></script>
     <script type="text/javascript" src="words.js"></script>
+
 
     <script type="text/javascript">
 
@@ -66,13 +68,38 @@
 
             // TODO: Send changes of devices to adapter for saveing            
 
-            //updateDeviceSettings();
-
-            let tableValues = table2values('devices');
-            console.log(tableValues);
+            updateDeviceSettings();           
 
             callback(obj);
         }
+
+        /*
+        function flattenObject(_obj, _path = '', _newObj = {})
+        {
+            for (const [key, value] of Object.entries(_obj)) 
+            {
+                if(typeof value === 'object' && !Array.isArray(value) && value !== null)
+                {
+                    _newObj = flattenObject(value, _path ? _path + '.' + key : key, _newObj);
+                }
+                else 
+                {
+                    _newObj[_path ? _path + '.' + key : key] = value;
+                }
+            } 
+            return _newObj;
+        }
+
+        function unflattenObject(_obj, _newObj = {})
+        {
+            for (const [key, value] of Object.entries(_obj)) 
+            {
+                if()
+                _newObj[key] = value;                
+            } 
+            return _newObj;
+        }
+        */
 
 
         function requestDeviceSettings(onChange)
@@ -82,28 +109,30 @@
                         console.log(_result);
                         window.deviceSettings = _result;
                         
-                        // prepare dresult for table creation
+                        // prepare result for table creation
                         // TODO: @@@
-
-                        // TODO: draw the rows
-                        //this.generateDeviceSettingsTable(_result)
-                        values2table('devices', _result, onChange);
+                        const devices = flattenObject(_result);                        
+                        values2table('devices', devices, onChange);
 
 
                         window.isProcessingRequest = false;
                     });
         }
 
+        /*
         function generateDeviceSettingsTable(_devices)
         {
             for (const device of _devices)
             {
                 this.addDeviceRow(device);
             }
-        }
+        }*/
 
         function updateDeviceSettings()
         {
+            const tableValues = table2values('devices');
+            console.log(tableValues);
+
             // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}                 
             window.isProcessingRequest = true; // TODO: @@@ add Timeout
             sendTo(null, "updateDeviceSettings", window.deviceSettings, function (_result) {
@@ -112,6 +141,7 @@
                     });
         }
 
+        /*
         function addDeviceRow(_device)
         {
             const elementDeviceTableBody = document.getElementById('deviceTableBody');            
@@ -128,6 +158,7 @@
             const newDeviceRow = elementDeviceTableBody.append(deviceRowNode);
             return newDeviceRow;
         }
+        */
 
         
     </script>
@@ -167,6 +198,7 @@
 
 <body>
 
+    <!--
     <template id="templateDeviceRow">
         <tr>
             <td><input placeholder="Id" id="deviceId" type="text" class="validate"></td>
@@ -174,6 +206,7 @@
             <td><input placeholder="0" id="fadeTime" type="number" class="validate"></td>
         </tr>
     </template>
+    -->
 
     <div class="m adapter-container">
         <div class="main-page row">
@@ -260,8 +293,8 @@
                                 <th data-name="_index"   style="width: 40px"  class="translate"></th>
                                 <!--<th data-name="enabled"  style="width: 70px" data-style="width: 70px" data-type="checkbox" class="translate">Enabled</th>-->
                                 <th data-name="name"     class="translate">Name</th>
-                                <th data-name="id"     class="translate">Id</th>                                                                
-                                <th data-name="fadeTime"     class="translate">FadeTime</th>
+                                <th data-name="deviceId"     class="translate">Id</th>                                                                
+                                <th data-name="settings.fadeTime"     class="translate">FadeTime</th>
                                 <th data-buttons="delete up down" style="width: 120px"></th>
                             </tr>
                             </thead>
