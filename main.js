@@ -219,7 +219,7 @@ class Artnetdmx extends utils.Adapter {
 
     async handleMessages(_obj)
     {
-        this.log.warn(JSON.stringify(_obj));
+        //this.log.warn(JSON.stringify(_obj));
 
         if (typeof _obj === 'object'){
             switch (_obj.command) {
@@ -230,7 +230,7 @@ class Artnetdmx extends utils.Adapter {
                     break;
 
                 case 'updateDeviceSettings':
-                    this.log.warn(JSON.stringify(_obj));
+                    //this.log.warn(JSON.stringify(_obj));
                     for (const deviceSetting of _obj.message){
                         await this.addOrUpdateDevice(deviceSetting);
                     }
@@ -252,7 +252,7 @@ class Artnetdmx extends utils.Adapter {
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
 
         for (const [key, value] of Object.entries( _device.settings)) {
-            await this.setObjectHelper('lights.' + _device.deviceId + '.settings' + '.' + key, key, 'config', 'number');
+            await this.setObjectHelper('lights.' + _device.deviceId + '.settings' + '.' + key, key, 'state', 'number');
             await this.setStateAsync('lights.' + _device.deviceId + '.settings' + '.' + key, { val: value, ack: true });
         }
 
