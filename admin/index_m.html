@@ -61,6 +61,10 @@
                     obj[$this.attr('id')] = $this.val();
                 }
             });
+
+            // TODO: Send changes of devices to adapter for saveing
+            updateDeviceSettings();
+
             callback(obj);
         }
 
@@ -87,10 +91,6 @@
             {
                 this.addDeviceRow(device);
             }
-
-            //<td><input placeholder="Id" id="deviceId" type="text" class="validate"></td>
-            //<td><input placeholder="Name" id="deviceName" type="text" class="validate"></td>
-            //<td><input placeholder="0" id="fadeTime" type="number" class="validate"></td>
         }
 
         function updateDeviceSettings()
@@ -160,9 +160,9 @@
 
     <template id="templateDeviceRow">
         <tr>
-            <td><input placeholder="Id" id="deviceId" type="text" class="validate"></td>
-            <td><input placeholder="Name" id="name" type="text" class="validate"></td>
-            <td><input placeholder="0" id="fadeTime" type="number" class="validate"></td>
+            <td><input placeholder="Id" id="deviceId" type="text" class="validate input-field"></td>
+            <td><input placeholder="Name" id="name" type="text" class="validate input-field"></td>
+            <td><input placeholder="0" id="fadeTime" type="number" class="validate input-field"></td>
         </tr>
     </template>
 
