@@ -265,7 +265,8 @@ class Artnetdmx extends utils.Adapter {
             }
         }
 
-        for (const [key, value] of Object.entries( _device.settings.channels)) {
+        for (const [key, value] of Object.entries( _device.settings.channel)) {
+            // TODO: use typof value to get correct type!!!
             await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel' + '.' + key, key, 'state', (key == 'type') ? 'string' : 'number');
             await this.setStateAsync('lights.' + _device.deviceId + '.settings.channel' + '.' + key, { val: value, ack: true });
         }
