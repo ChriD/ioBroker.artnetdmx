@@ -82,10 +82,12 @@
                         console.log(_result);
                         window.deviceSettings = _result;
                         
-                        
+                        // prepare dresult for table creation
+                        // TODO: @@@
+
                         // TODO: draw the rows
                         //this.generateDeviceSettingsTable(_result)
-                        values2table('devices', _devices, onChange);
+                        values2table('devices', _result, onChange);
 
 
                         window.isProcessingRequest = false;
