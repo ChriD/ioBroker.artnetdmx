@@ -71,9 +71,26 @@
             sendTo(null, "requestDeviceSettings", null, function (_result) {
                         console.log(_result);
                         window.deviceSettings = _result;
+                        
+                        
                         // TODO: draw the rows
+                        this.generateDeviceSettingsTable(_result)
+
+
                         window.isProcessingRequest = false;
                     });
+        }
+
+        function generateDeviceSettingsTable(_devices)
+        {
+            for (const device of _devices)
+            {
+                this.addDeviceRow(device);
+            }
+
+            //<td><input placeholder="Id" id="deviceId" type="text" class="validate"></td>
+            //<td><input placeholder="Name" id="deviceName" type="text" class="validate"></td>
+            //<td><input placeholder="0" id="fadeTime" type="number" class="validate"></td>
         }
 
         function updateDeviceSettings()
@@ -88,10 +105,19 @@
 
         function addDeviceRow(_device)
         {
-            const elementDeviceTableBody = document.getElementById('#deviceTableBody');            
+            const elementDeviceTableBody = document.getElementById('deviceTableBody');            
             const templateDeviceRow = document.getElementById('templateDeviceRow');
-            const newDeviceRow = elementDeviceTableBody.append(templateDeviceRow.content.cloneNode(true));
-            // TODO: @@@
+            const deviceRowNode = templateDeviceRow.content.cloneNode(true)
+            
+            if(_device)
+            {
+                deviceRowNode.getElementById('deviceId').value = _device.deviceId;
+                deviceRowNode.getElementById('name').value = _device.name;
+                deviceRowNode.getElementById('fadeTime').value = _device.settings.fadeTime;
+            }
+
+            const newDeviceRow = elementDeviceTableBody.append(deviceRowNode);
+            return newDeviceRow;
         }
 
         
@@ -134,9 +160,9 @@
 
     <template id="templateDeviceRow">
         <tr>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
+            <td><input placeholder="Id" id="deviceId" type="text" class="validate"></td>
+            <td><input placeholder="Name" id="deviceName" type="text" class="validate"></td>
+            <td><input placeholder="0" id="fadeTime" type="number" class="validate"></td>
         </tr>
     </template>
 
@@ -199,7 +225,7 @@
 
                 <h6 class="translate sub-title">Devices</h6>
                 <button onclick="updateDeviceSettings()">Update test</button>
-                <button onclick="addDeviceRow()">Add device</button>
+                <button onclick="addDeviceRow(null)">Add device</button>
 
                 <table>
                     <thead>
@@ -210,11 +236,7 @@
                         </tr>
                     </thead>
                     <tbody id="deviceTableBody">
-                        <tr>
-                          <td>1</td>
-                          <td>2</td>
-                          <td>3</td>
-                        </tr>
+                        <!-- -->     
                     </tbody>
                 </table>
                 

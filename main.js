@@ -243,7 +243,7 @@ class Artnetdmx extends utils.Adapter {
     async addOrUpdateDevice(_device)
     {
         // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}
-        this.log.warn(JSON.stringify(_device));
+        //this.log.warn(JSON.stringify(_device));
 
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
@@ -252,6 +252,8 @@ class Artnetdmx extends utils.Adapter {
             await this.setObjectHelper('lights.' + _device.deviceId + '.settings' + '.' + key, key, 'number');
             await this.setStateAsync('lights.' + _device.deviceId + '.settings' + '.' + key, { val: value, ack: true });
         }
+
+        // TODO: clear devices not in settings (do by parameter)
 
     }
 
