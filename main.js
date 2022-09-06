@@ -251,7 +251,7 @@ class Artnetdmx extends utils.Adapter {
     async addOrUpdateDevice(_device)
     {
         // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}
-        //this.log.warn(JSON.stringify(_device));
+        this.log.warn(JSON.stringify(_device));
 
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
@@ -266,8 +266,8 @@ class Artnetdmx extends utils.Adapter {
         }
 
         for (const [key, value] of Object.entries( _device.settings.channels)) {
-            await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channels' + '.' + key, key, 'state', 'number');
-            await this.setStateAsync('lights.' + _device.deviceId + '.settings.channels' + '.' + key, { val: value, ack: true });
+            await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel' + '.' + key, key, 'state', (key == 'type') ? 'string' : 'number');
+            await this.setStateAsync('lights.' + _device.deviceId + '.settings.channel' + '.' + key, { val: value, ack: true });
         }
 
         // TODO: clear devices not in settings (do by parameter)
@@ -291,7 +291,7 @@ class Artnetdmx extends utils.Adapter {
             objectContainer.common.read = true;
             objectContainer.common.write = true;
         }
-        this.log.warn(JSON.stringify(objectContainer));
+        //this.log.warn(JSON.stringify(objectContainer));
         await this.setObjectNotExistsAsync(_id, objectContainer);
     }
 
