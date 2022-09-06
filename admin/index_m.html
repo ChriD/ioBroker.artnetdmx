@@ -43,6 +43,9 @@
                 }
             });
             onChange(false);
+
+            
+
             // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
             if (M) M.updateTextFields();
         }
@@ -63,7 +66,10 @@
             });
 
             // TODO: Send changes of devices to adapter for saveing
-            updateDeviceSettings();
+            table2values('devices');
+
+            let tableValues = updateDeviceSettings();
+            console.log(tableValues);
 
             callback(obj);
         }
@@ -78,7 +84,8 @@
                         
                         
                         // TODO: draw the rows
-                        this.generateDeviceSettingsTable(_result)
+                        //this.generateDeviceSettingsTable(_result)
+                        values2table('devices', devices, onChange);
 
 
                         window.isProcessingRequest = false;
@@ -160,9 +167,9 @@
 
     <template id="templateDeviceRow">
         <tr>
-            <td><input placeholder="Id" id="deviceId" type="text" class="validate input-field"></td>
-            <td><input placeholder="Name" id="name" type="text" class="validate input-field"></td>
-            <td><input placeholder="0" id="fadeTime" type="number" class="validate input-field"></td>
+            <td><input placeholder="Id" id="deviceId" type="text" class="validate"></td>
+            <td><input placeholder="Name" id="name" type="text" class="validate"></td>
+            <td><input placeholder="0" id="fadeTime" type="number" class="validate"></td>
         </tr>
     </template>
 
@@ -216,6 +223,7 @@
             </div>
 
 
+            <!--
             <div id="tab-devices" class="col s12 page">
                 <div class="row">
                     <div class="col s6">
@@ -235,12 +243,31 @@
                             <th>Fade Time</th>
                         </tr>
                     </thead>
-                    <tbody id="deviceTableBody">
-                        <!-- -->     
+                    <tbody id="deviceTableBody">                    
                     </tbody>
-                </table>
-                
+                </table>                
             </div>
+            -->
+            <div id="tab-devices"    class="col s12 page">
+                <div class="col s12" id="devices">
+                    <a class="btn-floating waves-effect waves-light blue table-button-add"><i class="material-icons">add</i></a>
+                    <div class="table-values-div">
+                        <table class="table-values">
+                            <thead>
+                            <tr>
+                                <th data-name="_index"   style="width: 40px"  class="translate"></th>
+                                <!--<th data-name="enabled"  style="width: 70px" data-style="width: 70px" data-type="checkbox" class="translate">Enabled</th>-->
+                                <th data-name="name"     class="translate">Name</th>
+                                <th data-name="name"     class="translate">Id</th>                                                                
+                                <th data-name="name"     class="translate">FadeTime</th>
+                                <th data-buttons="delete up down" style="width: 120px"></th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 
