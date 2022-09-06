@@ -43,36 +43,3 @@
     }
     return result;
   }
-  
-  
-  // TESTS
-  const obj = {
-    value: {
-      foo: {
-        bar: 'yes',
-        so: {
-          freakin: {
-            nested: 'Wow',
-          }
-        }
-      },
-    },
-    // Some edge cases to test
-    test: [true, false, [null, undefined, 1]],
-    not_lost: [], // Empty arrays should be preserved
-    not_lost2: {}, // Empty objects should be preserved
-    // Be careful with object having dots in the keys
-    'I.like.dots..in.object.keys...': "... Please don't override me",
-    I: {
-      like: {
-        'dots..in': {
-          object: {
-            'keys...': "You've been overwritten"
-          }
-        }
-      }
-    }
-  };
-  console.log(flattenObject(['I', {'am': 'an array'}]));
-  let flat = flattenObject(obj);
-  console.log(flat, unflattenObject(flat));

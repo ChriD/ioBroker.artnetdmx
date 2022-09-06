@@ -255,10 +255,19 @@ class Artnetdmx extends utils.Adapter {
 
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel', 'channel', 'channel');
 
         for (const [key, value] of Object.entries( _device.settings)) {
-            await this.setObjectHelper('lights.' + _device.deviceId + '.settings' + '.' + key, key, 'state', 'number');
-            await this.setStateAsync('lights.' + _device.deviceId + '.settings' + '.' + key, { val: value, ack: true });
+            if(typeof value !== 'object' || value === null)
+            {
+                await this.setObjectHelper('lights.' + _device.deviceId + '.settings' + '.' + key, key, 'state', 'number');
+                await this.setStateAsync('lights.' + _device.deviceId + '.settings' + '.' + key, { val: value, ack: true });
+            }
+        }
+
+        for (const [key, value] of Object.entries( _device.settings.channels)) {
+            await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channels' + '.' + key, key, 'state', 'number');
+            await this.setStateAsync('lights.' + _device.deviceId + '.settings.channels' + '.' + key, { val: value, ack: true });
         }
 
         // TODO: clear devices not in settings (do by parameter)
