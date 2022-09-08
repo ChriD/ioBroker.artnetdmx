@@ -66,7 +66,9 @@ class Artnetdmx extends utils.Adapter {
                 device.settings.channel.blue = this.getStateValueFromStatesObject(settingsStates, 'channel.blue', null);
                 device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, 'channel.white', null);
 
-                this.log.warn(JSON.stringify(this.deviceSettings));
+                this.log.warn(JSON.stringify(device));
+
+                this.deviceSettings.push(device);
 
                 // TODO: @@@ does return states within channel too, maybe ist better do this fixed?
                 /*
