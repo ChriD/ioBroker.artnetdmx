@@ -356,10 +356,13 @@ class Artnetdmx extends utils.Adapter {
     {
         let converted;
 
+        if(_value === null)
+            return _value;
+
         switch(_type)
         {
             case 'string':
-                converted = JSON.stringify(_value);
+                converted = _value.toString();
                 break;
             case 'number':
                 converted = Number(_value);
