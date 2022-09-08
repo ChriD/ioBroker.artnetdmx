@@ -54,7 +54,7 @@ class Artnetdmx extends utils.Adapter {
             {
                 const statePathDeviceSettings = deviceObject._id + '.settings';
                 const settingsStates = await this.getStatesAsync(statePathDeviceSettings + '.*');
-                
+
                 this.log.warn(statePathDeviceSettings);
 
                 const device = {};
