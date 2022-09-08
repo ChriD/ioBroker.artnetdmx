@@ -32,15 +32,44 @@ class Artnetdmx extends utils.Adapter {
         this.on('unload', this.onUnload.bind(this));
     }
 
+    getStateValueFromStatesObject(_object, _key, _defaultValue)
+    {
+        if(_object[_key])
+            return _object[_key].val;
+        return _defaultValue;
+    }
+
     async buildDeviceSettingsFromAdapterObjects()
     {
         try
         {
-            this.deviceSettings = [];
+            this.deviceSettings = []
 
-            const devices = await this.getDevicesAsync();
-            for (const device of devices)
+            const deviceObjects = await this.getDevicesAsync();
+            for (const deviceObject of deviceObjects)
             {
+                const settingsStates = await this.getStatesAsync(deviceObject._id + '.settings.*');
+
+                const device = {};
+                device.settings = {};
+                device.settings.channel = {};
+
+                device.id = deviceObject._id;
+                device.deviceId = (deviceObject._id).split('.').pop();
+                device.name = deviceObject.common.name;
+
+                device.settings.fadeTime = this.getStateValueFromStatesObject(settingsStates, 'fadeTime', 0);
+                device.settings.type = this.getStateValueFromStatesObject(settingsStates, 'type', 'DIMMABLE');
+                device.settings.channel.main = this.getStateValueFromStatesObject(settingsStates, 'channel.main', null);
+                device.settings.channel.red = this.getStateValueFromStatesObject(settingsStates, 'channel.red', null);
+                device.settings.channel.green = this.getStateValueFromStatesObject(settingsStates, 'channel.green', null);
+                device.settings.channel.blue = this.getStateValueFromStatesObject(settingsStates, 'channel.blue', null);
+                device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, 'channel.white', null);
+
+                this.log.warn(JSON.stringify(this.deviceSettings));
+
+                // TODO: @@@ does return states within channel too, maybe ist better do this fixed?
+                /*
                 const states = await this.getStatesAsync(device._id + '.settings.*');
                 const settingsObject = {};
                 for (const [key, state] of Object.entries(states)){
@@ -48,13 +77,14 @@ class Artnetdmx extends utils.Adapter {
                 }
 
                 this.deviceSettings.push({
-                    'id' : device._id,
-                    'deviceId' : (device._id).split('.').pop(),
-                    'name' : device.common.name,
+                    'id' : deviceObject._id,
+                    'deviceId' : (deviceObject._id).split('.').pop(),
+                    'name' : deviceObject.common.name,
                     'settings' : settingsObject
                 });
 
                 //this.log.warn(JSON.stringify(this.deviceSettings));
+                */
             }
         }
         catch(_error)
@@ -250,6 +280,7 @@ class Artnetdmx extends utils.Adapter {
 
     async addOrUpdateDevice(_device)
     {
+        // TODO: make manual not dynamic?!
         // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}
         this.log.warn(JSON.stringify(_device));
 
@@ -267,6 +298,8 @@ class Artnetdmx extends utils.Adapter {
 
         for (const [key, value] of Object.entries( _device.settings.channel)) {
             // TODO: use typof value to get correct type!!!
+            // TODO: if value is empty or 0 remove state entry!
+            // TODO: vonvert value to type?!
             await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel' + '.' + key, key, 'state', (key == 'type') ? 'string' : 'number');
             await this.setStateAsync('lights.' + _device.deviceId + '.settings.channel' + '.' + key, { val: value, ack: true });
         }
@@ -275,7 +308,7 @@ class Artnetdmx extends utils.Adapter {
 
     }
 
-    async setObjectHelper(_id, _name, _type, _stateType)
+    async setObjectHelper(_id, _name, _type, _stateType, _value, _deleteNullValue)
     {
         const objectContainer = {
             type: _type,
@@ -294,6 +327,18 @@ class Artnetdmx extends utils.Adapter {
         }
         //this.log.warn(JSON.stringify(objectContainer));
         await this.setObjectNotExistsAsync(_id, objectContainer);
+
+        if(_stateType)
+        {
+            if(_deleteNullValue && !_value)
+            {
+                await this.delStateAsync(_id);
+            }
+            else
+            {
+                await this.setStateAsync(_id, { val: _value, ack: true });
+            }
+        }
     }
 
 }
