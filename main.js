@@ -52,11 +52,9 @@ class Artnetdmx extends utils.Adapter {
             const deviceObjects = await this.getDevicesAsync();
             for (const deviceObject of deviceObjects)
             {
-                const statePathDeviceSettings = this.namespace + '.lights.' + deviceObject._id + '.settings';
-                const settingsStates = await this.getStatesAsync('lights.' + deviceObject._id + '.settings.*');
-
-                this.log.warn("TEST");
-                this.log.warn(this.namespace);
+                const statePathDeviceSettings = deviceObject._id + '.settings';
+                const settingsStates = await this.getStatesAsync(statePathDeviceSettings + '.*');
+                
                 this.log.warn(statePathDeviceSettings);
 
                 const device = {};
