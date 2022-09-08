@@ -50,6 +50,8 @@ class Artnetdmx extends utils.Adapter {
             {
                 const settingsStates = await this.getStatesAsync(deviceObject._id + '.settings.*');
 
+                this.log.warn(JSON.stringify(settingsStates));
+
                 const device = {};
                 device.settings = {};
                 device.settings.channel = {};
