@@ -44,9 +44,7 @@ class Artnetdmx extends utils.Adapter {
     async buildDeviceSettingsFromAdapterObjects()
     {
         try
-        {
-            this.log.warn(this.namespace);
-
+        {            
             this.deviceSettings = [];
 
             const deviceObjects = await this.getDevicesAsync();
@@ -289,7 +287,7 @@ class Artnetdmx extends utils.Adapter {
     {
         // TODO: make manual not dynamic?!
         // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}
-        this.log.warn(JSON.stringify(_device));
+        //this.log.warn(JSON.stringify(_device));
 
         // main device and channel objects
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
@@ -312,6 +310,7 @@ class Artnetdmx extends utils.Adapter {
         // values
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.isOn', 'isOn', 'state', 'boolean');
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.brightness', 'brightness', 'state', 'number');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.main', 'main', 'state', 'number');
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.red', 'red', 'state', 'number');
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.green', 'green', 'state', 'number');
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.blue', 'blue', 'state', 'number');
@@ -343,6 +342,7 @@ class Artnetdmx extends utils.Adapter {
             if(_deleteNullValue && !_value)
             {
                 await this.delStateAsync(_id);
+                await this.delObjectAsync(_id);
             }
             else
             {
