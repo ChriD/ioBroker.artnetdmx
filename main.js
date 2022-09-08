@@ -47,15 +47,13 @@ class Artnetdmx extends utils.Adapter {
         {
             this.log.warn(this.namespace);
 
-            this.deviceSettings = []
+            this.deviceSettings = [];
 
             const deviceObjects = await this.getDevicesAsync();
             for (const deviceObject of deviceObjects)
             {
                 const statePathDeviceSettings = deviceObject._id + '.settings';
                 const settingsStates = await this.getStatesAsync(statePathDeviceSettings + '.*');
-
-                this.log.warn(statePathDeviceSettings);
 
                 const device = {};
                 device.settings = {};
@@ -66,14 +64,12 @@ class Artnetdmx extends utils.Adapter {
                 device.name = deviceObject.common.name;
 
                 device.settings.fadeTime = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'fadeTime', 0);
-                device.settings.type = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings,'type', null);
+                device.settings.type = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings,'type', '');
                 device.settings.channel.main = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.main', null);
                 device.settings.channel.red = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.red', null);
                 device.settings.channel.green = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings,'channel.green', null);
                 device.settings.channel.blue = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.blue', null);
                 device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.white', null);
-
-                this.log.warn(JSON.stringify(device));
 
                 this.deviceSettings.push(device);
 
@@ -276,6 +272,8 @@ class Artnetdmx extends utils.Adapter {
                         await this.addOrUpdateDevice(deviceSetting);
                     }
 
+                    // TODO: clear devices not updated!
+
                     await this.buildDeviceSettingsFromAdapterObjects();
 
                     if (_obj.callback) {
@@ -293,10 +291,33 @@ class Artnetdmx extends utils.Adapter {
         // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}
         this.log.warn(JSON.stringify(_device));
 
+        // main device and channel objects
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel', 'channel', 'channel');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values', 'values', 'channel');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel', 'channel', 'channel');
 
+        // overall settings
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.fadeTime', 'fadeTime', 'state', 'number', _device.settings.fadeTime);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.type', 'type', 'state', 'string', _device.settings.type);
+
+        // channels
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.main', 'main', 'state', 'number', _device.settings.channel.main);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.red', 'red', 'state', 'number', _device.settings.channel.red);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.green', 'green', 'state', 'number', _device.settings.channel.green);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', 'state', 'number', _device.settings.channel.blue);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.white', 'white', 'state', 'number', _device.settings.channel.white);
+
+        // values
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values.isOn', 'isOn', 'state', 'boolean');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values.brightness', 'brightness', 'state', 'number');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.red', 'red', 'state', 'number');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.green', 'green', 'state', 'number');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.blue', 'blue', 'state', 'number');
+        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.white', 'white', 'state', 'number');
+
+        /*
         for (const [key, value] of Object.entries( _device.settings)) {
             if(typeof value !== 'object' || value === null)
             {
@@ -312,9 +333,7 @@ class Artnetdmx extends utils.Adapter {
             await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel' + '.' + key, key, 'state', (key == 'type') ? 'string' : 'number');
             await this.setStateAsync('lights.' + _device.deviceId + '.settings.channel' + '.' + key, { val: value, ack: true });
         }
-
-        // TODO: clear devices not in settings (do by parameter)
-
+        */
     }
 
     async setObjectHelper(_id, _name, _type, _stateType, _value, _deleteNullValue)
