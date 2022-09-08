@@ -7,6 +7,7 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
+const { KeyObject } = require('crypto');
 const { threadId } = require('worker_threads');
 
 // Load your modules here, e.g.:
@@ -32,10 +33,11 @@ class Artnetdmx extends utils.Adapter {
         this.on('unload', this.onUnload.bind(this));
     }
 
-    getStateValueFromStatesObject(_object, _key, _defaultValue)
+    getStateValueFromStatesObject(_object, path, _key, _defaultValue)
     {
-        if(_object[_key])
-            return _object[_key].val;
+        const fullKey = path ? (path + '.' + _key) : _key;
+        if(_object[fullKey])
+            return _object[fullKey].val;
         return _defaultValue;
     }
 
@@ -48,9 +50,10 @@ class Artnetdmx extends utils.Adapter {
             const deviceObjects = await this.getDevicesAsync();
             for (const deviceObject of deviceObjects)
             {
-                const settingsStates = await this.getStatesAsync(deviceObject._id + '.settings.*');
+                const statePathDeviceSettings = this.namespace + '.lights.' + deviceObject._id + '.settings';
+                const settingsStates = await this.getStatesAsync('lights.' + deviceObject._id + '.settings.*');
 
-                this.log.warn(JSON.stringify(settingsStates));
+                this.log.warn(statePathDeviceSettings);
 
                 const device = {};
                 device.settings = {};
@@ -60,13 +63,13 @@ class Artnetdmx extends utils.Adapter {
                 device.deviceId = (deviceObject._id).split('.').pop();
                 device.name = deviceObject.common.name;
 
-                device.settings.fadeTime = this.getStateValueFromStatesObject(settingsStates, 'fadeTime', 0);
-                device.settings.type = this.getStateValueFromStatesObject(settingsStates, 'type', 'DIMMABLE');
-                device.settings.channel.main = this.getStateValueFromStatesObject(settingsStates, 'channel.main', null);
-                device.settings.channel.red = this.getStateValueFromStatesObject(settingsStates, 'channel.red', null);
-                device.settings.channel.green = this.getStateValueFromStatesObject(settingsStates, 'channel.green', null);
-                device.settings.channel.blue = this.getStateValueFromStatesObject(settingsStates, 'channel.blue', null);
-                device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, 'channel.white', null);
+                device.settings.fadeTime = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'fadeTime', 0);
+                device.settings.type = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings,'type', null);
+                device.settings.channel.main = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.main', null);
+                device.settings.channel.red = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.red', null);
+                device.settings.channel.green = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings,'channel.green', null);
+                device.settings.channel.blue = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.blue', null);
+                device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.white', null);
 
                 this.log.warn(JSON.stringify(device));
 
