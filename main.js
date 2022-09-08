@@ -303,11 +303,11 @@ class Artnetdmx extends utils.Adapter {
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings.type', 'type', 'state', 'string', _device.settings.type);
 
         // channels
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.main', 'main', 'state', 'number', _device.settings.channel.main);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.red', 'red', 'state', 'number', _device.settings.channel.red);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.green', 'green', 'state', 'number', _device.settings.channel.green);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', 'state', 'number', _device.settings.channel.blue);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.white', 'white', 'state', 'number', _device.settings.channel.white);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.main', 'main', 'state', 'number', _device.settings.channel.main, true);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.red', 'red', 'state', 'number', _device.settings.channel.red, true);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.green', 'green', 'state', 'number', _device.settings.channel.green, true);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', 'state', 'number', _device.settings.channel.blue, true);
+        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.white', 'white', 'state', 'number', _device.settings.channel.white, true);
 
         // values
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.isOn', 'isOn', 'state', 'boolean');
@@ -316,27 +316,9 @@ class Artnetdmx extends utils.Adapter {
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.green', 'green', 'state', 'number');
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.blue', 'blue', 'state', 'number');
         await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.white', 'white', 'state', 'number');
-
-        /*
-        for (const [key, value] of Object.entries( _device.settings)) {
-            if(typeof value !== 'object' || value === null)
-            {
-                await this.setObjectHelper('lights.' + _device.deviceId + '.settings' + '.' + key, key, 'state', 'number');
-                await this.setStateAsync('lights.' + _device.deviceId + '.settings' + '.' + key, { val: value, ack: true });
-            }
-        }
-
-        for (const [key, value] of Object.entries( _device.settings.channel)) {
-            // TODO: use typof value to get correct type!!!
-            // TODO: if value is empty or 0 remove state entry!
-            // TODO: vonvert value to type?!
-            await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel' + '.' + key, key, 'state', (key == 'type') ? 'string' : 'number');
-            await this.setStateAsync('lights.' + _device.deviceId + '.settings.channel' + '.' + key, { val: value, ack: true });
-        }
-        */
     }
 
-    async setObjectHelper(_id, _name, _type, _stateType, _value, _deleteNullValue)
+    async setObjectHelper(_id, _name, _type, _stateType, _value, _deleteNullValue = false)
     {
         const objectContainer = {
             type: _type,
@@ -364,12 +346,33 @@ class Artnetdmx extends utils.Adapter {
             }
             else
             {
-                await this.setStateAsync(_id, { val: _value, ack: true });
+                await this.setStateAsync(_id, { val: this.convertValue(_value, _stateType), ack: true });
             }
         }
     }
 
+
+    convertValue(_value, _type)
+    {
+        let converted;
+
+        switch(_type)
+        {
+            case 'string':
+                converted = JSON.stringify(_value);
+                break;
+            case 'number':
+                converted = Number(_value);
+                break;
+            default:
+                converted = _value;
+        }
+        return converted;
+    }
+
 }
+
+
 
 if (require.main !== module) {
     // Export the constructor in compact mode
