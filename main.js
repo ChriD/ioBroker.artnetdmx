@@ -45,6 +45,8 @@ class Artnetdmx extends utils.Adapter {
     {
         try
         {
+            this.log.warn(this.namespace);
+
             this.deviceSettings = []
 
             const deviceObjects = await this.getDevicesAsync();
@@ -53,6 +55,8 @@ class Artnetdmx extends utils.Adapter {
                 const statePathDeviceSettings = this.namespace + '.lights.' + deviceObject._id + '.settings';
                 const settingsStates = await this.getStatesAsync('lights.' + deviceObject._id + '.settings.*');
 
+                this.log.warn("TEST");
+                this.log.warn(this.namespace);
                 this.log.warn(statePathDeviceSettings);
 
                 const device = {};
