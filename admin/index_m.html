@@ -116,8 +116,8 @@
 
             let availableChannels = [];            
             let deviceTableElement = document.querySelector('#deviceTable');
-            let rowElement = deviceTableElement.querySelectorAll('tr[data-index="' + _rowIndex + '"]');
-            let typeElement = rowElement.querySelectorAll('select[data-name="settings.type"]');            
+            let rowElement = deviceTableElement.querySelector('tr[data-index="' + _rowIndex + '"]');
+            let typeElement = rowElement.querySelector('select[data-name="settings.type"]');            
 
             switch(typeElement.value)
             {
