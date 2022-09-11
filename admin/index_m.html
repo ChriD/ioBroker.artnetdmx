@@ -126,7 +126,7 @@
             {
                 elements.forEach(item => {
                     // TODO: 
-                    item.onChange = (_event) => {
+                    item.onchange = (_event) => {
                         console.log(_event);
                         let rowId = this.getTableRowDataId(_event.target);
                         this.updateEditableChannels(rowId, _event.target.value);
