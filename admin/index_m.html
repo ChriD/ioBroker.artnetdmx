@@ -101,6 +101,52 @@
         }
         */
 
+        function getTableRowDataId(_childElement)
+        {
+            let rowElement = _childElement.closes('tr');
+            if(rowElement)
+                return rowElement.getAttribute('data-id');
+            return '';
+        }
+
+        function updateEditableChannels(_rowId, _type)
+        {
+
+        }
+
+        function onDeviceTableReady()
+        {
+            // TODO: run through all rows and attach events and disable all not used channel columns!!!!
+
+            
+            let deviceTableElement = document.querySelector('#deviceTable');
+
+            let elements = deviceTableElement.querySelectorAll('select[data-name="settings.type"]');
+            if(elements)
+            {
+                elements.forEach(item => {
+                    // TODO: 
+                    item.onChange = (_event) => {
+                        console.log(_event);
+                        let rowId = this.getTableRowDataId(_event.target);
+                        this.updateEditableChannels(rowId, _event.target.value);
+                        // disable channels for that specific row
+                        // search parent until <tr and then get data-id
+                    }
+                });
+            }
+
+            let typeElements = deviceTableElement.querySelectorAll('input[data-name="name"]');
+            if(typeElements)
+            {
+                typeElements.forEach(item => {
+                    // TODO: 
+                });
+            }
+
+            // disable channels in relation to the type            
+        }
+
 
         function requestDeviceSettings(onChange)
         {            
@@ -117,7 +163,7 @@
                             devices.push(flattenObject(device));  
                         }        
                         console.log(devices);                     
-                        values2table('devices', devices, onChange);
+                        values2table('devices', devices, onChange, onDeviceTableReady);
 
 
                         window.isProcessingRequest = false;
@@ -242,7 +288,7 @@
             <div id="tab-devices"    class="col s12 page">
                 <div class="col s12" id="devices">
                     <a class="btn-floating waves-effect waves-light blue table-button-add"><i class="material-icons">add</i></a>
-                    <div class="table-values-div">
+                    <div class="table-values-div" id="deviceTable">
                         <table class="table-values">
                             <thead>
                             <tr>
@@ -260,7 +306,7 @@
                                 <th data-name="settings.channel.red" data-type="number" class="translate channel">Ch. Red</th>
                                 <th data-name="settings.channel.green" data-type="number" class="translate channel">Ch. Green</th>
                                 <th data-name="settings.channel.blue" data-type="number" class="translate channel">Ch. Blue</th>
-                                <th data-name="settings.fadeTime" data-type="number" class="translate">Fade time</th>
+                                <th data-name="settings.fadeTime" data-type="number" data-default="-1" class="translate">Fade time</th>
                                 <th data-buttons="delete up down" style="width: 120px"></th>
                             </tr>
                             </thead>
