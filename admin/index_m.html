@@ -101,7 +101,7 @@
         }
         */
 
-        function getTableRowDataId(_childElement)
+        function getTableRowDataIndex(_childElement)
         {
             let rowElement = _childElement.closest('tr');
             if(rowElement)
@@ -111,7 +111,7 @@
 
         function updateEditableChannels(_rowIndex, _type)
         {
-            if(!_rowId)
+            if(!_rowIndex)
                 return;
 
             let availableChannels = [];            
@@ -165,8 +165,8 @@
                 elements.forEach(item => {
                     item.onchange = (_event) => {
                         console.log(_event);
-                        let rowId = this.getTableRowDataId(_event.currentTarget);
-                        this.updateEditableChannels(rowId, _event.currentTarget.value);
+                        let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
+                        this.updateEditableChannels(rowIndex, _event.currentTarget.value);
                     }
                 });
             }
