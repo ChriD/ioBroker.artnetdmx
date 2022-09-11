@@ -105,33 +105,68 @@
         {
             let rowElement = _childElement.closes('tr');
             if(rowElement)
-                return rowElement.getAttribute('data-id');
+                return rowElement.getAttribute('data-index');
             return '';
         }
 
-        function updateEditableChannels(_rowId, _type)
+        function updateEditableChannels(_rowIndex, _type)
         {
+            if(!_rowId)
+                return;
 
+            let availableChannels = [];            
+            let deviceTableElement = document.querySelector('#deviceTable');
+            let rowElement = deviceTableElement.querySelectorAll('tr[data-index="' + _rowIndex + '"]');
+            let typeElement = rowElement.querySelectorAll('select[data-name="settings.type"]');            
+
+            switch(typeElement.value)
+            {
+                case 'dimmable':
+                    availableChannels.push('main');
+                    break;
+                case 'TW':
+                    availableChannels.push('main', 'white');
+                    break;
+                case 'RGB':
+                    availableChannels.push('red', 'green', 'blue');
+                    break;
+                case 'RGBW':
+                    availableChannels.push('red', 'green', 'blue', 'white');
+                    break; 
+                case 'RGBWTW':
+                    availableChannels.push('main', 'red', 'green', 'blue', 'white');
+                    break;                                                                                
+            }
+            
+            const allChannelElements = rowElement.querySelectorAll('input[data-name^="settings.channel."]');          
+            for (const channel of allChannelElements)
+            {
+                channelValue = channel.getAttribute('data-name').split('.').pop();                
+                this.updateEditableChannel(channelElement, availableChannels.includes(channelValue) );            
+            }
+        }
+
+        function updateEditableChannel(_channelElement, _enabled)    
+        {
+            if(!channelElement)
+                return;
+
+            channelElement.disabled = !_enabled;
+            channelElement.readOnly = !_enabled;
         }
 
         function onDeviceTableReady()
         {
-            // TODO: run through all rows and attach events and disable all not used channel columns!!!!
-
-            
+            // TODO: run through all rows and attach events and disable all not used channel columns!!!!            
             let deviceTableElement = document.querySelector('#deviceTable');
-
             let elements = deviceTableElement.querySelectorAll('select[data-name="settings.type"]');
             if(elements)
             {
                 elements.forEach(item => {
-                    // TODO: 
                     item.onchange = (_event) => {
                         console.log(_event);
-                        let rowId = this.getTableRowDataId(_event.target);
-                        this.updateEditableChannels(rowId, _event.target.value);
-                        // disable channels for that specific row
-                        // search parent until <tr and then get data-id
+                        let rowId = this.getTableRowDataId(_event.currentTarget);
+                        this.updateEditableChannels(rowId, _event.currentTarget.value);
                     }
                 });
             }
