@@ -73,33 +73,6 @@
             callback(obj);
         }
 
-        /*
-        function flattenObject(_obj, _path = '', _newObj = {})
-        {
-            for (const [key, value] of Object.entries(_obj)) 
-            {
-                if(typeof value === 'object' && !Array.isArray(value) && value !== null)
-                {
-                    _newObj = flattenObject(value, _path ? _path + '.' + key : key, _newObj);
-                }
-                else 
-                {
-                    _newObj[_path ? _path + '.' + key : key] = value;
-                }
-            } 
-            return _newObj;
-        }
-
-        function unflattenObject(_obj, _newObj = {})
-        {
-            for (const [key, value] of Object.entries(_obj)) 
-            {
-                if()
-                _newObj[key] = value;                
-            } 
-            return _newObj;
-        }
-        */
 
         function getTableRowDataIndex(_childElement)
         {
@@ -153,17 +126,22 @@
 
             _channelElement.disabled = !_enabled;
             _channelElement.readOnly = !_enabled;
-            _channelElement.value = '';
+            if(!_enabled)
+                _channelElement.value = '';
         }
 
         function onDeviceTableReady()
-        {
-            // TODO: run through all rows and attach events and disable all not used channel columns!!!!            
+        {            
+            // TODO: run through all rows and attach events      
             let deviceTableElement = document.querySelector('#deviceTable');
             let elements = deviceTableElement.querySelectorAll('select[data-name="settings.type"]');
             if(elements)
             {
                 elements.forEach(item => {
+
+                    let rowIndex = getTableRowDataIndex(item);
+                    this.updateEditableChannels(rowIndex, item.value);
+
                     item.onchange = (_event) => {
                         console.log(_event);
                         let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
