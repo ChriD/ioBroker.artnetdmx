@@ -139,9 +139,9 @@
             }
             
             const allChannelElements = rowElement.querySelectorAll('input[data-name^="settings.channel."]');          
-            for (const channel of allChannelElements)
+            for (const channelElement of allChannelElements)
             {
-                channelValue = channel.getAttribute('data-name').split('.').pop();                
+                channelValue = channelElement.getAttribute('data-name').split('.').pop();                
                 this.updateEditableChannel(channelElement, availableChannels.includes(channelValue) );            
             }
         }
