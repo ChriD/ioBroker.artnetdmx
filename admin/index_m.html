@@ -148,11 +148,12 @@
 
         function updateEditableChannel(_channelElement, _enabled)    
         {
-            if(!channelElement)
+            if(!_channelElement)
                 return;
 
-            channelElement.disabled = !_enabled;
-            channelElement.readOnly = !_enabled;
+            _channelElement.disabled = !_enabled;
+            _channelElement.readOnly = !_enabled;
+            _channelElement.value = '';
         }
 
         function onDeviceTableReady()
