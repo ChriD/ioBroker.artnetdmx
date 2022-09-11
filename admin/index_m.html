@@ -103,7 +103,7 @@
 
         function getTableRowDataId(_childElement)
         {
-            let rowElement = _childElement.closes('tr');
+            let rowElement = _childElement.closest('tr');
             if(rowElement)
                 return rowElement.getAttribute('data-index');
             return '';
