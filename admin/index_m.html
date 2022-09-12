@@ -175,8 +175,8 @@
                 typeElements.forEach(item => {
 
                     item.onblur = (_event) => {                        
-                        let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
-                        this.updateObjectId(rowIndex, _event.relatedTarget.value); // TODO: @@@
+                        let rowIndex = this.getTableRowDataIndex(_event.target);
+                        this.updateObjectId(rowIndex, _event.target.value);
                     }
                 });
             }    
