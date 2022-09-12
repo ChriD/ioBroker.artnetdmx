@@ -130,10 +130,28 @@
                 _channelElement.value = '';
         }
 
+
+        async function updateObjectId(_rowIndex, _value, _forceUpdate = false)
+        {
+            if(!_rowIndex)
+                return;
+
+            let deviceTableElement = document.querySelector('#deviceTable');
+            let rowElement = deviceTableElement.querySelector('tr[data-index="' + _rowIndex + '"]');
+            let deviceIdElement = rowElement.querySelector('select[data-name="deviceId"]');  
+            let deviceId = deviceIdElement.value;
+
+            // the fill the deviceId if its empty or if we are forced too
+            if(!deviceId || _forceUpdate){
+                deviceIdElement.value = await this.formatObjectId(_value);                                
+            }
+        }
+
         function onDeviceTableReady()
         {            
             // TODO: run through all rows and attach events      
             let deviceTableElement = document.querySelector('#deviceTable');
+            // TODO: select rows ....
             let elements = deviceTableElement.querySelectorAll('select[data-name="settings.type"]');
             if(elements)
             {
@@ -142,8 +160,7 @@
                     let rowIndex = getTableRowDataIndex(item);
                     this.updateEditableChannels(rowIndex, item.value);
 
-                    item.onchange = (_event) => {
-                        console.log(_event);
+                    item.onchange = (_event) => {                        
                         let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
                         this.updateEditableChannels(rowIndex, _event.currentTarget.value);
                     }
@@ -154,11 +171,15 @@
             if(typeElements)
             {
                 typeElements.forEach(item => {
-                    // TODO: 
-                });
-            }
 
-            // disable channels in relation to the type            
+                    item.onchange = (_event) => {                        
+                        let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
+                        this.updateObjectId(rowIndex, _event.currentTarget.value);
+                    }
+                });
+            }    
+            
+            // TODO: add some kind of update knob to the ID
         }
 
 
@@ -183,6 +204,16 @@
                         window.isProcessingRequest = false;
                     });
         }
+
+        function formatObjectId(_value)
+        {    
+            return new Promise((_resolve, _reject) => {                
+                sendTo(null, "formatObjectId", _value, function (_result) {
+                        _resolve(_result.value);                        
+                    });               
+            })        
+        }
+
 
 
 
@@ -231,6 +262,14 @@
 
     .channel{
         width: 50px;
+    }
+
+    .fadeTime{
+        width: 80px;
+    }
+
+    .type{
+        width: 150px;
     }
 </style>
 
@@ -314,13 +353,13 @@
                                 <th data-name="commonRole" style="display: none;" data-type="select" data-options="linkedState;const;array" class="translate">Role</th>  
                                 <th data-name="nativeIcon" data-type="select" class="translate" data-options="/;action/action;alert/alert;arrow-d/arrow-d;arrow-d-l/arrow-d-l;arrow-d-r/arrow-d-r;arrow-l/arrow-l;arrow-r/arrow-r;arrow-u/arrow-u;arrow-u-l/arrow-u-l;arrow-u-r/arrow-u-r;audio/audio;back/back;bars/bars;bullets/bullets;calendar/calendar;camera/camera;carat-d/carat-d;carat-l/carat-l;carat-r/carat-r;carat-u/carat-u;check/check;clock/clock;cloud/cloud;comment/comment;delete/delete;edit/edit;eye/eye;forbidden/forbidden;forward/forward;gear/gear;grid/grid;heart/heart;home/home;info/info;location/location;lock/lock;mail/mail;minus/minus;navigation/navigation;phone/phone;plus/plus;power/power;recycle/recycle;refresh/refresh;search/search;shop/shop;star/star;tag/tag;user/user;video/video;">Icon</th>                               
                                 -->
-                                <th data-name="settings.type" data-type="select" data-options="dimmable;TW;RGB;RGBW" class="translate">Type</th>                                
+                                <th data-name="settings.type" data-type="select" data-options="dimmable;TW;RGB;RGBW;RGBTW" class="translate type">Type</th>                                
                                 <th data-name="settings.channel.main" data-type="number" class="translate channel">Ch. Main</th>
                                 <th data-name="settings.channel.white" data-type="number" class="translate channel">Ch. White</th>
                                 <th data-name="settings.channel.red" data-type="number" class="translate channel">Ch. Red</th>
                                 <th data-name="settings.channel.green" data-type="number" class="translate channel">Ch. Green</th>
                                 <th data-name="settings.channel.blue" data-type="number" class="translate channel">Ch. Blue</th>
-                                <th data-name="settings.fadeTime" data-type="number" data-default="-1" class="translate">Fade time</th>
+                                <th data-name="settings.fadeTime" data-type="number" data-default="-1" class="translate fadeTime">Fade time</th>
                                 <th data-buttons="delete up down" style="width: 120px"></th>
                             </tr>
                             </thead>
