@@ -82,7 +82,7 @@
             return '';
         }
 
-        function updateEditableChannels(_rowIndex, _type)
+        function updateEditableChannels(_rowIndex)
         {
             if(!_rowIndex)
                 return;
@@ -163,7 +163,7 @@
                 let settingsTypeElement = rowElement.querySelector('select[data-name="settings.type"]');
                 settingsTypeElement.onchange = (_event) => {                        
                     let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
-                    this.updateEditableChannels(rowIndex, _event.currentTarget.value);
+                    this.updateEditableChannels(rowIndex);
                 }
 
                 let settingsNameElement = rowElement.querySelector('input[data-name="name"]');
@@ -175,7 +175,7 @@
                 // TODO: @@@ add deviceId recalc button
 
                 // enable or disable the channel selection
-                this.updateEditableChannels(rowIndex, item.value);
+                this.updateEditableChannels(rowIndex);
 
             });
 
