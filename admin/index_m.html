@@ -166,7 +166,7 @@
                     this.updateEditableChannels(rowIndex, _event.currentTarget.value);
                 }
 
-                let settingsNameElement = rowElement.querySelector('select[data-name="settings.name"]');
+                let settingsNameElement = rowElement.querySelector('input[data-name="name"]');
                 settingsNameElement.onblur = (_event) => {                        
                     let rowIndex = this.getTableRowDataIndex(_event.target);
                     this.updateObjectId(rowIndex, _event.target.value);
