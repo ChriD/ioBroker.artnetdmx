@@ -260,10 +260,12 @@ class Artnetdmx extends utils.Adapter {
             switch (_obj.command) {
                 case 'formatObjectId':
                     if (_obj.callback) {
-                        this.log.error( _obj.message);
-                        this.log.error( this.FORBIDDEN_CHARS.toString());
-                        const validObjectId =  _obj.message.toString().replace(this.FORBIDDEN_CHARS, '_');
+                        this.log.error(_obj.message);
+                        this.log.error(this.FORBIDDEN_CHARS.toString());
+                        const validObjectId = _obj.message.toString().replace(this.FORBIDDEN_CHARS, '_');
+                        this.log.error(validObjectId);
                         validObjectId.replace(/[\.\s\/]/g, '_');
+                        this.log.error(validObjectId);
                         this.sendTo(_obj.from, _obj.command, validObjectId, _obj.callback);
                     }
                     break;

@@ -211,8 +211,8 @@
         {    
             return new Promise((_resolve, _reject) => {  
                 console.log(_value);       
-                sendTo(null, "formatObjectId", _value, function (_result) {
-                        _resolve(_result.value);                        
+                sendTo(null, 'formatObjectId', _value, function (_result) {
+                        _resolve(_result);                        
                     });               
             })        
         }
