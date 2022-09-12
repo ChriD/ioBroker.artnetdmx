@@ -153,7 +153,8 @@
         {            
             // TODO: run through all rows and attach events      
             let deviceTableElement = document.querySelector('#deviceTable');
-            let rowElements = deviceTableElement.querySelectorAll('tr');
+            let deviceTableBodyElement = document.querySelector('tbody');
+            let rowElements = deviceTableBodyElement.querySelectorAll('tr');
 
             rowElements.forEach(rowElement => {
                 let rowIndex = getTableRowDataIndex(rowElement);
