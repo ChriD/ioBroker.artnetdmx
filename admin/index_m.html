@@ -149,9 +149,9 @@
             }
         }
 
+
         function onDeviceTableReady()
-        {            
-            // TODO: run through all rows and attach events      
+        {                    
             let deviceTableElement = document.querySelector('#deviceTable');
             let deviceTableBodyElement = document.querySelector('tbody');
             let rowElements = deviceTableBodyElement.querySelectorAll('tr');
@@ -159,13 +159,16 @@
             rowElements.forEach(rowElement => {
                 let rowIndex = getTableRowDataIndex(rowElement);
 
-                // attach events
+                // attach onchange event to the device type so that we can update the channel controls
+                // in relation to the selection
                 let settingsTypeElement = rowElement.querySelector('select[data-name="settings.type"]');
                 settingsTypeElement.onchange = (_event) => {                        
                     let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
                     this.updateEditableChannels(rowIndex);
                 }
 
+                // when the name of the device was changed we will update the object id for that device
+                // given the id is empty.
                 let settingsNameElement = rowElement.querySelector('input[data-name="name"]');
                 settingsNameElement.onblur = (_event) => {                        
                     let rowIndex = this.getTableRowDataIndex(_event.target);
@@ -173,43 +176,13 @@
                 }
 
                 // TODO: @@@ add deviceId recalc button
+                let deviceIdElement = rowElement.querySelector('input[data-name="deviceId"]');
+                let columnElement = deviceIdElement.parentElement;
+                let deviceIdUpdateButtonElement = columnElement.append('<input type="submit" data-name="deviceIdUpdate">');
 
-                // enable or disable the channel selection
+                // enable/disable the channel controls for each row for editing
                 this.updateEditableChannels(rowIndex);
-
-            });
-
-            /*
-            // TODO: select rows ....
-            let elements = deviceTableElement.querySelectorAll('select[data-name="settings.type"]');
-            if(elements)
-            {
-                elements.forEach(item => {
-
-                    let rowIndex = getTableRowDataIndex(item);
-                    this.updateEditableChannels(rowIndex, item.value);
-
-                    item.onchange = (_event) => {                        
-                        let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
-                        this.updateEditableChannels(rowIndex, _event.currentTarget.value);
-                    }
-                });
-            }
-
-            let typeElements = deviceTableElement.querySelectorAll('input[data-name="name"]');
-            if(typeElements)
-            {
-                typeElements.forEach(item => {
-
-                    item.onblur = (_event) => {                        
-                        let rowIndex = this.getTableRowDataIndex(_event.target);
-                        this.updateObjectId(rowIndex, _event.target.value);
-                    }
-                });
-            }    
-            */
-            
-            // TODO: add some kind of update knob to the ID
+            });           
         }
 
 
@@ -379,7 +352,7 @@
                                 <th data-name="_index"   style="width: 40px"  class="translate"></th>
                                 <!--<th data-name="enabled"  style="width: 70px" data-style="width: 70px" data-type="checkbox" class="translate">Enabled</th>-->
                                 <th data-name="name" class="translate">Name</th>
-                                <th data-name="deviceId" class="translate">Id</th>                                                               
+                                <th data-name="deviceId" class="translate">Id</th>                                                                                               
                                 <!--
                                 <th data-name="commonRole" style="display: none;" data-type="select" data-options="linkedState;const;array" class="translate">Role</th>  
                                 <th data-name="nativeIcon" data-type="select" class="translate" data-options="/;action/action;alert/alert;arrow-d/arrow-d;arrow-d-l/arrow-d-l;arrow-d-r/arrow-d-r;arrow-l/arrow-l;arrow-r/arrow-r;arrow-u/arrow-u;arrow-u-l/arrow-u-l;arrow-u-r/arrow-u-r;audio/audio;back/back;bars/bars;bullets/bullets;calendar/calendar;camera/camera;carat-d/carat-d;carat-l/carat-l;carat-r/carat-r;carat-u/carat-u;check/check;clock/clock;cloud/cloud;comment/comment;delete/delete;edit/edit;eye/eye;forbidden/forbidden;forward/forward;gear/gear;grid/grid;heart/heart;home/home;info/info;location/location;lock/lock;mail/mail;minus/minus;navigation/navigation;phone/phone;plus/plus;power/power;recycle/recycle;refresh/refresh;search/search;shop/shop;star/star;tag/tag;user/user;video/video;">Icon</th>                               
