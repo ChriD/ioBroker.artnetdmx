@@ -262,7 +262,9 @@ class Artnetdmx extends utils.Adapter {
                     if (_obj.callback) {
                         this.log.error(_obj.message);
                         this.log.error(this.FORBIDDEN_CHARS.toString());
-                        const validObjectId = _obj.message.toString().replace(this.FORBIDDEN_CHARS, '_');
+                        let validObjectId = _obj.message.toString();
+                        this.log.error(validObjectId);
+                        validObjectId = validObjectId.replace(this.FORBIDDEN_CHARS, '_');
                         this.log.error(validObjectId);
                         validObjectId.replace(/[\.\s\/]/g, '_');
                         this.log.error(validObjectId);
