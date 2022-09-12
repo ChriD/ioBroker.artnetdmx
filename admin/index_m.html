@@ -143,7 +143,9 @@
 
             // the fill the deviceId if its empty or if we are forced too
             if(!deviceId || _forceUpdate){
-                deviceIdElement.value = await this.formatObjectId(_value);                                
+                if(_value != '') {
+                    deviceIdElement.value = await this.formatObjectId(_value);                                
+                }
             }
         }
 
@@ -174,7 +176,7 @@
 
                     item.onblur = (_event) => {                        
                         let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
-                        this.updateObjectId(rowIndex, _event.currentTarget.text);
+                        this.updateObjectId(rowIndex, _event.relatedTarget.value); // TODO: @@@
                     }
                 });
             }    
@@ -207,7 +209,8 @@
 
         function formatObjectId(_value)
         {    
-            return new Promise((_resolve, _reject) => {                
+            return new Promise((_resolve, _reject) => {  
+                console.log(_value);       
                 sendTo(null, "formatObjectId", _value, function (_result) {
                         _resolve(_result.value);                        
                     });               
