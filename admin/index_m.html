@@ -138,7 +138,7 @@
 
             let deviceTableElement = document.querySelector('#deviceTable');
             let rowElement = deviceTableElement.querySelector('tr[data-index="' + _rowIndex + '"]');
-            let deviceIdElement = rowElement.querySelector('select[data-name="deviceId"]');  
+            let deviceIdElement = rowElement.querySelector('input[data-name="deviceId"]');  
             let deviceId = deviceIdElement.value;
 
             // the fill the deviceId if its empty or if we are forced too
@@ -172,9 +172,9 @@
             {
                 typeElements.forEach(item => {
 
-                    item.onchange = (_event) => {                        
+                    item.onblur = (_event) => {                        
                         let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
-                        this.updateObjectId(rowIndex, _event.currentTarget.value);
+                        this.updateObjectId(rowIndex, _event.currentTarget.text);
                     }
                 });
             }    
