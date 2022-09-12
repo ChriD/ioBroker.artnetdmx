@@ -178,7 +178,14 @@
                 // TODO: @@@ add deviceId recalc button
                 let deviceIdElement = rowElement.querySelector('input[data-name="deviceId"]');
                 let columnElement = deviceIdElement.parentElement;
-                let deviceIdUpdateButtonElement = columnElement.append('<input type="submit" data-name="deviceIdUpdate">');
+
+                /*
+                var input = document.createElement("input");
+                input.type = "text";
+                input.className = "css-class-name"; // set the CSS class
+                container.appendChild(input); // put it into the DOM
+                */
+                let deviceIdUpdateButtonElement = columnElement.innerHTML += '<input type="submit" data-name="deviceIdUpdate">';
 
                 // enable/disable the channel controls for each row for editing
                 this.updateEditableChannels(rowIndex);
