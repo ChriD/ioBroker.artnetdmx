@@ -181,7 +181,8 @@
 
                 
                 var input = document.createElement("input");
-                input.type = "submit";                
+                input.type = "submit";            
+                input.setAttribute("data-name", "deviceIdUpdate")     ;
                 let deviceIdUpdateButtonElement = columnElement.appendChild(input); // put it into the DOM                
                 //let deviceIdUpdateButtonElement = columnElement.innerHTML += '<input type="submit" data-name="deviceIdUpdate">';
 
