@@ -197,15 +197,15 @@ class Artnetdmx extends utils.Adapter {
     //  * @param {string} id
     //  * @param {ioBroker.Object | null | undefined} obj
     //  */
-     onObjectChange(id, obj) {
-         if (obj) {
-             // The object was changed
+    onObjectChange(id, obj) {
+        if (obj) {
+            // The object was changed
             this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-         } else {
-             // The object was deleted
-             this.log.info(`object ${id} deleted`);
-         }
-     }
+        } else {
+            // The object was deleted
+            this.log.info(`object ${id} deleted`);
+        }
+    }
 
     /**
      * Is called if a subscribed state changes
