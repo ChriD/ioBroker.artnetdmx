@@ -74,9 +74,9 @@
         }
 
 
-        function getTableRowDataIndex(_childElement)
+        function getTableRowDataIndex(_childOrRowElement)
         {
-            let rowElement = _childElement.closest('tr');
+            let rowElement = _childOrRowElement.tagName instanceof HTMLTableRowElement ? _childOrRowElement : _childOrRowElement.closest('tr');
             if(rowElement)
                 return rowElement.getAttribute('data-index');
             return '';
@@ -153,6 +153,32 @@
         {            
             // TODO: run through all rows and attach events      
             let deviceTableElement = document.querySelector('#deviceTable');
+            let rowElements = deviceTableElement.querySelectorAll('tr');
+
+            elements.forEach(rowElement => {
+                let rowIndex = getTableRowDataIndex(rowElement);
+
+                // attach events
+                let settingsTypeElement = rowElement.querySelector('select[data-name="settings.type"]');
+                settingsTypeElement.onchange = (_event) => {                        
+                    let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
+                    this.updateEditableChannels(rowIndex, _event.currentTarget.value);
+                }
+
+                let settingsNameElement = rowElement.querySelector('select[data-name="settings.name"]');
+                settingsNameElement.onblur = (_event) => {                        
+                    let rowIndex = this.getTableRowDataIndex(_event.target);
+                    this.updateObjectId(rowIndex, _event.target.value);
+                }
+
+                // TODO: @@@ add deviceId recalc button
+
+                // enable or disable the channel selection
+                this.updateEditableChannels(rowIndex, item.value);
+
+            });
+
+            /*
             // TODO: select rows ....
             let elements = deviceTableElement.querySelectorAll('select[data-name="settings.type"]');
             if(elements)
@@ -180,6 +206,7 @@
                     }
                 });
             }    
+            */
             
             // TODO: add some kind of update knob to the ID
         }
