@@ -294,9 +294,7 @@ class Artnetdmx extends utils.Adapter {
 
     async addOrUpdateDevice(_device)
     {
-        // TODO: make manual not dynamic?!
-        // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}
-        //this.log.warn(JSON.stringify(_device));
+        // TODO: verify before adding the device! 
 
         // main device and channel objects
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
