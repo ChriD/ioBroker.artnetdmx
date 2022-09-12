@@ -179,13 +179,11 @@
                 let deviceIdElement = rowElement.querySelector('input[data-name="deviceId"]');
                 let columnElement = deviceIdElement.parentElement;
 
-                /*
+                
                 var input = document.createElement("input");
-                input.type = "text";
-                input.className = "css-class-name"; // set the CSS class
-                container.appendChild(input); // put it into the DOM
-                */
-                let deviceIdUpdateButtonElement = columnElement.innerHTML += '<input type="submit" data-name="deviceIdUpdate">';
+                input.type = "submit";                
+                let deviceIdUpdateButtonElement = columnElement.appendChild(input); // put it into the DOM                
+                //let deviceIdUpdateButtonElement = columnElement.innerHTML += '<input type="submit" data-name="deviceIdUpdate">';
 
                 // enable/disable the channel controls for each row for editing
                 this.updateEditableChannels(rowIndex);
