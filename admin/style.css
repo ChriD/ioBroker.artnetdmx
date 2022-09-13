@@ -37,12 +37,14 @@ input[data-name="deviceId"] {
     padding-right: 50px;
 }
 
+.table-button-add {
+    margin-bottom: 5px;
+}
+
 i[data-name="deviceIdUpdate"] {
-    margin-left: -50px;
+    margin-left: -25px;
     height: 25px;
-    width: 50px;
-    background: blue;
-    color: white;
+    width: 25px;
     border: 0;
     -webkit-appearance: none;
 }
