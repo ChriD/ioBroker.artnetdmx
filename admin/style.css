@@ -38,13 +38,14 @@ input[data-name="deviceId"] {
 }
 
 .table-button-add {
-    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 10px;
 }
 
 i[data-name="deviceIdUpdate"] {
+    position: absolute;
     margin-left: -25px;
-    height: 25px;
-    width: 25px;
+    margin-top: 3px;
     border: 0;
     -webkit-appearance: none;
 }
