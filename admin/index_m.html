@@ -352,21 +352,21 @@
 
                 <h6 class="translate sub-title">Artnet/DMX Settings</h6>
                 <div class="row">                    
-                    <div class="input-field col s12 m6 l4">
+                    <div class="input-field col s2 m1 l1">
                         <input id="universe" type="number" min="0" max="32768" class="value" />
                         <label class="translate" for="pass">Universe:</label>
                     </div>
-                    <div class="input-field col s12 m6 l4">
+                    <div class="input-field col s2 m1 l1">
                         <input id="framesPerSec" type="number" min="1" max="44" class="value" />
-                        <label class="translate" for="framesPerSec">Frames:</label>
+                        <label class="translate" for="framesPerSec">Frames [per sec]:</label>
                     </div>
-                    <div class="input-field col s12 m6 l4">
+                    <div class="input-field col s2 m1 l1">
                         <input id="fullRefreshPeriod" type="number" min="0" max="60" class="value" />
-                        <label class="translate" for="fullRefreshPeriod">Refresh Period:</label>
+                        <label class="translate" for="fullRefreshPeriod">Refresh Period [ms]:</label>
                     </div>
-                    <div class="input-field col s12 m6 l4">                        
+                    <div class="input-field col s2 m1 l1">                        
                         <input id="defaultFadeTime" type="number" min="0" max="60000" class="value" />
-                        <label class="translate" for="defaultFadeTime">Default fade time:</label>
+                        <label class="translate" for="defaultFadeTime">Default fade time [ms]:</label>
                     </div>
                 </div>                
             </div>
@@ -379,9 +379,9 @@
                             <thead>
                             <tr>
                                 <th data-name="_index" style="width: 40px" class="translate"></th>                                
-                                <th data-name="name" class="translate">Name</th>
-                                <th data-name="deviceId" class="translate">Id</th>                                
-                                <th data-name="settings.type" data-type="select" data-options="dimmable;TW;RGB;RGBW;RGBTW" class="translate type">Type</th>                                
+                                <th data-name="name" class="translate" style="min-width: 180px">Name</th>
+                                <th data-name="deviceId" class="translate" style="min-width: 180px">Id</th>                                
+                                <th data-name="settings.type"  style="min-width: 100px" data-type="select" data-options="dimmable;TW;RGB;RGBW;RGBTW" class="translate type">Type</th>                                
                                 <th data-name="settings.channel.main" data-type="number" class="translate channel">Ch. Main</th>
                                 <th data-name="settings.channel.white" data-type="number" class="translate channel">Ch. White</th>
                                 <th data-name="settings.channel.red" data-type="number" class="translate channel">Ch. Red</th>
