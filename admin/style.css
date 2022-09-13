@@ -37,7 +37,7 @@ input[data-name="deviceId"] {
     padding-right: 50px;
 }
 
-input[data-name="deviceIdUpdate"] {
+i[data-name="deviceIdUpdate"] {
     margin-left: -50px;
     height: 25px;
     width: 50px;

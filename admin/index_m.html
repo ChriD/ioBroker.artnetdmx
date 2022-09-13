@@ -178,14 +178,23 @@
                 // TODO: @@@ add deviceId recalc button
                 let deviceIdElement = rowElement.querySelector('input[data-name="deviceId"]');
                 let columnElement = deviceIdElement.parentElement;                
-                var input = document.createElement("input");
-                input.type = "submit";            
+                var input = document.createElement("i");
+                input.classList.add('material-icons');
                 input.setAttribute("data-name", "deviceIdUpdate");
+                input.innerHTML = 'delete';
                 let deviceIdUpdateButtonElement = columnElement.appendChild(input); // put it into the DOM                
                 deviceIdUpdateButtonElement.onclick = (_event) => {                        
                     let rowIndex = this.getTableRowDataIndex(_event.target);
                     this.updateObjectId(rowIndex, settingsNameElement.value, true);
                 }
+
+                /*
+                <i class="material-icons" style="
+                    margin-left: -25px;           
+                    border: 0;
+                    -webkit-appearance: none;
+                ">delete</i>
+                */
                 
 
                 // enable/disable the channel controls for each row for editing
