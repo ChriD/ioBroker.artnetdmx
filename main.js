@@ -302,6 +302,7 @@ class Artnetdmx extends utils.Adapter {
 
     async addOrUpdateDevice(_device)
     {
+        this.log.error(JSON.stringify(_device));
         // TODO: verify before adding the device!
         // main device and channel objects
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
