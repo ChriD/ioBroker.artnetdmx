@@ -37,9 +37,12 @@
             if (M) M.updateTextFields();
         }
         
-        function save(_callback) {            
-            saveSettings(_callback);
-            updateDeviceSettings();
+        // this one is beeing called wehn we hit SAVE or SAVE AND CLOSE and therfore we have to be sure the
+        // 'callback' is only beeing called when the save of the devices has been done!
+        function save(_callback) {  
+            updateDeviceSettings().then(()=>{
+                saveSettings(_callback);
+            });
         }
 
         // this function will get the data from the form controls and pass it to the save callback of the adapter
@@ -261,20 +264,24 @@
         }
 
         // this method stores the current devices and their settings (given in the html table) as objects in the backend
+        // it will return a promise which will be fulfilled if the storage was completed. That's importent on "SAVE AND CLOSE"
         function updateDeviceSettings()
-        {            
-            const tableValues = table2values('devices');
-            // we have to unflatten the flattend object we get from the 'table2values' function so we have a 
-            // valid object for storage/object creation
-            let devices = new Array();
-            for (const device of tableValues)
-            {
-                devices.push(unflattenObject(device));  
-            }      
-            this.setProcessingRequest(true);
-            sendTo(null, "updateDeviceSettings", devices, function (_result) {
-                    this.setProcessingRequest(false);
-                });
+        {      
+            return new Promise((_resolve, _reject) => {
+                const tableValues = table2values('devices');
+                // we have to unflatten the flattend object we get from the 'table2values' function so we have a 
+                // valid object for storage/object creation
+                let devices = new Array();
+                for (const device of tableValues)
+                {
+                    devices.push(unflattenObject(device));  
+                }      
+                this.setProcessingRequest(true);
+                sendTo(null, "updateDeviceSettings", devices, function (_result) {
+                        _resolve(_result);
+                        this.setProcessingRequest(false);
+                    });
+            })                           
         }        
     </script>
 

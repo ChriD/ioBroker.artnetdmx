@@ -4,6 +4,14 @@
  * Created with @iobroker/create-adapter v2.2.0
  */
 
+/*
+    TODO: 
+    * Configuration initial values
+    * BUGFIX: error on 2 devices!
+    * remove non used devices
+
+*/ 
+
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
