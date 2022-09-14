@@ -72,11 +72,11 @@
                 var $key = $(this);
                 var id = $key.attr('id');
                 if ($key.attr('type') === 'checkbox') {                    
-                    $key.prop('checked', settings[id])
+                    $key.prop('checked', _settings[id])
                         .on('change', () => _onChange())
                         ;
                 } else {                    
-                    $key.val(settings[id])
+                    $key.val(_settings[id])
                         .on('change', () => _onChange())
                         .on('keyup', () => _onChange())
                         ;
