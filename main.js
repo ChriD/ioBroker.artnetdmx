@@ -274,7 +274,7 @@ class Artnetdmx extends utils.Adapter {
                     break;
 
                 case 'updateDeviceSettings':
-                    this.log.warn(JSON.stringify(_obj));
+                    this.log.warn(JSON.stringify(_obj.message));
 
                     try
                     {
@@ -302,8 +302,7 @@ class Artnetdmx extends utils.Adapter {
 
     async addOrUpdateDevice(_device)
     {
-        // TODO: verify before adding the device!         
-
+        // TODO: verify before adding the device!
         // main device and channel objects
         await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
         await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
