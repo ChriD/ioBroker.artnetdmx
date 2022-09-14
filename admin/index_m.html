@@ -1,3 +1,10 @@
+<!-- 
+    * Interface selection
+    * loading indicator
+    * "frames per second" as select control?
+    * remove standard icon and create own header
+-->
+
 <html>
 
 <head>
@@ -25,6 +32,22 @@
         function load(settings, onChange) {
     
             requestDeviceSettings(onChange);
+
+
+                // TODO: @@@@
+            /*
+            getIPs(function (ips) {
+                for (var i = 0; i < ips.length; i++) {
+                    if (ips[i].family.indexOf("ipv4") > -1 && ips[i].address !== "0.0.0.0" && ips[i].address !== "127.0.0.1") {
+                        $("#localInterface").append('<option value="' + ips[i].address + '">' + ips[i].name + "</option>");
+                    }
+                }
+                $("#localInterface.value").val(settings.localInterface).select();
+            });
+            */
+
+            //triggerst getIPs
+            fillSelectIPs("#localInterface", settings.adapterAddress, false, true);
 
             // example: select elements with id=key and class=value and insert value
             if (!settings) return;
@@ -67,23 +90,7 @@
             });
                        
 
-            updateDeviceSettings();    
-            
-            
-            // TODO: @@@@
-            /*
-            getIPs(function (ips) {
-                for (var i = 0; i < ips.length; i++) {
-                    if (ips[i].family.indexOf("ipv4") > -1 && ips[i].address !== "0.0.0.0" && ips[i].address !== "127.0.0.1") {
-                        $("#localInterface").append('<option value="' + ips[i].address + '">' + ips[i].name + "</option>");
-                    }
-                }
-                $("#localInterface.value").val(settings.localInterface).select();
-            });
-            */
-
-            //triggerst getIPs
-            fillSelectIPs("#localInterface", settings.adapterAddress, false, true);
+            updateDeviceSettings();                                    
 
             callback(obj);
         }
@@ -215,9 +222,6 @@
             sendTo(null, "requestDeviceSettings", null, function (_result) {
                         console.log(_result);
                         window.deviceSettings = _result;
-                        
-                        // prepare result for table creation
-                        // TODO: @@@
                         let devices = new Array();
                         for (const device of _result)
                         {
@@ -247,8 +251,6 @@
         function updateDeviceSettings()
         {
             const tableValues = table2values('devices');
-            /*const flattedTableValues = flattenObject(tableValues);
-            const devices = unflattenObject(flattedTableValues);*/arguments
             let devices = new Array();
             for (const device of tableValues)
             {
@@ -300,28 +302,26 @@
     }
 </style>
 
-
 </head>
 
-<!-- Put your content here -->
-        <!-- 
-            Host
-            Port
-            Universe
-            Buffer refresh Period
-            Default fade Time
-        -->
-
-        <!-- For example columns with settings: -->
 
 <body>
 
     <div class="m adapter-container">
+
+        <nav>
+            <div class="row">
+                <div class="col s2">
+                    <img src="mylogo.png" class="logo">
+                </div>
+            </div>
+        </nav>
+
         <div class="main-page row">
             <div class="col s12">
                 <ul class="tabs">
-                    <li class="tab col s4"><a href="#tab-main" class="translate active">General</a></li>
-                    <li class="tab col s4"><a href="#tab-devices" class="translate">Devices</a></li>
+                    <li class="tab col s2"><a href="#tab-main" class="translate active">General</a></li>
+                    <li class="tab col s2"><a href="#tab-devices" class="translate">Devices</a></li>
                 </ul>
             </div>
 
@@ -338,13 +338,13 @@
                         <input type="text" id="nodeip" class="value" />
                         <label class="translate" for="nodeip">Node IP:</label>
                     </div>
-                    <div class="input-field col s3 m3 l3">
+                    <div class="input-field col s3 m2 l1">
                         <input id="nodeport" type="number" min="1" max="65565" class="value" />
                         <label class="translate" for="nodeport">Port:</label>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col s12 m6 l3 input-field">
+                    <div class="col s9 m9 l3 input-field">
                         <select class="value" id="localInterface"></select>
                         <label class="translate" for="localInterface">Local IPv4 network interface</label>
                     </div>
