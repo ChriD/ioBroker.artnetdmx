@@ -267,7 +267,7 @@ class Artnetdmx extends utils.Adapter {
                     }
                     break;
 
-                case 'requestDeviceSettings':
+                case 'requestArtnetDevices':
                     if (_obj.callback) {
                         this.sendTo(_obj.from, _obj.command, this.deviceSettings, _obj.callback);
                     }

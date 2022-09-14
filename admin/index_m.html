@@ -1,82 +1,52 @@
-<!-- 
-    * Interface selection
+<!--     
     * loading indicator
     * "frames per second" as select control?
     * remove standard icon and create own header
 -->
 
 <html>
-
 <head>
-
-    <!-- Load ioBroker scripts and styles-->
     <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
     <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
-
     <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
-
     <script type="text/javascript" src="../../js/translate.js"></script>
     <script type="text/javascript" src="../../lib/js/materialize.js"></script>
     <script type="text/javascript" src="../../js/adapter-settings.js"></script>
 
-    <!-- Load our own files -->
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="style.css"/>
     <script type="text/javascript" src="objectHelpers.js"></script>
     <script type="text/javascript" src="words.js"></script>
 
-
     <script type="text/javascript">
+        
+        function load(_settings, _onChange) {
+            // due to the fact the our devices abns their "settings" are stored as iobroker objects/states and not 
+            // as a "config", we have to request the devices and their settings from the adapter
+            requestArtnetDevices(_onChange);
 
-        // This will be called by the admin adapter when the settings page loads
-        function load(settings, onChange) {
-    
-            requestDeviceSettings(onChange);
+            // we do connect to some kind of ArtnetDMX device so we need to have the selection which network interface
+            // we should use when doing so. The standard 'adapter-settings.js' will help us with it's 'fillSelectIPs'
+            // method
+            fillSelectIPs("#localInterface", _settings.adapterAddress, false, true);
 
-
-                // TODO: @@@@
-            /*
-            getIPs(function (ips) {
-                for (var i = 0; i < ips.length; i++) {
-                    if (ips[i].family.indexOf("ipv4") > -1 && ips[i].address !== "0.0.0.0" && ips[i].address !== "127.0.0.1") {
-                        $("#localInterface").append('<option value="' + ips[i].address + '">' + ips[i].name + "</option>");
-                    }
-                }
-                $("#localInterface.value").val(settings.localInterface).select();
-            });
-            */
-
-            //triggerst getIPs
-            fillSelectIPs("#localInterface", settings.adapterAddress, false, true);
-
-            // example: select elements with id=key and class=value and insert value
-            if (!settings) return;
-            $('.value').each(function () {
-                var $key = $(this);
-                var id = $key.attr('id');
-                if ($key.attr('type') === 'checkbox') {
-                    // do not call onChange direct, because onChange could expect some arguments
-                    $key.prop('checked', settings[id])
-                        .on('change', () => onChange())
-                        ;
-                } else {
-                    // do not call onChange direct, because onChange could expect some arguments
-                    $key.val(settings[id])
-                        .on('change', () => onChange())
-                        .on('keyup', () => onChange())
-                        ;
-                }
-            });
-            onChange(false);
-            
-
-            // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
+            // load the settings from the _settings object into the html controls
+            loadSettings(_settings, _onChange);
+                       
+            // reinitialize all the materialize labels on the page because we are adding inputs dynamically
+            // in fact in our case this following line wont be of any effect i think
             if (M) M.updateTextFields();
         }
+        
+        function save(callback) {            
+            saveSettings(_callback);
+            updateDeviceSettings();
+        }
 
-        // This will be called by the admin adapter when the user presses the save button
-        function save(callback) {
-            // example: select elements with class=value and build settings object
+        // this function will get the data from the form controls and pass it to the save callback of the adapter
+        // we use the example in the tutorial adapter for loading and storing config data, its good enough and usable 
+        function saveSettings(_callback)
+        {
             var obj = {};
             $('.value').each(function () {
                 var $this = $(this);
@@ -88,14 +58,53 @@
                     obj[$this.attr('id')] = $this.val();
                 }
             });
-                       
-
-            updateDeviceSettings();                                    
-
             callback(obj);
         }
 
+        // this function will fill the controls from the settings/config object from the adapter
+        // we use the example in the tutorial adapter for loading and storing config data, its good enough and usable 
+        function loadSettings(_settings, _onChange)
+        {
+            if (!_settings) 
+                return;
 
+            $('.value').each(function () {
+                var $key = $(this);
+                var id = $key.attr('id');
+                if ($key.attr('type') === 'checkbox') {                    
+                    $key.prop('checked', settings[id])
+                        .on('change', () => _onChange())
+                        ;
+                } else {                    
+                    $key.val(settings[id])
+                        .on('change', () => _onChange())
+                        .on('keyup', () => _onChange())
+                        ;
+                }
+            });
+            _onChange(false);
+        }
+
+        // this method does handle the lock/unlock of the gui when there is a request pending (to the adapter endpoint)
+        // we assume there is only one request active becausw we will lock the page if there is a request pending
+        // so we can safely use this "one timeout" approach
+        function setProcessingRequest(_isProcessing = true)
+        {
+            window.isProcessingRequest = _isProcessing;
+            if(_isProcessing){
+                window.isProcessingRequestTimeoutId = setTimeout(()=>{
+                    window.isProcessingRequest = false;
+                }, 5000);
+            }
+            else{
+                if(window.isProcessingRequestTimeoutId)
+                    clearTimeout(window.isProcessingRequestTimeoutId)                
+            }
+        }
+
+
+        // this function will get the row index for an element which is within the device grid or for the row 
+        // element itself
         function getTableRowDataIndex(_childOrRowElement)
         {
             let rowElement = _childOrRowElement.tagName instanceof HTMLTableRowElement ? _childOrRowElement : _childOrRowElement.closest('tr');
@@ -104,6 +113,9 @@
             return '';
         }
 
+
+        // use this function to change the editable and visual state of the channel controls
+        // different types of devices have another count of channels and this function will handle the visual stuff for that
         function updateEditableChannels(_rowIndex)
         {
             if(!_rowIndex)
@@ -141,6 +153,8 @@
             }
         }
 
+        // use this to set a chennel element if it is editable/enabled or not
+        // Attention! This function will clear the value of the channel if the channel is beeing disabled!
         function updateEditableChannel(_channelElement, _enabled)    
         {
             if(!_channelElement)
@@ -152,7 +166,8 @@
                 _channelElement.value = '';
         }
 
-
+        // this function will update the value of the objectId control by the formatted name of the device
+        // this will only happen if the objectIs is empty or we are forcing the function to do so (refresh objectId button)
         async function updateObjectId(_rowIndex, _value, _forceUpdate = false)
         {
             if(!_rowIndex)
@@ -162,16 +177,17 @@
             let rowElement = deviceTableElement.querySelector('tr[data-index="' + _rowIndex + '"]');
             let deviceIdElement = rowElement.querySelector('input[data-name="deviceId"]');  
             let deviceId = deviceIdElement.value;
-
-            // the fill the deviceId if its empty or if we are forced too
-            if(!deviceId || _forceUpdate){
+            
+            if(!deviceId || _forceUpdate)
+            {
                 if(_value != '') {
                     deviceIdElement.value = await this.formatObjectId(_value);                                
                 }
             }
         }
 
-
+        // this method will be called if the html table was built and filled with data. We will use this method to attach
+        // to some kind of events and to inject a refresh button for the objectId. For this it will iterate the row elements
         function onDeviceTableReady()
         {                    
             let deviceTableElement = document.querySelector('#deviceTable');
@@ -197,113 +213,73 @@
                     this.updateObjectId(rowIndex, _event.target.value);
                 }
 
-                // TODO: @@@ add deviceId recalc button
+                // inject the 'update objectId' button for refershing the object id from the device name
                 let deviceIdElement = rowElement.querySelector('input[data-name="deviceId"]');
                 let columnElement = deviceIdElement.parentElement;                
                 var input = document.createElement("i");
                 input.classList.add('material-icons');
                 input.setAttribute("data-name", "deviceIdUpdate");
                 input.innerHTML = 'refresh';
-                let deviceIdUpdateButtonElement = columnElement.appendChild(input); // put it into the DOM                
+                let deviceIdUpdateButtonElement = columnElement.appendChild(input);                
                 deviceIdUpdateButtonElement.onclick = (_event) => {                        
                     let rowIndex = this.getTableRowDataIndex(_event.target);
                     this.updateObjectId(rowIndex, settingsNameElement.value, true);
                 }
 
-                // enable/disable the channel controls for each row for editing
+                // enable/disable the channel controls for the given row index
                 this.updateEditableChannels(rowIndex);
             });           
         }
 
-
-        function requestDeviceSettings(onChange)
+        // this functions requests the device and their settings from the adapter backend and if the data is ready it will
+        // fill the device table in the admin gui
+        function requestArtnetDevices(_onChange)
         {            
-            window.isProcessingRequest = true; // TODO: @@@ add Timeout
-            sendTo(null, "requestDeviceSettings", null, function (_result) {
-                        console.log(_result);
-                        window.deviceSettings = _result;
+            setProcessingRequest(true);
+            sendTo(null, "requestArtnetDevices", null, function (_result) {
+                        // we have to convert the array we are getting from the backend to a readable array for the
+                        // 'values2table' function, this will be done by flattening the objects within the array
+                        // so we can acces the data via eg. 'deviceId.settings.channel.red' in the table data section
                         let devices = new Array();
                         for (const device of _result)
                         {
                             devices.push(flattenObject(device));  
-                        }        
-                        console.log(devices);                     
-                        values2table('devices', devices, onChange, onDeviceTableReady);
-
-
-                        window.isProcessingRequest = false;
+                        } 
+                        values2table('devices', devices, _onChange, onDeviceTableReady);
+                        setProcessingRequest(false);
                     });
         }
 
+        // this function will format a string (in this case the name of the device) to a valid object id which can be used 
+        // in the backend. The format will be done in the adapter backend because there we have 'FORBIDDEN_CHARS' available
         function formatObjectId(_value)
         {    
-            return new Promise((_resolve, _reject) => {  
-                console.log(_value);       
+            return new Promise((_resolve, _reject) => {                      
                 sendTo(null, 'formatObjectId', _value, function (_result) {
                         _resolve(_result);                        
                     });               
             })        
         }
 
-
-
-
+        // this method stores the current devices and their settings (given in the html table) as objects in the backend
         function updateDeviceSettings()
-        {
+        {            
             const tableValues = table2values('devices');
+            // we have to unflatten the flattend object we get from the 'table2values' function so we have a 
+            // valid object for storage/object creation
             let devices = new Array();
             for (const device of tableValues)
             {
                 devices.push(unflattenObject(device));  
             }      
-
-            console.log(devices);
-
-            // 	{"id":"artnetdmx.0.lights.Bedrom","deviceId":"Bedrom","name":"Bedroom Main Light","settings":{"fadeTime":150}}                 
-            window.isProcessingRequest = true; // TODO: @@@ add Timeout
+            this.setProcessingRequest(true);
             sendTo(null, "updateDeviceSettings", devices, function (_result) {
-                        console.log(_result)
-                        window.isProcessingRequest = false;
-                    });
-        }
-
-
-        
+                    this.setProcessingRequest(false);
+                });
+        }        
     </script>
 
-
-
-<style>
-    .sub-title {
-        margin-top: 2rem!important;
-        padding: 0.5rem;
-        background: #64b5f6;
-        color: white;
-    }
-    .main-page {
-        height: 100%;
-        overflow: hidden;
-        margin-bottom: 0 !important;
-    }
-    .page {
-        height: calc(100% - 34px) !important;
-    }
-
-    .channel{
-        width: 50px;
-    }
-
-    .fadeTime{
-        width: 80px;
-    }
-
-    .type{
-        width: 150px;
-    }
-</style>
-
 </head>
-
 
 <body>
 
@@ -344,7 +320,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col s9 m9 l3 input-field">
+                    <div class="col s9 m5 l3 input-field">
                         <select class="value" id="localInterface"></select>
                         <label class="translate" for="localInterface">Local IPv4 network interface</label>
                     </div>

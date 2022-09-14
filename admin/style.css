@@ -49,3 +49,31 @@ i[data-name="deviceIdUpdate"] {
     border: 0;
     -webkit-appearance: none;
 }
+
+
+.sub-title {
+    margin-top: 2rem!important;
+    padding: 0.5rem;
+    background: #64b5f6;
+    color: white;
+}
+.main-page {
+    height: 100%;
+    overflow: hidden;
+    margin-bottom: 0 !important;
+}
+.page {
+    height: calc(100% - 34px) !important;
+}
+
+.channel{
+    width: 50px;
+}
+
+.fadeTime{
+    width: 80px;
+}
+
+.type{
+    width: 150px;
+}
