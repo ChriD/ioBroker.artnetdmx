@@ -1,7 +1,6 @@
 <!--     
     * loading indicator
     * "frames per second" as select control?
-    * remove standard icon and create own header
 -->
 
 <html>
@@ -38,7 +37,7 @@
             if (M) M.updateTextFields();
         }
         
-        function save(callback) {            
+        function save(_callback) {            
             saveSettings(_callback);
             updateDeviceSettings();
         }
@@ -58,7 +57,7 @@
                     obj[$this.attr('id')] = $this.val();
                 }
             });
-            callback(obj);
+            _callback(obj);
         }
 
         // this function will fill the controls from the settings/config object from the adapter
