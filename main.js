@@ -1,25 +1,13 @@
-'use strict';
-
-/*
- * Created with @iobroker/create-adapter v2.2.0
- */
-
 /*
     TODO: 
     * Configuration initial values
-    * BUGFIX: error on 2 devices!
     * remove non used devices
-
 */ 
 
-// The adapter-core module gives you access to the core ioBroker functions
-// you need to create an adapter
-const utils = require('@iobroker/adapter-core');
-const { KeyObject } = require('crypto');
-const { threadId } = require('worker_threads');
+'use strict';
 
-// Load your modules here, e.g.:
-// const fs = require("fs");
+const utils = require('@iobroker/adapter-core');
+
 
 class Artnetdmx extends utils.Adapter {
 
@@ -32,7 +20,7 @@ class Artnetdmx extends utils.Adapter {
             name: 'artnetdmx',
         });
 
-        this.deviceSettings = [];
+        this.devices = [];
 
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
@@ -41,19 +29,154 @@ class Artnetdmx extends utils.Adapter {
         this.on('unload', this.onUnload.bind(this));
     }
 
-    getStateValueFromStatesObject(_object, path, _key, _defaultValue)
-    {
-        const fullKey = path ? (path + '.' + _key) : _key;
-        if(_object[fullKey])
-            return _object[fullKey].val;
-        return _defaultValue;
+    /**
+     * Is called when databases are connected and adapter received configuration.
+     */
+    async onReady() {
+
+        // TODO: Artnet informations
+        // Reset the connection indicator during startup
+        this.setState('info.connection', false, true);
+
+        // build device settings object for the admin page (the device list will be created from the devices in the object list)
+        // the admin page will show the devices defined in the object list and the values of the settings given in the "settings"
+        // channel of the device
+        await this.buildDevicesArrayFromAdapterObjects();
+
+        // subscribe to all 'settings' states in the adapter
+        this.subscribeStates('*');
     }
 
-    async buildDeviceSettingsFromAdapterObjects()
+    /**
+     * Is called when adapter shuts down - callback has to be called under any circumstances!
+     * @param {() => void} callback
+     */
+    onUnload(callback) {
+        try {
+            // TODO: disconnect from artnet
+            callback();
+        } catch (e) {
+            callback();
+        }
+    }
+
+    /**
+     * Is called if a subscribed object changes
+     * @param {string} id
+     * @param {ioBroker.Object | null | undefined} obj
+     */
+    onObjectChange(id, obj) {
+        if (obj) {
+            // TODO
+            // The object was changed
+            this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
+        } else {
+            // TODO
+            // The object was deleted
+            this.log.info(`object ${id} deleted`);
+        }
+    }
+
+    /**
+     * Is called if a subscribed state changes
+     * @param {string} id
+     * @param {ioBroker.State | null | undefined} state
+     */
+    onStateChange(id, state) {
+
+        // TODO: @@@ If a "settings" state was changed we do update the deviceSettings for the admin gui
+        if (state) {
+            // The state was changed
+            this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+        } else {
+            // The state was deleted
+            this.log.info(`state ${id} deleted`);
+        }
+    }
+
+    /**
+     * Is called when a message is sent to the backend
+     * @param {Object} _obj message that was sent
+     */
+    onMessage(_obj)
+    {
+        this.handleMessages(_obj);
+        return true;
+    }
+
+    /**
+     * Is called when a message is sent to the backend
+     * @param {Object} _obj message that was sent
+     */
+    async handleMessages(_obj)
+    {
+        //this.log.warn(JSON.stringify(_obj));
+
+        if (typeof _obj === 'object')
+        {
+            switch (_obj.command)
+            {
+                // the admin gui does need to convert user given object id's to valid object db store id's
+                // that means the have to remove special chars from the string so we can use it as an id
+                case 'formatObjectId':
+                    if (_obj.callback) {
+                        const validObjectId = this.formatObjectId(_obj.message.toString());
+                        this.sendTo(_obj.from, _obj.command, validObjectId, _obj.callback);
+                    }
+                    break;
+
+                // the admin gui refelects the devices in the object store and you can define some settings there
+                // for that to work it does need all the devices and their channels and state which can be received
+                // eith this type of message
+                case 'requestArtnetDevices':
+                    if (_obj.callback) {
+                        this.sendTo(_obj.from, _obj.command, this.devices, _obj.callback);
+                    }
+                    break;
+
+                // in the state of saving the configuration (when the admin gui saves it's configuration) it will
+                // send us the array of artnet devices configured in the admin
+                case 'updateArtnetDevices':
+                    try
+                    {
+                        const deviceIds = new Array();
+                        for (const device of _obj.message){
+                            await this.addOrUpdateDevice(device);
+                            deviceIds.push(device.deviceId);
+                        }
+                        // we may have removed some devices in the admin view and those should be deleted from 
+                        // the object store. Therefore we run through the current devices and check if they are
+                        await this.cleanupDevices(deviceIds);
+                    }
+                    catch(_exception)
+                    {
+                        this.log.error(_exception.toString());
+                    }
+
+                    // be sure the internal device array is up to date, and will be reloaded from the object db store
+                    // we completely rebuild the array, thats okay here
+                    await this.buildDevicesArrayFromAdapterObjects();
+
+                    // the callback here is some kind of mandatory, because otherwise the admin gui 'save' function
+                    // will not work correctly (it awaits the callback to not retsart the backend before save was
+                    // finished!)
+                    if (_obj.callback) {
+                        this.sendTo(_obj.from, _obj.command, {}, _obj.callback);
+                    }
+                    break;
+            }
+        }
+    }
+
+    /**
+     * this method reads all devices (objects) from the object db store and some of its child objects/states
+     * this data will be stored (cached) in an array for passing it to the admin gui later on
+     */
+    async buildDevicesArrayFromAdapterObjects()
     {
         try
-        {            
-            this.deviceSettings = [];
+        {
+            this.devices = [];
 
             const deviceObjects = await this.getDevicesAsync();
             for (const deviceObject of deviceObjects)
@@ -77,25 +200,7 @@ class Artnetdmx extends utils.Adapter {
                 device.settings.channel.blue = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.blue', null);
                 device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.white', null);
 
-                this.deviceSettings.push(device);
-
-                // TODO: @@@ does return states within channel too, maybe ist better do this fixed?
-                /*
-                const states = await this.getStatesAsync(device._id + '.settings.*');
-                const settingsObject = {};
-                for (const [key, state] of Object.entries(states)){
-                    settingsObject[key.split('.').pop()] = state ? state.val : null;
-                }
-
-                this.deviceSettings.push({
-                    'id' : deviceObject._id,
-                    'deviceId' : (deviceObject._id).split('.').pop(),
-                    'name' : deviceObject.common.name,
-                    'settings' : settingsObject
-                });
-
-                //this.log.warn(JSON.stringify(this.deviceSettings));
-                */
+                this.devices.push(device);
             }
         }
         catch(_error)
@@ -105,273 +210,152 @@ class Artnetdmx extends utils.Adapter {
     }
 
     /**
-     * Is called when databases are connected and adapter received configuration.
+     * TODO: @@@
+     * this method will return the value of the object for the given path
+     * @param  {Object} _object the object
+     * @param  {String} _path the path of the property
+     * @param  {String} _key the key or another path with key
+     * @param  {any} _defaultValue for the property if empty/null
+     * @return {any} the value at the path and key
      */
-    async onReady() {
-        
-        
-
-        // Initialize your adapter here
-
-        // Subscribe to every state and fill internal state info object for the devices
-
-        // Reset the connection indicator during startup
-        this.setState('info.connection', false, true);
-
-        // The adapters config (in the instance object everything under the attribute "native") is accessible via
-        // this.config:
-        this.log.info('config option1: ' + this.config.option1);
-        this.log.info('config option2: ' + this.config.option2);
-        
-
-
-        // TEST: @@@
-
-        // TODO: channel     
-        
-
-
-        /*
-        For every state in the system there has to be also an object of type state
-        Here a simple template for a boolean variable named "testVariable"
-        Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
-        */
-    
-
-        
-
-
-
-        // build device settings object for the admin page (the device list will be created from the devices in the object list)
-        // the admin page will show the devices defined in the object list and the values of the settings given in the "settings"
-        // channel of the device
-        await this.buildDeviceSettingsFromAdapterObjects();
-
-        // subscribe to all 'settings' states in the adapter
-        this.subscribeStates('*');
-
-
-        // In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
-        //this.subscribeStates('testVariable');
-        // You can also add a subscription for multiple states. The following line watches all states starting with "lights."
-        // this.subscribeStates('lights.*');
-        // Or, if you really must, you can also watch all states. Don't do this if you don't need to. Otherwise this will cause a lot of unnecessary load on the system:
-        // this.subscribeStates('*');
-
-        /*
-            setState examples
-            you will notice that each setState will cause the stateChange event to fire (because of above subscribeStates cmd)
-        */
-        // the variable testVariable is set to true as command (ack=false)
-        //await this.setStateAsync('testVariable', true);
-
-        // same thing, but the value is flagged "ack"
-        // ack should be always set to true if the value is received from or acknowledged from the target system
-        //await this.setStateAsync('testVariable', { val: true, ack: true });
-
-        // same thing, but the state is deleted after 30s (getState will return null afterwards)
-       // await this.setStateAsync('testVariable', { val: true, ack: true, expire: 30 });
-
-        // examples for the checkPassword/checkGroup functions
-        //let result = await this.checkPasswordAsync('admin', 'iobroker');
-        //this.log.info('check user admin pw iobroker: ' + result);
-
-        //result = await this.checkGroupAsync('admin', 'admin');
-        //this.log.info('check group user admin group admin: ' + result);
+    getStateValueFromStatesObject(_object, _path, _key, _defaultValue)
+    {
+        const fullKey = _path ? (_path + '.' + _key) : _key;
+        if(_object[fullKey])
+            return _object[fullKey].val;
+        return _defaultValue;
     }
 
     /**
-     * Is called when adapter shuts down - callback has to be called under any circumstances!
-     * @param {() => void} callback
+     * use this method to format a n 'on clean' objectId to a 'clean' (valid) objectId
+     * @param  {String} _objectId the non clean object id
+     * @return {String} _objectId as clean usable value in the object db store
      */
-    onUnload(callback) {
-        try {
-            // Here you must clear all timeouts or intervals that may still be active
-            // clearTimeout(timeout1);
-            // clearTimeout(timeout2);
-            // ...
-            // clearInterval(interval1);
-
-            callback();
-        } catch (e) {
-            callback();
-        }
-    }
-
-    // If you need to react to object changes, uncomment the following block and the corresponding line in the constructor.
-    // You also need to subscribe to the objects with `this.subscribeObjects`, similar to `this.subscribeStates`.
-    // /**
-    //  * Is called if a subscribed object changes
-    //  * @param {string} id
-    //  * @param {ioBroker.Object | null | undefined} obj
-    //  */
-    onObjectChange(id, obj) {
-        if (obj) {
-            // The object was changed
-            this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-        } else {
-            // The object was deleted
-            this.log.info(`object ${id} deleted`);
-        }
+    formatObjectId(_objectId)
+    {
+        let validObjectId = _objectId.replace(this.FORBIDDEN_CHARS, '_');
+        validObjectId = validObjectId.replace(/[\.\s\/]/g, '_');
+        return validObjectId;
     }
 
     /**
-     * Is called if a subscribed state changes
-     * @param {string} id
-     * @param {ioBroker.State | null | undefined} state
+     * This method is usesd to remove unecessary devices which are not defined in given array of device id's
+     * @param  {Array} _deviceIds Array of device id's which should be in the object store
+     * @return {Promise}
      */
-    onStateChange(id, state) {
-
-        // TODO: @@@ If a "settings" state was changed we do update the deviceSettings for the admin gui
-
-        if (state) {
-            // The state was changed
-            this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-        } else {
-            // The state was deleted
-            this.log.info(`state ${id} deleted`);
-        }
-    }
-
-    // If you need to accept messages in your adapter, uncomment the following block and the corresponding line in the constructor.
-    // /**
-    //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-    //  * Using this method requires "common.messagebox" property to be set to true in io-package.json
-    //  * @param {ioBroker.Message} obj
-    //  */
-    // onMessage(obj) {
-    //     if (typeof obj === 'object' && obj.message) {
-    //         if (obj.command === 'send') {
-    //             // e.g. send email or pushover or whatever
-    //             this.log.info('send command');
-
-    //             // Send response in callback if required
-    //             if (obj.callback) this.sendTo(obj.from, obj.command, 'Message received', obj.callback);
-    //         }
-    //     }
-    // }
-
-
-    // New message arrived. obj is array with current messages
-    // triggered from admin page read in knx project
-    onMessage(_obj)
+    async cleanupDevices(_deviceIds)
     {
-        this.handleMessages(_obj);
-        return true;
-    }
-
-    async handleMessages(_obj)
-    {
-        //this.log.warn(JSON.stringify(_obj));
-
-        if (typeof _obj === 'object'){
-            switch (_obj.command) {
-                case 'formatObjectId':
-                    if (_obj.callback) {
-                        this.log.error(this.FORBIDDEN_CHARS.toString());
-                        let validObjectId = _obj.message.toString().replace(this.FORBIDDEN_CHARS, '_');
-                        validObjectId = validObjectId.replace(/[\.\s\/]/g, '_');
-                        this.sendTo(_obj.from, _obj.command, validObjectId, _obj.callback);
-                    }
-                    break;
-
-                case 'requestArtnetDevices':
-                    if (_obj.callback) {
-                        this.sendTo(_obj.from, _obj.command, this.deviceSettings, _obj.callback);
-                    }
-                    break;
-
-                case 'updateDeviceSettings':
-                    try
-                    {
-                        for (const deviceSetting of _obj.message){
-                            await this.addOrUpdateDevice(deviceSetting);
-                        }
-                    }
-                    catch(_exception)
-                    {
-                        this.log.error(_exception.toString());
-                    }
-
-                    // TODO: clear devices not updated!
-
-                    await this.buildDeviceSettingsFromAdapterObjects();
-
-                    if (_obj.callback) {
-                        this.sendTo(_obj.from, _obj.command, {}, _obj.callback);
-                    }
-                    break;
+        const deviceObjects = await this.getDevicesAsync();
+        for (const deviceObject of deviceObjects)
+        {
+            if(!_deviceIds.includes(deviceObject._id))
+            {
+                await this.delObjectAsync(deviceObject._id);
             }
         }
     }
 
-
+    /**
+     * adds or updates a device id object and all its child's by the given device description object
+     * @param  {Object} _device the device description object
+     * @return {Promise}
+     */
     async addOrUpdateDevice(_device)
     {
-        // TODO: verify before adding the device!
+        // TODO: verify before adding the device?!
+
         // main device and channel objects
-        await this.setObjectHelper('lights.' + _device.deviceId, _device.name, 'device');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel', 'channel', 'channel');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values', 'values', 'channel');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel', 'channel', 'channel');
+        await this.createObjectNotExists('lights.' + _device.deviceId, _device.name, 'device');
+        await this.createObjectNotExists('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
+        await this.createObjectNotExists('lights.' + _device.deviceId + '.settings.channel', 'channel', 'channel');
+        await this.createObjectNotExists('lights.' + _device.deviceId + '.values', 'values', 'channel');
+        await this.createObjectNotExists('lights.' + _device.deviceId + '.values.channel', 'channel', 'channel');
 
         // overall settings
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.fadeTime', 'fadeTime', 'state', 'number', _device.settings.fadeTime);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.type', 'type', 'state', 'string', _device.settings.type);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.fadeTime', 'fadeTime', 'number', _device.settings.fadeTime);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.type', 'type', 'string', _device.settings.type);
 
         // channels
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.main', 'main', 'state', 'number', _device.settings.channel.main, true);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.red', 'red', 'state', 'number', _device.settings.channel.red, true);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.green', 'green', 'state', 'number', _device.settings.channel.green, true);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', 'state', 'number', _device.settings.channel.blue, true);
-        await this.setObjectHelper('lights.' + _device.deviceId + '.settings.channel.white', 'white', 'state', 'number', _device.settings.channel.white, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.main', 'main', 'number', _device.settings.channel.main, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.red', 'red', 'number', _device.settings.channel.red, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.green', 'green', 'number', _device.settings.channel.green, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', 'number', _device.settings.channel.blue, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.white', 'white', 'number', _device.settings.channel.white, true);
 
-        // values
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values.isOn', 'isOn', 'state', 'boolean');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values.brightness', 'brightness', 'state', 'number');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.main', 'main', 'state', 'number');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.red', 'red', 'state', 'number');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.green', 'green', 'state', 'number');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.blue', 'blue', 'state', 'number');
-        await this.setObjectHelper('lights.' + _device.deviceId + '.values.channel.white', 'white', 'state', 'number');
+        // set some value objects/states for the devices but do not overwrite any values which are already present
+        // those are the states that are always present on every device, even if the device is not capable of that state!
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.isOn', 'isOn', 'boolean', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.brightness', 'brightness', 'number', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.main', 'main', 'number', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.red', 'red', 'number', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.green', 'green', 'number', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.blue', 'blue', 'number', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.white', 'white', 'number', null, false, false);
     }
 
-    async setObjectHelper(_id, _name, _type, _stateType, _value, _deleteNullValue = false)
+    /**
+     * a special helper method to easily add objects
+     * @param  {String} _id the object id
+     * @param  {String} _name the object name
+     * @param  {String} _type the object type (e.g. device, channel, state, ...)
+     * @param  {Object} _common the common description of the object which will be created
+     * @return {Promise}
+     */
+    async createObjectNotExists(_id, _name, _type, _common = null)
     {
+        const commonObject = _common ? _common : {};
+        commonObject.name = _name;
+
         const objectContainer = {
             type: _type,
-            common: {
-                name: _name
-            },
+            common: commonObject,
             native: {},
         };
-
-        if(_stateType)
-        {
-            objectContainer.common.type = _stateType;
-            objectContainer.common.role = 'state';
-            objectContainer.common.read = true;
-            objectContainer.common.write = true;
-        }
-        //this.log.warn(JSON.stringify(objectContainer));
         await this.setObjectNotExistsAsync(_id, objectContainer);
+    }
 
-        if(_stateType)
+
+    /**
+     * a special helper method to easily add/remove and change values of states
+     * @param  {String} _id the state id
+     * @param  {String} _name the state name
+     * @param  {String} _stateType the state type (e.g. number, string, ...) If this value is set, the object will be a state
+     * @param  {any} _stateValue the value of the state
+     * @param  {Boolean} _deleteStateOnNullValue indicates if passing a null value should delete the state and its object
+     * @param  {Boolean} _allowSetValue indicates if the value given value will be set (mainly used for syncing the state object with admin)
+     * @return {Promise}
+     */
+    async createOrUpdateState(_id, _name, _stateType, _stateValue, _deleteStateOnNullValue = true, _allowSetValue = true)
+    {
+        const commonObject = {
+            type: 'state',
+            role: 'state',
+            read: true,
+            write: true
+        };
+        await this.createObjectNotExists(_id, _name, _type, commonObject);
+
+        if(_allowSetValue)
         {
-            if(_deleteNullValue && !_value)
+            if(_deleteStateOnNullValue && _stateValue === null)
             {
                 await this.delStateAsync(_id);
                 await this.delObjectAsync(_id);
             }
             else
             {
-                await this.setStateAsync(_id, { val: this.convertValue(_value, _stateType), ack: true });
+                await this.setStateAsync(_id, { val: this.convertValue(_stateValue, _stateType), ack: true });
             }
         }
     }
 
-
+    /**
+     * conversion method for any value to the type given in the parameters
+     * currently only 'string' and 'number' is a valid type
+     * @param  {any} _value the value ehich should be converted
+     * @param  {String} _type the type the value should be converted to
+     * @return {any} _value converted to the given _type
+     */
     convertValue(_value, _type)
     {
         let converted;
@@ -397,13 +381,12 @@ class Artnetdmx extends utils.Adapter {
 
 
 
+
 if (require.main !== module) {
-    // Export the constructor in compact mode
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
      */
     module.exports = (options) => new Artnetdmx(options);
 } else {
-    // otherwise start the instance directly
     new Artnetdmx();
 }
