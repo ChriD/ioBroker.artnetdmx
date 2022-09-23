@@ -2,6 +2,7 @@
     TODO: 
     * Configuration initial values
     * remove non used devices
+    * name change / ID change?!
 */ 
 
 'use strict';
@@ -147,7 +148,7 @@ class Artnetdmx extends utils.Adapter {
                         }
                         // we may have removed some devices in the admin view and those should be deleted from 
                         // the object store. Therefore we run through the current devices and check if they are
-                        //await this.cleanupDevices(deviceIds);
+                        await this.cleanupDevices(deviceIds);
                     }
                     catch(_exception)
                     {
