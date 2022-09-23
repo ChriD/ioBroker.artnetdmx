@@ -146,7 +146,7 @@ class Artnetdmx extends utils.Adapter {
                         }
                         // we may have removed some devices in the admin view and those should be deleted from 
                         // the object store. Therefore we run through the current devices and check if they are
-                        await this.cleanupDevices(deviceIds);
+                        //await this.cleanupDevices(deviceIds);
                     }
                     catch(_exception)
                     {
@@ -253,7 +253,7 @@ class Artnetdmx extends utils.Adapter {
             {
                 await this.delObjectAsync(deviceObject._id);
             }
-        }
+        }        
     }
 
     /**
