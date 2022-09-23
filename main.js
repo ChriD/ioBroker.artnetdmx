@@ -333,7 +333,7 @@ class Artnetdmx extends utils.Adapter {
             read: true,
             write: true
         };
-        await this.createObjectNotExists(_id, _name, _type, commonObject);
+        await this.createObjectNotExists(_id, _name, 'state', commonObject);
 
         if(_allowSetValue)
         {
