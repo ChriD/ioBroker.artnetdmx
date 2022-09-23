@@ -140,7 +140,8 @@ class Artnetdmx extends utils.Adapter {
                     try
                     {
                         const deviceIds = new Array();
-                        for (const device of _obj.message){
+                        for (const device of _obj.message)
+                        {
                             await this.addOrUpdateDevice(device);
                             deviceIds.push(device.deviceId);
                         }
@@ -246,14 +247,17 @@ class Artnetdmx extends utils.Adapter {
      */
     async cleanupDevices(_deviceIds)
     {
+        this.log.error(JSON.stringify(_deviceIds)); // @@@
         const deviceObjects = await this.getDevicesAsync();
         for (const deviceObject of deviceObjects)
         {
-            if(!_deviceIds.includes(deviceObject._id))
+            this.log.error(JSON.stringify(deviceObject)); // @@@
+            if(_deviceIds.includes(deviceObject._id) == false)
             {
+                await this.delStateAsync(deviceObject._id);
                 await this.delObjectAsync(deviceObject._id);
             }
-        }        
+        }
     }
 
     /**
