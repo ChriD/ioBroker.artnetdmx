@@ -328,7 +328,7 @@ class Artnetdmx extends utils.Adapter {
     async createOrUpdateState(_id, _name, _stateType, _stateValue, _deleteStateOnNullValue = true, _allowSetValue = true)
     {
         const commonObject = {
-            type: 'state',
+            type: _stateType,
             role: 'state',
             read: true,
             write: true
