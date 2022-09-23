@@ -2,7 +2,8 @@
     TODO: 
     * Configuration initial values
     * remove non used devices
-    * name change / ID change?!
+    * name change
+    * ID change (should already work?!)
 */ 
 
 'use strict';
@@ -181,7 +182,6 @@ class Artnetdmx extends utils.Adapter {
             this.devices = [];
 
             const deviceObjects = await this.getDevicesAsync();
-            this.log.error(JSON.stringify(deviceObjects));
             for (const deviceObject of deviceObjects)
             {
                 const statePathDeviceSettings = deviceObject._id + '.settings';
