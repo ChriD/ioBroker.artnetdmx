@@ -248,12 +248,11 @@ class Artnetdmx extends utils.Adapter {
      */
     async cleanupDevices(_deviceIds)
     {
-        this.log.error(JSON.stringify(_deviceIds)); // @@@
         const deviceObjects = await this.getDevicesAsync();
         for (const deviceObject of deviceObjects)
         {
-            this.log.error(JSON.stringify(deviceObject)); // @@@
-            if(_deviceIds.includes(deviceObject._id) == false)
+            const deviceId = (deviceObject._id).split('.').pop();
+            if(_deviceIds.includes(deviceId) == false)
             {
                 await this.delStateAsync(deviceObject._id);
                 await this.delObjectAsync(deviceObject._id);
