@@ -1,9 +1,8 @@
 /*
     TODO: 
     * Configuration initial values
-    * remove non used devices
-    * name change
-    * ID change (should already work?!)
+    * remove non used devices (doesn't work proper tree stands)
+    * name change (recreate?!)
 */ 
 
 'use strict';
@@ -147,7 +146,7 @@ class Artnetdmx extends utils.Adapter {
                             await this.addOrUpdateDevice(device);
                             deviceIds.push(device.deviceId);
                         }
-                        // we may have removed some devices in the admin view and those should be deleted from 
+                        // we may have removed some devices in the admin view and those should be deleted from
                         // the object store. Therefore we run through the current devices and check if they are
                         await this.cleanupDevices(deviceIds);
                     }
@@ -255,7 +254,7 @@ class Artnetdmx extends utils.Adapter {
             if(_deviceIds.includes(deviceId) == false)
             {
                 await this.delStateAsync(deviceObject._id);
-                await this.delObjectAsync(deviceObject._id);
+                await this.delObjectAsync(deviceObject._id, {recursive: true});
             }
         }
     }
@@ -268,9 +267,9 @@ class Artnetdmx extends utils.Adapter {
     async addOrUpdateDevice(_device)
     {
         // TODO: verify before adding the device?!
-
+ 
         // main device and channel objects
-        await this.createObjectNotExists('lights.' + _device.deviceId, _device.name, 'device');
+        await this.createObjectNotExists('lights.' + _device.deviceId, _device.name, 'device', null, true);
         await this.createObjectNotExists('lights.' + _device.deviceId + '.settings', 'settings', 'channel');
         await this.createObjectNotExists('lights.' + _device.deviceId + '.settings.channel', 'channel', 'channel');
         await this.createObjectNotExists('lights.' + _device.deviceId + '.values', 'values', 'channel');
@@ -306,7 +305,7 @@ class Artnetdmx extends utils.Adapter {
      * @param  {Object} _common the common description of the object which will be created
      * @return {Promise}
      */
-    async createObjectNotExists(_id, _name, _type, _common = null)
+    async createObjectNotExists(_id, _name, _type, _common = null, _forceOverwrite = false)
     {
         const commonObject = _common ? _common : {};
         commonObject.name = _name;
@@ -316,7 +315,13 @@ class Artnetdmx extends utils.Adapter {
             common: commonObject,
             native: {},
         };
-        await this.setObjectNotExistsAsync(_id, objectContainer);
+
+        if(_forceOverwrite) {
+            await this.setObjectAsync(_id, objectContainer)
+        }
+        else {
+            await this.setObjectNotExistsAsync(_id, objectContainer);
+        }
     }
 
 
