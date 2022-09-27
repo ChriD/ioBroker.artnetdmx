@@ -54,7 +54,7 @@
         "main": "main.js",
         "icon": "artnetdmx.png",
         "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ChriD/ioBroker.artnetdmx/main/admin/artnetdmx.gif",
+        "extIcon": "https://raw.githubusercontent.com/ChriD/ioBroker.artnetdmx/main/admin/artnetdmx.png",
         "readme": "https://github.com/ChriD/ioBroker.artnetdmx/blob/main/README.md",
         "loglevel": "info",
         "mode": "daemon",

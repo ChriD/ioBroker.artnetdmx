@@ -1,6 +1,7 @@
 /*
     TODO:
     * Configuration initial values
+    * save empty as NULL (so objects are deleted)
 */ 
 
 'use strict';
