@@ -14,6 +14,8 @@
 
 Describe your project here
 
+Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
+
 ## Developer manual
 This section is intended for the developer. It can be deleted later
 

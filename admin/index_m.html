@@ -29,6 +29,14 @@
             // method
             fillSelectIPs("#localInterface", _settings.adapterAddress, false, true);
 
+            // set some standard values for the configuration            
+            _settings = _settings ? _settings : {}
+            _settings.nodeport = _settings.nodeport ? _settings.nodeport : 6454;
+            _settings.universe = _settings.universe ? _settings.universe : 0;
+            _settings.framesPerSec = _settings.framesPerSec ? _settings.framesPerSec : 44;
+            _settings.fullRefreshPeriod = _settings.fullRefreshPeriod ? _settings.fullRefreshPeriod : 5000;
+            _settings.defaultFadeTime = _settings.defaultFadeTime ? _settings.defaultFadeTime : 250;
+           
             // load the settings from the _settings object into the html controls
             loadSettings(_settings, _onChange);
                        
