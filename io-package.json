@@ -65,25 +65,7 @@
         "messagebox": true,
         "subscribe": "messagebox",
         "adminUI": {
-            "config": "materialize",
-            "tab": "materialize"
-        },
-        "adminTab": {
-            "singleton": true,
-            "name": {
-                "en": "Artnet-DMX",
-                "de": "Artnet-DMX",
-                "ru": "Артнет-DMX",
-                "pt": "Artnet-DMX",
-                "nl": "Artnet-DMX",
-                "fr": "Artnet-DMX",
-                "it": "Artnet-DMX",
-                "es": "Artnet-DMX",
-                "pl": "Artnet-DMX",
-                "zh-cn": "Artnet-DMX"
-            },
-            "link": "",
-            "fa-icon": "info"
+            "config": "materialize"
         },
         "dependencies": [
             {

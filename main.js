@@ -1,8 +1,6 @@
 /*
     TODO:
     * Configuration initial values
-    * remove non used devices (doesn't work proper tree stands)
-    * name change (recreate?!)
 */ 
 
 'use strict';
