@@ -1,6 +1,9 @@
 <!--     
     * loading indicator
-    * "frames per second" as select control?
+    * "frames per second" as select control? (1-44) ???
+    * only allow values from 1(0?) to 255 (add offset counter????)
+    * save devices / update devices to JSON
+    * be sure to send nuöö values on empty channels
 -->
 
 <html>
@@ -20,7 +23,7 @@
     <script type="text/javascript">
         
         function load(_settings, _onChange) {
-            // due to the fact the our devices abns their "settings" are stored as iobroker objects/states and not 
+            // due to the fact the our devices and their "settings" are stored as iobroker objects/states and not 
             // as a "config", we have to request the devices and their settings from the adapter
             requestArtnetDevices(_onChange);
 
@@ -48,9 +51,17 @@
         // this one is beeing called wehn we hit SAVE or SAVE AND CLOSE and therfore we have to be sure the
         // 'callback' is only beeing called when the save of the devices has been done!
         function save(_callback) {  
-            updateArtnetDevices().then(()=>{
-                saveSettings(_callback);
-            });
+            if(this.validateSettings())
+            {
+                updateArtnetDevices().then(()=>{
+                    saveSettings(_callback);            
+                });
+            }
+        }
+
+        function validateSettings()
+        {
+            return false;
         }
 
         // this function will get the data from the form controls and pass it to the save callback of the adapter
@@ -332,15 +343,15 @@
                         <input id="universe" type="number" min="0" max="32768" class="value" />
                         <label class="translate" for="pass">Universe:</label>
                     </div>
-                    <div class="input-field col s3 m3 l3">
+                    <div class="input-field col s3 m3 l1">
                         <input id="framesPerSec" type="number" min="1" max="44" class="value" />
                         <label class="translate" for="framesPerSec">Frames [per sec]:</label>
                     </div>
-                    <div class="input-field col s3 m3 l3">
+                    <div class="input-field col s3 m3 l1">
                         <input id="fullRefreshPeriod" type="number" min="0" max="60" class="value" />
                         <label class="translate" for="fullRefreshPeriod">Refresh Period [ms]:</label>
                     </div>
-                    <div class="input-field col s3 m3 l3">                        
+                    <div class="input-field col s3 m3 l1">                        
                         <input id="defaultFadeTime" type="number" min="0" max="60000" class="value" />
                         <label class="translate" for="defaultFadeTime">Default fade time [ms]:</label>
                     </div>
