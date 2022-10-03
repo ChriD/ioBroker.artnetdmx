@@ -62,7 +62,16 @@
                 errorTextClass: 'text-help' 
             };
 
+            /*
+            Pristine.addValidator("ip", function(value, param1, param2) {
+                // here `this` refers to the respective input element
+                return parseInt(param1) <= value && value <= parseInt(param2)                
+            }, "The value (${0}) must be between ${1} and ${2}", 5, false);
+            */
+
             window.pristine = new Pristine(document.getElementById("form"), defaultConfig);
+
+
         }
         
         // this one is beeing called wehn we hit SAVE or SAVE AND CLOSE and therfore we have to be sure the
@@ -380,7 +389,7 @@
                 <h6 class="translate sub-title">Connection settings</h6>
                 <div class="row">
                     <div class="input-field col s6 m3 l2">
-                        <input type="text" id="nodeip" class="value" />
+                        <input type="text" id="nodeip" class="value" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" placeholder="127.0.0.1" autocomplete="off"/>
                         <label class="translate" for="nodeip">Node IP:</label>
                     </div>
                     <div class="input-field col s3 m2 l1">
