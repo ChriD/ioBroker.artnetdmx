@@ -3,7 +3,8 @@
     * "frames per second" as select control? (1-44) ???
     * only allow values from 1(0?) to 255 (add offset counter????)
     * save devices / update devices to JSON
-    * be sure to send nuöö values on empty channels
+    * be sure to send null values on empty channels
+    * IP selection
 -->
 
 <html>
@@ -18,6 +19,7 @@
 
     <link rel="stylesheet" type="text/css" href="style.css"/>
     <script type="text/javascript" src="objectHelpers.js"></script>
+    <script type="text/javascript" src="pristine.js"></script>
     <script type="text/javascript" src="words.js"></script>
 
     <script type="text/javascript">
@@ -46,12 +48,27 @@
             // reinitialize all the materialize labels on the page because we are adding inputs dynamically
             // in fact in our case this following line wont be of any effect i think
             if (M) M.updateTextFields();
+
+            let defaultConfig = {
+                // class of the parent element where the error/success class is added
+                classTo: 'input-field',
+                errorClass: 'has-danger',
+                successClass: 'has-success',
+                // class of the parent element where error text element is appended
+                errorTextParent: 'input-field',
+                // type of element to create for the error text
+                errorTextTag: 'div',
+                // class of the error text element
+                errorTextClass: 'text-help' 
+            };
+
+            window.pristine = new Pristine(document.getElementById("form"), defaultConfig);
         }
         
         // this one is beeing called wehn we hit SAVE or SAVE AND CLOSE and therfore we have to be sure the
         // 'callback' is only beeing called when the save of the devices has been done!
         function save(_callback) {  
-            if(this.validateSettings())
+            if(validateSettings())
             {
                 updateArtnetDevices().then(()=>{
                     saveSettings(_callback);            
@@ -59,14 +76,42 @@
             }
         }
 
+        
         function validateSettings()
         {
-            return false;
+            return window.pristine.validate();
+            //return true;
+
+            /*
+            let ret = true;
+            const config = buildSettingsObjectFromForm();
+            const devices = getDeviceObjectFromTable('devices');
+            // TODO: how to output errors on GUI? Whats the standard way in iobroker admin?
+
+            // 
+            if(config.framesPerSec < 1 || config.framesPerSec > 44)
+            {
+                ret = false;
+            }
+
+            // * validate channel values 0(1)-255
+            // * validate frames per second
+
+            return ret;
+            */
         }
 
         // this function will get the data from the form controls and pass it to the save callback of the adapter
         // we use the example in the tutorial adapter for loading and storing config data, its good enough and usable 
         function saveSettings(_callback)
+        {
+            var obj = buildSettingsObjectFromForm();
+            _callback(obj);
+        }
+
+
+        // this function will get the data from the form controls and stores it into an object which will be returned
+        function buildSettingsObjectFromForm()
         {
             var obj = {};
             $('.value').each(function () {
@@ -79,7 +124,7 @@
                     obj[$this.attr('id')] = $this.val();
                 }
             });
-            _callback(obj);
+            return obj;
         }
 
         // this function will fill the controls from the settings/config object from the adapter
@@ -102,6 +147,10 @@
                         .on('keyup', () => _onChange())
                         ;
                 }
+
+                // add 
+
+
             });
             _onChange(false);
         }
@@ -170,7 +219,7 @@
             for (const channelElement of allChannelElements)
             {
                 channelValue = channelElement.getAttribute('data-name').split('.').pop();                
-                this.updateEditableChannel(channelElement, availableChannels.includes(channelValue) );            
+                updateEditableChannel(channelElement, availableChannels.includes(channelValue) );            
             }
         }
 
@@ -202,7 +251,7 @@
             if(!deviceId || _forceUpdate)
             {
                 if(_value != '') {
-                    deviceIdElement.value = await this.formatObjectId(_value);                                
+                    deviceIdElement.value = await formatObjectId(_value);                                
                 }
             }
         }
@@ -222,16 +271,16 @@
                 // in relation to the selection
                 let settingsTypeElement = rowElement.querySelector('select[data-name="settings.type"]');
                 settingsTypeElement.onchange = (_event) => {                        
-                    let rowIndex = this.getTableRowDataIndex(_event.currentTarget);
-                    this.updateEditableChannels(rowIndex);
+                    let rowIndex = getTableRowDataIndex(_event.currentTarget);
+                    updateEditableChannels(rowIndex);
                 }
 
                 // when the name of the device was changed we will update the object id for that device
                 // given the id is empty.
                 let settingsNameElement = rowElement.querySelector('input[data-name="name"]');
                 settingsNameElement.onblur = (_event) => {                        
-                    let rowIndex = this.getTableRowDataIndex(_event.target);
-                    this.updateObjectId(rowIndex, _event.target.value);
+                    let rowIndex = getTableRowDataIndex(_event.target);
+                    updateObjectId(rowIndex, _event.target.value);
                 }
 
                 // inject the 'update objectId' button for refershing the object id from the device name
@@ -243,12 +292,12 @@
                 input.innerHTML = 'refresh';
                 let deviceIdUpdateButtonElement = columnElement.appendChild(input);                
                 deviceIdUpdateButtonElement.onclick = (_event) => {                        
-                    let rowIndex = this.getTableRowDataIndex(_event.target);
-                    this.updateObjectId(rowIndex, settingsNameElement.value, true);
+                    let rowIndex = getTableRowDataIndex(_event.target);
+                    updateObjectId(rowIndex, settingsNameElement.value, true);
                 }
 
                 // enable/disable the channel controls for the given row index
-                this.updateEditableChannels(rowIndex);
+                updateEditableChannels(rowIndex);
             });           
         }
 
@@ -286,29 +335,38 @@
         // it will return a promise which will be fulfilled if the storage was completed. That's importent on "SAVE AND CLOSE"
         function updateArtnetDevices()
         {      
-            return new Promise((_resolve, _reject) => {
-                const tableValues = table2values('devices');
-                // we have to unflatten the flattend object we get from the 'table2values' function so we have a 
-                // valid object for storage/object creation
-                let devices = new Array();
-                for (const device of tableValues)
-                {
-                    devices.push(unflattenObject(device));  
-                }      
-                this.setProcessingRequest(true);
+            return new Promise((_resolve, _reject) => {          
+                let devices = getDeviceObjectFromTable('devices')
+                setProcessingRequest(true);                
                 sendTo(null, "updateArtnetDevices", devices, function (_result) {
                         _resolve(_result);
-                        this.setProcessingRequest(false);
+                        setProcessingRequest(false);
                     });
             })                           
         }        
+
+        // this method gets the values of the given table and converts them to a nice object whichb we can send to the
+        // backend or which we can use to validate the entries
+        function getDeviceObjectFromTable(_table = 'devices')
+        {
+            const tableValues = table2values('devices');
+            // we have to unflatten the flattend object we get from the 'table2values' function so we have a 
+            // valid object for storage/object creation
+            let devices = new Array();
+            for (const device of tableValues)
+            {
+                devices.push(unflattenObject(device));  
+            }            
+            return devices;
+        }
+
     </script>
 
 </head>
 
 <body>
 
-    <div class="m adapter-container">
+    <div class="m adapter-container" id="form">
         <div class="row">
 
             <div class="col s12">
@@ -343,15 +401,15 @@
                         <input id="universe" type="number" min="0" max="32768" class="value" />
                         <label class="translate" for="pass">Universe:</label>
                     </div>
-                    <div class="input-field col s3 m3 l1">
+                    <div class="input-field col s3 m2 l2">
                         <input id="framesPerSec" type="number" min="1" max="44" class="value" />
                         <label class="translate" for="framesPerSec">Frames [per sec]:</label>
                     </div>
-                    <div class="input-field col s3 m3 l1">
-                        <input id="fullRefreshPeriod" type="number" min="0" max="60" class="value" />
+                    <div class="input-field col s3 m2 l2">
+                        <input id="fullRefreshPeriod" type="number" min="0" class="value" />
                         <label class="translate" for="fullRefreshPeriod">Refresh Period [ms]:</label>
                     </div>
-                    <div class="input-field col s3 m3 l1">                        
+                    <div class="input-field col s3 m2 l2">                        
                         <input id="defaultFadeTime" type="number" min="0" max="60000" class="value" />
                         <label class="translate" for="defaultFadeTime">Default fade time [ms]:</label>
                     </div>
