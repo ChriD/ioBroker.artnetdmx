@@ -39,7 +39,7 @@
                 }
                 $("#localInterface.value").val(_settings.adapterAddress).select();
             });
-            fillSelectIPs("#localInterface", _settings.adapterAddress, false, true);
+            fillSelectIPs("#adapterAddress", _settings.adapterAddress, false, true);
 
             // set some standard values for the configuration            
             _settings = _settings ? _settings : {}
