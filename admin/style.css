@@ -77,3 +77,7 @@ i[data-name="deviceIdUpdate"] {
 .type{
     width: 150px;
 }
+
+.text-help{
+    color: red;
+}
