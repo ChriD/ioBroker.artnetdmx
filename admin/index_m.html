@@ -37,9 +37,9 @@
                         $("#localInterface").append('<option value="' + ips[i].address + '">' + ips[i].name + "</option>");
                     }
                 }
-                $("#localInterface.value").val(_settings.adapterAddress).select();
+                $("#localInterface.value").val(_settings.localInterface).select();
             });
-            fillSelectIPs("#adapterAddress", _settings.adapterAddress, false, true);
+            fillSelectIPs("#adapterAddress", _settings.localInterface, false, true);
 
             // set some standard values for the configuration            
             _settings = _settings ? _settings : {}
