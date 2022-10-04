@@ -62,12 +62,15 @@
                 errorTextClass: 'text-help' 
             };
 
-            /*
-            Pristine.addValidator("ip", function(value, param1, param2) {
-                // here `this` refers to the respective input element
-                return parseInt(param1) <= value && value <= parseInt(param2)                
-            }, "The value (${0}) must be between ${1} and ${2}", 5, false);
-            */
+            
+            Pristine.addValidator("ip", function(_value) {                     
+                const regex = new RegExp('^(?!0)(?!.*\.$)((1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$');
+                if (regex.test(_value)) 
+                {  
+                    return true;
+                }
+                return false;
+            }, "The value must be a valid ip address");
 
             window.pristine = new Pristine(document.getElementById("form"), defaultConfig);
 
@@ -389,7 +392,7 @@
                 <h6 class="translate sub-title">Connection settings</h6>
                 <div class="row">
                     <div class="input-field col s6 m3 l2">
-                        <input type="text" id="nodeip" class="value" minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" placeholder="127.0.0.1" autocomplete="off"/>
+                        <input type="text" id="nodeip" class="value" autocomplete="off" data-pristine-ip/>
                         <label class="translate" for="nodeip">Node IP:</label>
                     </div>
                     <div class="input-field col s3 m2 l1">
