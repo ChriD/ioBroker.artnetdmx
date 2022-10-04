@@ -1,6 +1,5 @@
 <!--     
     * loading indicator
-    * "frames per second" as select control? (1-44) ???
     * only allow values from 1(0?) to 255 (add offset counter????)
     * save devices / update devices to JSON
     * be sure to send null values on empty channels
@@ -32,6 +31,14 @@
             // we do connect to some kind of ArtnetDMX device so we need to have the selection which network interface
             // we should use when doing so. The standard 'adapter-settings.js' will help us with it's 'fillSelectIPs'
             // method
+            getIPs(function (ips) {
+                for (var i = 0; i < ips.length; i++) {
+                    if (ips[i].family.indexOf("ipv4") > -1 && ips[i].address !== "0.0.0.0" && ips[i].address !== "127.0.0.1") {
+                        $("#localInterface").append('<option value="' + ips[i].address + '">' + ips[i].name + "</option>");
+                    }
+                }
+                $("#localInterface.value").val(settings.localInterface).select();
+            });
             fillSelectIPs("#localInterface", _settings.adapterAddress, false, true);
 
             // set some standard values for the configuration            
@@ -62,6 +69,10 @@
                 updateArtnetDevices().then(()=>{
                     saveSettings(_callback);            
                 });
+            }
+            else
+            {
+                alert("Settings not correct!");
             }
         }
 
