@@ -224,6 +224,9 @@
             if(!_channelElement)
                 return;
 
+            _channelElement.min = 0;
+            _channelElement.max = 512;
+
             _channelElement.disabled = !_enabled;
             _channelElement.readOnly = !_enabled;
             if(!_enabled)
@@ -423,8 +426,8 @@
                                 <th data-name="settings.type"  style="min-width: 100px" data-type="select" data-options="dimmable;TW;RGB;RGBW;RGBTW" class="translate type">Type</th>                                
                                 <th data-name="settings.channel.main" data-type="number" class="translate channel">Ch. Main</th>
                                 <th data-name="settings.channel.white" data-type="number" class="translate channel">Ch. White</th>
-                                <th data-name="settings.channel.red" data-type="number" min="0" max="255" class="translate channel">Ch. Red</th>
-                                <th data-name="settings.channel.green" data-type="number" data-min="0" data-max="255" class="translate channel">Ch. Green</th>
+                                <th data-name="settings.channel.red" data-type="number" class="translate channel">Ch. Red</th>
+                                <th data-name="settings.channel.green" data-type="number" class="translate channel">Ch. Green</th>
                                 <th data-name="settings.channel.blue" data-type="number" class="translate channel">Ch. Blue</th>
                                 <th data-name="settings.fadeTime" data-type="number" data-default="-1" class="translate fadeTime">Fade time</th>
                                 <th data-buttons="delete up down" style="width: 120px"></th>
