@@ -1,9 +1,9 @@
 <!--     
+    Roadmap:
     * loading indicator
-    * only allow values from 1(0?) to 255 (add offset counter????)
+    * only allow values from 1(0?) to 512 (add offset counter?)
     * save devices / update devices to JSON
     * be sure to send null values on empty channels
-    * IP selection
 -->
 
 <html>
@@ -228,7 +228,7 @@
             }
         }
 
-        // use this to set a chennel element if it is editable/enabled or not
+        // use this to set a channel element if it is editable/enabled or not
         // Attention! This function will clear the value of the channel if the channel is beeing disabled!
         function updateEditableChannel(_channelElement, _enabled)    
         {

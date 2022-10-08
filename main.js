@@ -2,11 +2,12 @@
     TODO:
     * Configuration initial values
     * save empty as NULL (so objects are deleted)
-*/ 
+*/
 
 'use strict';
 
 const utils = require('@iobroker/adapter-core');
+const ArtnetActionBuffer = require('./artnetActionBuffer.js');
 
 
 class Artnetdmx extends utils.Adapter {
@@ -21,6 +22,7 @@ class Artnetdmx extends utils.Adapter {
         });
 
         this.devices = [];
+        this.artnetActionBuffer = null;
 
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
@@ -34,7 +36,7 @@ class Artnetdmx extends utils.Adapter {
      */
     async onReady() {
 
-        // TODO: Artnet informations
+        // TODO: Artnet informations from configuration
         // Reset the connection indicator during startup
         this.setState('info.connection', false, true);
 
@@ -42,6 +44,13 @@ class Artnetdmx extends utils.Adapter {
         // the admin page will show the devices defined in the object list and the values of the settings given in the "settings"
         // channel of the device
         await this.buildDevicesArrayFromAdapterObjects();
+
+        // setup the artnet action buffer which will do the connection and action handling for us
+        this.artnetActionBuffer = new ArtnetActionBuffer();
+        this.artnetActionBuffer.startBufferUpdate();
+
+        // TODO: check socket_ready and catch for throws in transmit!
+        //this.setState('info.connection', true, true);
 
         // subscribe to all 'settings' states in the adapter
         this.subscribeStates('*');
@@ -53,7 +62,8 @@ class Artnetdmx extends utils.Adapter {
      */
     onUnload(callback) {
         try {
-            // TODO: disconnect from artnet
+            if(this.artnetActionBuffer)
+                this.artnetActionBuffer.stopBufferUpdate();
             callback();
         } catch (e) {
             callback();
@@ -69,6 +79,9 @@ class Artnetdmx extends utils.Adapter {
         if (obj) {
             // TODO
             // The object was changed
+            // TODO: create action buffer from given object
+            //this.artnetActionBuffer.addAction(_actionBuffer)
+
             this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
         } else {
             // TODO
