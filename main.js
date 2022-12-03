@@ -7,6 +7,7 @@
 'use strict';
 
 const utils = require('@iobroker/adapter-core');
+const { info } = require('node:console');
 const path = require('node:path');
 const ArtnetActionBuffer = require(path.resolve( __dirname, './lib/artnetActionBuffer/artnetActionBuffer'));
 
@@ -54,7 +55,9 @@ class Artnetdmx extends utils.Adapter {
         });
         this.artnetActionBuffer.on('error', (_exception) => {
             this.log.error(_exception.message);
-            //this.log.error(_exception.ToString());
+        });
+        this.artnetActionBuffer.on('bufferChanged', (_idx) => {
+            this.log.info(JSON.stringify(this.artnetActionBuffer.bufferAction));
         });
         this.artnetActionBuffer.startBufferUpdate();
 
