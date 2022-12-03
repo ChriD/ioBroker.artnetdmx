@@ -283,6 +283,8 @@ class Artnetdmx extends utils.Adapter {
                 const device = {};
                 device.settings = {};
                 device.settings.channel = {};
+                device.values = {};
+                device.values.channel = {};
 
                 device.id = deviceObject._id;
                 device.deviceId = (deviceObject._id).split('.').pop();
