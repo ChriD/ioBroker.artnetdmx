@@ -23,7 +23,10 @@
     "url": "https://github.com/ChriD/ioBroker.artnetdmx.git"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.6.0"
+    "@iobroker/adapter-core": "^2.6.0",
+    "jspack": "0.0.4",
+    "netmask": "^2.0.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^2.2.2",
