@@ -153,8 +153,7 @@ class Artnetdmx extends utils.Adapter {
                         // action buffer for that channel
                         for (const [objKey, objValue] of Object.entries(deviceObject.settings.channel))
                         {
-                            this.log.info(`OBJ VAL: ${objValue}`);
-                            if(objValue.val)
+                            if(objValue)
                             {
                                 actionBuffer = {
                                     'action'  : 'fadeto',
