@@ -127,11 +127,9 @@ class Artnetdmx extends utils.Adapter {
                     const deviceId = (id.split('.').slice(0, 4)).join('.');
                     this.log.info(`DeviceId: ${deviceId}`);
 
-                    const device = this.deviceMap[deviceId];
-                    const deviceStr = JSON.stringify(device);
+                    const deviceObject = this.deviceMap[deviceId];
+                    const deviceStr = JSON.stringify(deviceObject);
                     this.log.info(`Device: ${deviceStr}`);
-
-                    return;
 
                     // TODO: get the id of the device and then get all states for the device
                     // deviceStates = getCachedDeviceStates();
@@ -141,7 +139,7 @@ class Artnetdmx extends utils.Adapter {
 
                     // TODO: @@@ add functions an cache the values (remove cache if any state on the 'settings level' was changed!)
                     // TODO: IsOn and Brightness will should change the cached device object
-                    const deviceObject = {};
+                    //const deviceObject = {};
                     const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.IsOn ? 1 : 0);
 
                     if(key == 'isOn')
@@ -297,6 +295,18 @@ class Artnetdmx extends utils.Adapter {
                 device.settings.channel.green = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings,'channel.green', null);
                 device.settings.channel.blue = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.blue', null);
                 device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.white', null);
+
+
+                const statePathDeviceValues = deviceObject._id + '.values';
+                const valuesStates = await this.getStatesAsync(statePathDeviceValues + '.*');
+
+                device.values.isOn = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues, 'isOn', null);
+                device.values.brightness = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues, 'brightness', null);
+                device.values.channel.main = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues, 'channel.main', null);
+                device.values.channel.red = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues, 'channel.red', null);
+                device.values.channel.green = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues,'channel.green', null);
+                device.values.channel.blue = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues, 'channel.blue', null);
+                device.values.channel.white = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues, 'channel.white', null);
 
                 this.devices.push(device);
                 this.deviceMap[device.id] = device;
