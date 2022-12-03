@@ -23,6 +23,7 @@ class Artnetdmx extends utils.Adapter {
         });
 
         this.devices = [];
+        this.deviceMap = {};
         this.artnetActionBuffer = null;
 
         this.on('ready', this.onReady.bind(this));
@@ -120,6 +121,16 @@ class Artnetdmx extends utils.Adapter {
                     this.log.info(`Id: ${id}`);
                     this.log.info(`Key: ${key}`);
                     this.log.info(`State: ${stateStr}`);
+              
+
+                    // artnetdmx.0.lights.Küche-TEST.*****
+                    const deviceId = (id.split('.').slice(0, 4)).join('.');
+                    this.log.info(`DeviceId: ${deviceId}`);
+
+                    const device = this.deviceMap[deviceId];
+                    const deviceStr = JSON.stringify(device);
+                    this.log.info(`Device: ${deviceStr}`);
+
                     return;
 
                     // TODO: get the id of the device and then get all states for the device
@@ -263,6 +274,7 @@ class Artnetdmx extends utils.Adapter {
         try
         {
             this.devices = [];
+            this.deviceMap = {};
 
             const deviceObjects = await this.getDevicesAsync();
             for (const deviceObject of deviceObjects)
@@ -287,6 +299,7 @@ class Artnetdmx extends utils.Adapter {
                 device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.white', null);
 
                 this.devices.push(device);
+                this.deviceMap[device.id] = device;
             }
         }
         catch(_error)
