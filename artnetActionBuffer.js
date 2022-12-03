@@ -1,17 +1,22 @@
 /*
 */
-
 'use strict';
 
+//import { EventEmitter } from 'node:events';
+const EventEmitter = require('events');
 const DMXLib = require('./lib/dmxnet');
 
-class ArtnetActionBuffer
+class ArtnetActionBuffer extends EventEmitter
 {
     constructor(_configuration)
     {
+        super();
+
         this.configuration          = _configuration;
         this.artnet                 = null;
         this.artnetSender           = null;
+
+        this.isConnected            = false;
 
         // this buffer contains the current value which will be sent to the artnet protocol
         this.buffer                 = [512];
@@ -122,11 +127,27 @@ class ArtnetActionBuffer
             catch(_exception)
             {
                 // TODO:@@@
+                this.emit('error', _exception);
             }
         }
 
         // TODO: catch exception. if there is one, emit error / and connectionState?
-        this.artnetSender.transmit();
+        try
+        {
+            this.artnetSender.transmit();
+            if(this.isConnected != true)
+            {
+                this.isConnected = true;
+                this.emit('connectionState', this.isConnected);
+            }
+        }
+        catch(_exception)
+        {
+            this.isConnected = false;
+            this.emit('error', _exception);
+            this.emit('connectionState', this.isConnected);
+        }
+
     }
 
 

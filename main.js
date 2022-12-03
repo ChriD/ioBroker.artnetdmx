@@ -47,10 +47,13 @@ class Artnetdmx extends utils.Adapter {
 
         // setup the artnet action buffer which will do the connection and action handling for us
         this.artnetActionBuffer = new ArtnetActionBuffer();
+        this.artnetActionBuffer.on('connectionState', (_connected) => {
+            this.setState('info.connection', _connected, true);
+        });
+        this.artnetActionBuffer.on('error', (_exception) => {
+            this.log.error(_exception.ToString());
+        });
         this.artnetActionBuffer.startBufferUpdate();
-
-        // TODO: check socket_ready and catch for throws in transmit!
-        //this.setState('info.connection', true, true);
 
         // subscribe to all 'settings' states in the adapter
         this.subscribeStates('*');
@@ -81,7 +84,6 @@ class Artnetdmx extends utils.Adapter {
             // The object was changed
             // TODO: create action buffer from given object
             //this.artnetActionBuffer.addAction(_actionBuffer)
-
             this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
         } else {
             // TODO
@@ -98,10 +100,65 @@ class Artnetdmx extends utils.Adapter {
     onStateChange(id, state) {
 
         // TODO: @@@ If a "settings" state was changed we do update the deviceSettings for the admin gui
-        if (state) {
-            // The state was changed
+        if (state)
+        {
+            // if isOn, brightness or a channel value changes, we have to build an action for the action buffer
+            // when the action is finished we have to ack the values?!?! --> Buffer will have an ack event?!
+            // 	state artnetdmx.0.lights.TEST.values.channel.blue changed: 10 (ack = false)
+            // artnetdmx.0.lights.TEST.values.channel.blue 
+            // artnetdmx.0.lights.Kueche_Spots.values.isOn
+            if(this.artnetActionBuffer)
+            {
+                const key = id.split('.').pop();
+                let actionBuffer = null;
+
+                // TODO: get the id of the device and then gett all states for the device
+                // deviceStates = getCachedDeviceStates();
+
+                // update new value on cached object
+                // deviceStates.values[key] = state.val;
+
+                // TODO: @@@ add functions an cache the values (remove cache if any state on the 'settings level' was changed!)
+                // TODO: IsOn and Brightness will should change the cached device object
+                const deviceObject = {};
+                const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.IsOn ? 1 : 0);
+
+                if(key == 'isOn')
+                {
+                    // get current rgb value object from type of device
+
+                    // TODO @@@ run through the device channels object and add the action buffers
+                    actionBuffer = {
+                        'action'  : 'fadeto',
+                        'channel' : deviceObject.settings.channel.red,
+                        'value'   : deviceObject.values.channel.red * brightnessMultiplicator
+                    };
+                }
+                // todo: brightness key
+                else
+                {
+                    // if channel VALUE add action buffer for that
+                    actionBuffer = {
+                        'action'  : 'fadeto',
+                        'channel' : deviceObject.settings.channel[key], // get channel from key
+                        'value'   : state.val * brightnessMultiplicator
+                    };
+                }
+
+                // setState("Test_Object", {val: {"eins":0,"zwei":1}}); 
+
+                //const channel   = _data.channel-1;
+                //_data.action    = _data.action ? _data.action.toUpperCase() : 'SET';
+
+                if(actionBuffer)
+                {
+                    this.artnetActionBuffer.addAction(_actionBuffer);
+                }
+            }
             this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-        } else {
+        }
+        else
+        {
             // The state was deleted
             this.log.info(`state ${id} deleted`);
         }
