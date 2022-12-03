@@ -109,14 +109,17 @@ class Artnetdmx extends utils.Adapter {
                 // if isOn, brightness or a channel value changes, we have to build an action for the action buffer
                 // when the action is finished we have to ack the values?!?! --> Buffer will have an ack event?!
                 // 	state artnetdmx.0.lights.TEST.values.channel.blue changed: 10 (ack = false)
-                // artnetdmx.0.lights.TEST.values.channel.blue 
+                // artnetdmx.0.lights.TEST.values.channel.blue
                 // artnetdmx.0.lights.Kueche_Spots.values.isOn
                 if(this.artnetActionBuffer)
                 {
                     const key = id.split('.').pop();
                     let actionBuffer = null;
+                    const stateStr = JSON.stringify(state);
 
+                    this.log.info(`Id: ${id}`);
                     this.log.info(`Key: ${key}`);
+                    this.log.info(`State: ${stateStr}`);
                     return;
 
                     // TODO: get the id of the device and then get all states for the device
