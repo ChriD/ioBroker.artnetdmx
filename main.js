@@ -133,6 +133,8 @@ class Artnetdmx extends utils.Adapter {
                     const deviceStr = JSON.stringify(deviceObject);
                     this.log.info(`Device: ${deviceStr}`);
 
+                    //setObj(deviceObject, ???? ) 
+
                     // TODO: get the id of the device and then get all states for the device
                     // deviceStates = getCachedDeviceStates();
 
@@ -142,37 +144,36 @@ class Artnetdmx extends utils.Adapter {
                     // TODO: @@@ add functions an cache the values (remove cache if any state on the 'settings level' was changed!)
                     // TODO: IsOn and Brightness will should change the cached device object
                     //const deviceObject = {};
-                    const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.IsOn ? 1 : 0);
+                    const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.isOn ? 1 : 0);
 
-                    if(key == 'isOn')
+                    // if the 'on' state or the 'brightness' was changed we have to set all the specific channels for the given device
+                    if(key == 'isOn' || key == 'brightness')
                     {
-                        // get current rgb value object from type of device
-
-                        // TODO @@@ run through the device channels object and add the action buffers
-                        actionBuffer = {
-                            'action'  : 'fadeto',
-                            'channel' : deviceObject.settings.channel.red,
-                            'value'   : deviceObject.values.channel.red * brightnessMultiplicator
-                        };
+                        // run through 'deviceObject.settings.channel' object childs and if there is a non NULL value we can create the
+                        // action buffer for that channel
+                        for (const [objKey, objValue] of Object.entries(deviceObject.settings.channel))
+                        {
+                            this.log.info(`OBJ VAL: ${objValue}`);
+                            if(objValue.val)
+                            {
+                                actionBuffer = {
+                                    'action'  : 'fadeto',
+                                    'channel' : objValue,
+                                    'value'   : deviceObject.values.channel[objKey] * brightnessMultiplicator
+                                };
+                                this.artnetActionBuffer.addAction(actionBuffer);
+                            }
+                        }
                     }
-                    // todo: brightness key
+                    // all other keys are chanel values. Wich channel id to use is defined in the 'settings.channel' path ob the device
+                    // object, so we do lookup the channel value from there with the key we got (red, green, ...)
                     else
                     {
-                        // if channel VALUE add action buffer for that
                         actionBuffer = {
                             'action'  : 'fadeto',
-                            'channel' : deviceObject.settings.channel[key], // get channel from key
+                            'channel' : deviceObject.settings.channel[key],
                             'value'   : state.val * brightnessMultiplicator
                         };
-                    }
-
-                    // setState("Test_Object", {val: {"eins":0,"zwei":1}}); 
-
-                    //const channel   = _data.channel-1;
-                    //_data.action    = _data.action ? _data.action.toUpperCase() : 'SET';
-
-                    if(actionBuffer)
-                    {
                         this.artnetActionBuffer.addAction(actionBuffer);
                     }
                 }
