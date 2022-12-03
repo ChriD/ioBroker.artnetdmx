@@ -121,7 +121,6 @@ class Artnetdmx extends utils.Adapter {
                     this.log.info(`Id: ${id}`);
                     this.log.info(`Key: ${key}`);
                     this.log.info(`State: ${stateStr}`);
-              
 
                     // artnetdmx.0.lights.Küche-TEST.*****
                     const deviceId = (id.split('.').slice(0, 4)).join('.');
@@ -171,7 +170,7 @@ class Artnetdmx extends utils.Adapter {
 
                     if(actionBuffer)
                     {
-                        this.artnetActionBuffer.addAction(_actionBuffer);
+                        this.artnetActionBuffer.addAction(actionBuffer);
                     }
                 }
                 this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
