@@ -52,7 +52,7 @@ class Artnetdmx extends utils.Adapter {
             this.setState('info.connection', _connected, true);
         });
         this.artnetActionBuffer.on('error', (_exception) => {
-            this.log.error(_exception);
+            this.log.error(_exception.message);
             //this.log.error(_exception.ToString());
         });
         this.artnetActionBuffer.startBufferUpdate();
@@ -102,67 +102,77 @@ class Artnetdmx extends utils.Adapter {
     onStateChange(id, state) {
 
         // TODO: @@@ If a "settings" state was changed we do update the deviceSettings for the admin gui
-        if (state)
+        try
         {
-            // if isOn, brightness or a channel value changes, we have to build an action for the action buffer
-            // when the action is finished we have to ack the values?!?! --> Buffer will have an ack event?!
-            // 	state artnetdmx.0.lights.TEST.values.channel.blue changed: 10 (ack = false)
-            // artnetdmx.0.lights.TEST.values.channel.blue 
-            // artnetdmx.0.lights.Kueche_Spots.values.isOn
-            if(this.artnetActionBuffer)
+            if (state)
             {
-                const key = id.split('.').pop();
-                let actionBuffer = null;
-
-                // TODO: get the id of the device and then gett all states for the device
-                // deviceStates = getCachedDeviceStates();
-
-                // update new value on cached object
-                // deviceStates.values[key] = state.val;
-
-                // TODO: @@@ add functions an cache the values (remove cache if any state on the 'settings level' was changed!)
-                // TODO: IsOn and Brightness will should change the cached device object
-                const deviceObject = {};
-                const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.IsOn ? 1 : 0);
-
-                if(key == 'isOn')
+                // if isOn, brightness or a channel value changes, we have to build an action for the action buffer
+                // when the action is finished we have to ack the values?!?! --> Buffer will have an ack event?!
+                // 	state artnetdmx.0.lights.TEST.values.channel.blue changed: 10 (ack = false)
+                // artnetdmx.0.lights.TEST.values.channel.blue 
+                // artnetdmx.0.lights.Kueche_Spots.values.isOn
+                if(this.artnetActionBuffer)
                 {
-                    // get current rgb value object from type of device
+                    const key = id.split('.').pop();
+                    let actionBuffer = null;
 
-                    // TODO @@@ run through the device channels object and add the action buffers
-                    actionBuffer = {
-                        'action'  : 'fadeto',
-                        'channel' : deviceObject.settings.channel.red,
-                        'value'   : deviceObject.values.channel.red * brightnessMultiplicator
-                    };
+                    this.log.info(`Key: ${key}`);
+                    return;
+
+                    // TODO: get the id of the device and then get all states for the device
+                    // deviceStates = getCachedDeviceStates();
+
+                    // update new value on cached object
+                    // deviceStates.values[key] = state.val;
+
+                    // TODO: @@@ add functions an cache the values (remove cache if any state on the 'settings level' was changed!)
+                    // TODO: IsOn and Brightness will should change the cached device object
+                    const deviceObject = {};
+                    const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.IsOn ? 1 : 0);
+
+                    if(key == 'isOn')
+                    {
+                        // get current rgb value object from type of device
+
+                        // TODO @@@ run through the device channels object and add the action buffers
+                        actionBuffer = {
+                            'action'  : 'fadeto',
+                            'channel' : deviceObject.settings.channel.red,
+                            'value'   : deviceObject.values.channel.red * brightnessMultiplicator
+                        };
+                    }
+                    // todo: brightness key
+                    else
+                    {
+                        // if channel VALUE add action buffer for that
+                        actionBuffer = {
+                            'action'  : 'fadeto',
+                            'channel' : deviceObject.settings.channel[key], // get channel from key
+                            'value'   : state.val * brightnessMultiplicator
+                        };
+                    }
+
+                    // setState("Test_Object", {val: {"eins":0,"zwei":1}}); 
+
+                    //const channel   = _data.channel-1;
+                    //_data.action    = _data.action ? _data.action.toUpperCase() : 'SET';
+
+                    if(actionBuffer)
+                    {
+                        this.artnetActionBuffer.addAction(_actionBuffer);
+                    }
                 }
-                // todo: brightness key
-                else
-                {
-                    // if channel VALUE add action buffer for that
-                    actionBuffer = {
-                        'action'  : 'fadeto',
-                        'channel' : deviceObject.settings.channel[key], // get channel from key
-                        'value'   : state.val * brightnessMultiplicator
-                    };
-                }
-
-                // setState("Test_Object", {val: {"eins":0,"zwei":1}}); 
-
-                //const channel   = _data.channel-1;
-                //_data.action    = _data.action ? _data.action.toUpperCase() : 'SET';
-
-                if(actionBuffer)
-                {
-                    this.artnetActionBuffer.addAction(_actionBuffer);
-                }
+                this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
             }
-            this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+            else
+            {
+                // The state was deleted
+                this.log.info(`state ${id} deleted`);
+            }
         }
-        else
+        catch(_exception)
         {
-            // The state was deleted
-            this.log.info(`state ${id} deleted`);
+            this.log.error(_exception.message);
         }
     }
 
@@ -223,7 +233,7 @@ class Artnetdmx extends utils.Adapter {
                     }
                     catch(_exception)
                     {
-                        this.log.error(_exception.toString());
+                        this.log.error(_exception.message);
                     }
 
                     // be sure the internal device array is up to date, and will be reloaded from the object db store
