@@ -52,7 +52,8 @@ class Artnetdmx extends utils.Adapter {
             this.setState('info.connection', _connected, true);
         });
         this.artnetActionBuffer.on('error', (_exception) => {
-            this.log.error(_exception.ToString());
+            this.log.error(_exception);
+            //this.log.error(_exception.ToString());
         });
         this.artnetActionBuffer.startBufferUpdate();
 
