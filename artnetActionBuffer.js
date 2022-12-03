@@ -4,7 +4,8 @@
 
 //import { EventEmitter } from 'node:events';
 const EventEmitter = require('events');
-const DMXLib = require('./lib/dmxnet');
+const path = require('node:path');
+const DMXLib = require(path.resolve( __dirname, './lib/dmxnet'));
 
 class ArtnetActionBuffer extends EventEmitter
 {
