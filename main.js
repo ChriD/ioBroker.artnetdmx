@@ -8,7 +8,7 @@
 
 const utils = require('@iobroker/adapter-core');
 const path = require('node:path');
-const ArtnetActionBuffer = require(path.resolve( __dirname, './artnetActionBuffer.js'));
+const ArtnetActionBuffer = require(path.resolve( __dirname, './artnetActionBuffer/artnetActionBuffer'));
 
 
 class Artnetdmx extends utils.Adapter {
