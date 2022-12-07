@@ -7,9 +7,10 @@
 'use strict';
 
 const utils = require('@iobroker/adapter-core');
-const { info } = require('node:console');
 const path = require('node:path');
 const ArtnetActionBuffer = require(path.resolve( __dirname, './lib/artnetActionBuffer/artnetActionBuffer'));
+const SetObjectValue = require(path.resolve( __dirname, './lib/setObjectValue.js'));
+const GetObjectValue = require(path.resolve( __dirname, './lib/getObjectValue.js'));
 
 
 class Artnetdmx extends utils.Adapter {
@@ -61,7 +62,7 @@ class Artnetdmx extends utils.Adapter {
         });
         this.artnetActionBuffer.startBufferUpdate();
 
-        // subscribe to all 'settings' states in the adapter
+        // subscribe to all states in the adapter because we want some kind of cached state in this adapter
         this.subscribeStates('*');
     }
 
@@ -80,77 +81,61 @@ class Artnetdmx extends utils.Adapter {
     }
 
     /**
-     * Is called if a subscribed object changes
-     * @param {string} id
-     * @param {ioBroker.Object | null | undefined} obj
-     */
-    onObjectChange(id, obj) {
-        if (obj) {
-            // TODO
-            // The object was changed
-            // TODO: create action buffer from given object
-            //this.artnetActionBuffer.addAction(_actionBuffer)
-            this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-        } else {
-            // TODO
-            // The object was deleted
-            this.log.info(`object ${id} deleted`);
-        }
-    }
-
-    /**
      * Is called if a subscribed state changes
      * @param {string} id
      * @param {ioBroker.State | null | undefined} state
      */
     onStateChange(id, state) {
-
-        // TODO: @@@ If a "settings" state was changed we do update the deviceSettings for the admin gui
         try
         {
             if (state)
             {
                 // if isOn, brightness or a channel value changes, we have to build an action for the action buffer
-                // when the action is finished we have to ack the values?!?! --> Buffer will have an ack event?!
-                // 	state artnetdmx.0.lights.TEST.values.channel.blue changed: 10 (ack = false)
-                // artnetdmx.0.lights.TEST.values.channel.blue
-                // artnetdmx.0.lights.Kueche_Spots.values.isOn
+                // TODO:    when the action is finished we have to ack the values?!?! --> Buffer will have an ack event?!
+                // 	        state artnetdmx.0.lights.TEST.values.channel.blue changed: 10 (ack = false)
+                //          artnetdmx.0.lights.TEST.values.channel.blue
+                //          artnetdmx.0.lights.Kueche_Spots.values.isOn
                 if(this.artnetActionBuffer)
                 {
-                    const key = id.split('.').pop();
                     let actionBuffer = null;
-                    const stateStr = JSON.stringify(state);
+                    const key = id.split('.').pop();
 
+                    // TODO: remove -->
                     this.log.info(`Id: ${id}`);
                     this.log.info(`Key: ${key}`);
-                    this.log.info(`State: ${stateStr}`);
+                    // TODO: remove <--
 
-                    // artnetdmx.0.lights.Küche-TEST.*****
+                    // we have to get the deviceId out of the full path of the given state. I'll do this with some split, slice and join
+                    // there may be a better approach but i am not that familiar with iobroker if there is a proper method for that.
                     const deviceId = (id.split('.').slice(0, 4)).join('.');
-                    this.log.info(`DeviceId: ${deviceId}`);
+                    const deviceStateKey = id.substring(deviceId.length + 1, id.length);
 
+                    // the adapter stores the device settings and values in an internal object. We will get the data for the device out
+                    // of this object and we update this object with the new state, so we will have always 'up to date' data on this object
                     const deviceObject = this.deviceMap[deviceId];
+                    if(!deviceObject)
+                        throw new Error(`Device for id: ${deviceId} not found`);
+
+                    // if the key is not present in the object we do not process any further, the key has to be there
+                    if(GetObjectValue(deviceObject, deviceStateKey, undefined) == undefined)
+                        throw new Error(`Device key '${deviceStateKey}' not found on device ${deviceId}`);
+                    SetObjectValue(deviceObject, deviceStateKey, state.val);
+
+                    // TODO: remove -->
                     const deviceStr = JSON.stringify(deviceObject);
+                    this.log.info(`DeviceStateKey: ${deviceStateKey}`);
                     this.log.info(`Device: ${deviceStr}`);
+                    // TODO: remove <--
 
-                    //setObj(deviceObject, ???? ) 
-
-                    // TODO: get the id of the device and then get all states for the device
-                    // deviceStates = getCachedDeviceStates();
-
-                    // update new value on cached object
-                    // deviceStates.values[key] = state.val;
-
-                    // TODO: @@@ add functions an cache the values (remove cache if any state on the 'settings level' was changed!)
-                    // TODO: IsOn and Brightness will should change the cached device object
-                    //const deviceObject = {};
                     const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.isOn ? 1 : 0);
 
-                    // if the 'on' state or the 'brightness' was changed we have to set all the specific channels for the given device
+                    // if the 'on' or the 'brightness' value were changed, we have to set all the specific channels for the given device
+                    // a device may have mutliple channels according to its type
                     if(key == 'isOn' || key == 'brightness')
                     {
-                        // run through 'deviceObject.settings.channel' object childs and if there is a non NULL value we can create the
-                        // action buffer for that channel
+                        // run through 'deviceObject.settings.channel' object prop's and if there is a non NULL value it means that the
+                        // channel is activce and we have to create an action buffer object for that channel to provide the new value to
+                        // the artnet backend
                         for (const [objKey, objValue] of Object.entries(deviceObject.settings.channel))
                         {
                             if(objValue)
@@ -164,7 +149,7 @@ class Artnetdmx extends utils.Adapter {
                             }
                         }
                     }
-                    // all other keys are chanel values. Wich channel id to use is defined in the 'settings.channel' path ob the device
+                    // all other keys are channel values. Which channel id to use is defined in the 'settings.channel' path of the device
                     // object, so we do lookup the channel value from there with the key we got (red, green, ...)
                     else
                     {
@@ -180,8 +165,8 @@ class Artnetdmx extends utils.Adapter {
             }
             else
             {
-                // The state was deleted
-                this.log.info(`state ${id} deleted`);
+                // The state was deleted.
+                // We do nothing here for now. This shouldn't bother us anyway.
             }
         }
         catch(_exception)
@@ -206,8 +191,6 @@ class Artnetdmx extends utils.Adapter {
      */
     async handleMessages(_obj)
     {
-        //this.log.warn(JSON.stringify(_obj));
-
         if (typeof _obj === 'object')
         {
             switch (_obj.command)
@@ -221,7 +204,7 @@ class Artnetdmx extends utils.Adapter {
                     }
                     break;
 
-                // the admin gui refelects the devices in the object store and you can define some settings there
+                // the admin gui reflects the devices in the object store and you can define some settings there
                 // for that to work it does need all the devices and their channels and state which can be received
                 // eith this type of message
                 case 'requestArtnetDevices':
