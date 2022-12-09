@@ -25,6 +25,13 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 to get development branches
 
 * Set the artnet settings in the adapter to connect to a ARTNET node device
+    * Connection settings
+        | Field | Description |
+        |-------------|-------------|
+        | `Node IP` | The ip of your artnet node (artnet to dmx) |
+        | `Port` | The port of the artnet node `default:6454` |
+        | `Local IPv4 network interface` | The ip of your artnet node (artnet to dmx) |
+    * Artnet/DMX Settings
 
 * Define devices in the adapter settin
 
