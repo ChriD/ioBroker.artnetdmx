@@ -12,14 +12,22 @@
 
 ## artnetdmx adapter for ioBroker
 
-Describe your project here
+With this adapter you can control DMX devices via an ARTNET node.
+
+
 
 Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
-## Developer manual
-This section is intended for the developer. It can be deleted later
 
 ### Getting started
+
+* Install the adapter within the iobroker adapter manager dor a stable version or use the advanged git-hub installation method
+to get development branches
+
+* Set the artnet settings in the adapter to connect to a ARTNET node device
+
+* Define devices in the adapter settin
+
 
 ### Scripts in `package.json`
 Several npm scripts are predefined for your convenience. You can run them using `npm run <scriptname>`
