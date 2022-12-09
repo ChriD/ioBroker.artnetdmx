@@ -29,11 +29,20 @@ to get development branches
         | Field | Description |
         |-------------|-------------|
         | `Node IP` | The ip of your artnet node (artnet to dmx) |
-        | `Port` | The port of the artnet node `default:6454` |
-        | `Local IPv4 network interface` | The ip of your artnet node (artnet to dmx) |
+        | `Port` | The port of the artnet node `default: 6454` |
+        | `Local IPv4 network interface` | The interface which should be used for network connection |
     * Artnet/DMX Settings
+        | Field | Description |
+        |-------------|-------------|
+        | `Universe` |  |
+        | `Net` |  |
+        | `Subnet` |  |  
+        | `Frames [per sec]` | The FPS with which the dmx values are updated `default (maxium fps): 44`<br> This rate only applies if there are value changes pending, otherwise the values are beeing refreshed periodically with the `Refresh period [ms]` period |  
+        | `Refresh period [ms]` | The period where all dmx values are beeing sent in a bulk, even if there is no value change on a channel<br>This is needed because there are artnet nodes wich do rely on refreshing the whole dmx channel values every x seconds |  
+        | `Default fade time [ms]` | The default fadeing time which is used when setting a channel value |  
+        | `Update dmx values on adapter startup` | If this is set, the adapter will update/refresh the stored device values when the adapter was started.<br>This setting should always be on yes `default: yes` |
 
-* Define devices in the adapter settin
+* Define devices in the adapter settings
 
 
 ### Scripts in `package.json`
