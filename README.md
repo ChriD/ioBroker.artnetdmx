@@ -40,34 +40,10 @@ to get development branches
         | `Frames [per sec]` | The FPS with which the dmx values are updated `default (maxium fps): 44`<br> This rate only applies if there are value changes pending, otherwise the values are beeing refreshed periodically with the `Refresh period [ms]` period |  
         | `Refresh period [ms]` | The period where all dmx values are beeing sent in a bulk, even if there is no value change on a channel<br>This is needed because there are artnet nodes wich do rely on refreshing the whole dmx channel values every x seconds |  
         | `Default fade time [ms]` | The default fadeing time which is used when setting a channel value |  
-        | `Update dmx values on adapter startup` | If this is set, the adapter will update/refresh the stored device values when the adapter was started.<br>This setting should always be on yes `default: yes` |
 
 * Define devices in the adapter settings
 
 
-### Scripts in `package.json`
-Several npm scripts are predefined for your convenience. You can run them using `npm run <scriptname>`
-| Script name | Description |
-|-------------|-------------|
-| `test:js` | Executes the tests you defined in `*.test.js` files. |
-| `test:package` | Ensures your `package.json` and `io-package.json` are valid. |
-| `test:integration` | Tests the adapter startup with an actual instance of ioBroker. |
-| `test` | Performs a minimal test run on package files and your tests. |
-| `check` | Performs a type-check on your code (without compiling anything). |
-| `lint` | Runs `ESLint` to check your code for formatting errors and potential bugs. |
-| `translate` | Translates texts in your adapter to all required languages, see [`@iobroker/adapter-dev`](https://github.com/ioBroker/adapter-dev#manage-translations) for more details. |
-| `release` | Creates a new release, see [`@alcalzone/release-script`](https://github.com/AlCalzone/release-script#usage) for more details. |
-
-### Writing tests
-When done right, testing code is invaluable, because it gives you the 
-confidence to change your code while knowing exactly if and when 
-something breaks. A good read on the topic of test-driven development 
-is https://hackernoon.com/introduction-to-test-driven-development-tdd-61a13bc92d92. 
-Although writing tests before the code might seem strange at first, but it has very 
-clear upsides.
-
-The template provides you with basic tests for the adapter startup and package files.
-It is recommended that you add your own tests into the mix.
 
 ### Publishing the adapter
 Using GitHub Actions, you can enable automatic releases on npm whenever you push a new git tag that matches the form 
