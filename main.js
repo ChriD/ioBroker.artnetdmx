@@ -81,6 +81,30 @@ class Artnetdmx extends utils.Adapter {
 
         // subscribe to all states in the lights object because we want some kind of cached state in this adapter
         this.subscribeStates('lights.*');
+
+        // be sure the action buffer does have the same values as given in the iobroker object store, otherwise after an adapter
+        // restart the lights will all go out because the action buffer channel value cache was deleted
+        this.setArtnetActionBufferByDeviceData();
+    }
+
+    setArtnetActionBufferByDeviceData()
+    {
+        const buffer = new Array(512).fill(0);
+        for(let idx=0; idx<this.devices.length; idx++)
+        {
+            const deviceObject = this.devices[idx];
+            for (const [objKey, objValue] of Object.entries(deviceObject.settings.channel))
+            {
+                if(objValue)
+                {
+                    // TODO: check if objValue is an number
+                    // TODO: check if eviceObject.values.channel[objKey] is an number
+                    buffer[objValue] = deviceObject.values.channel[objKey];
+                }
+            }
+        }
+        this.artnetActionBuffer.setBuffer(buffer);
+        this.artnetActionBuffer.transmitValues();
     }
 
     /**
