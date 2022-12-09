@@ -45,6 +45,8 @@
             _settings = _settings ? _settings : {}
             _settings.nodeport = _settings.nodeport ? _settings.nodeport : 6454;
             _settings.universe = _settings.universe ? _settings.universe : 0;
+            _settings.net = _settings.net ? _settings.net : 0;
+            _settings.subnet = _settings.subnet ? _settings.subnet : 0;
             _settings.framesPerSec = _settings.framesPerSec ? _settings.framesPerSec : 44;
             _settings.fullRefreshPeriod = _settings.fullRefreshPeriod ? _settings.fullRefreshPeriod : 5000;
             _settings.defaultFadeTime = _settings.defaultFadeTime ? _settings.defaultFadeTime : 250;
@@ -404,11 +406,21 @@
                 </div>
 
                 <h6 class="translate sub-title">Artnet/DMX Settings</h6>
-                <div class="row">                    
+                <div class="row">
                     <div class="input-field col s2 m1 l1">
                         <input id="universe" type="number" min="0" max="32768" class="value" />
-                        <label class="translate" for="pass">Universe:</label>
+                        <label class="translate" for="universe">Universe:</label>
                     </div>
+                    <div class="input-field col s2 m1 l1">
+                        <input id="net" type="number" min="0" max="32768" class="value" />
+                        <label class="translate" for="net">Net:</label>
+                    </div>
+                    <div class="input-field col s2 m1 l1">
+                        <input id="subnet" type="number" min="0" max="32768" class="value" />
+                        <label class="translate" for="subnet">Subnet:</label>
+                    </div>
+                </div>         
+                <div class="row">                    
                     <div class="input-field col s3 m2 l2">
                         <input id="framesPerSec" type="number" min="1" max="44" class="value" />
                         <label class="translate" for="framesPerSec">Frames [per sec]:</label>

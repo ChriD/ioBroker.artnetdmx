@@ -1,7 +1,8 @@
 /*
     TODO:
-    * Configuration initial values
     * save empty as NULL (so objects are deleted)
+    * add 'command' and/or 'control' property
+    * ACK
 */
 
 'use strict';
@@ -38,9 +39,8 @@ class Artnetdmx extends utils.Adapter {
      * Is called when databases are connected and adapter received configuration.
      */
     async onReady() {
-
-        // TODO: Artnet informations from configuration
         // Reset the connection indicator during startup
+        // The connection state of an Artnet connection is not really detectable because it used UDP
         this.setState('info.connection', false, true);
 
         // build device settings object for the admin page (the device list will be created from the devices in the object list)
@@ -48,27 +48,20 @@ class Artnetdmx extends utils.Adapter {
         // channel of the device
         await this.buildDevicesArrayFromAdapterObjects();
 
-        //
-        const artentConfiguration = {
+        // set the configuration values for the artnet action buffer
+        const artnetConfiguration = {
             host: this.config.nodeip,
             port: this.config.nodeport,
             universe: this.config.universe,
-            net: 0,
-            subnet: 0,
+            net: this.config.net,
+            subnet: this.config.subnet,
             localInterface: this.config.localInterface,
             framesPerSec: this.config.framesPerSec,
             refresh: this.config.fullRefreshPeriod
         };
-        //this.log.info(JSON.stringify(artentConfiguration));
-        // framesPerSec
-        // host
-        // universe
-        // port
-        // refresh
-        // localInterface
 
         // setup the artnet action buffer which will do the connection and action handling for us
-        this.artnetActionBuffer = new ArtnetActionBuffer(artentConfiguration);
+        this.artnetActionBuffer = new ArtnetActionBuffer(artnetConfiguration);
         this.artnetActionBuffer.on('connectionStateChanged', (_connected) => {
             this.setState('info.connection', _connected, true);
         });
@@ -121,11 +114,6 @@ class Artnetdmx extends utils.Adapter {
                     let actionBuffer = null;
                     const key = id.split('.').pop();
 
-                    // TODO: remove -->
-                    this.log.info(`Id: ${id}`);
-                    this.log.info(`Key: ${key}`);
-                    // TODO: remove <--
-
                     // we have to get the deviceId out of the full path of the given state. I'll do this with some split, slice and join
                     // there may be a better approach but i am not that familiar with iobroker if there is a proper method for that.
                     const deviceId = (id.split('.').slice(0, 4)).join('.');
@@ -143,12 +131,6 @@ class Artnetdmx extends utils.Adapter {
                         throw new Error(`Device key '${deviceStateKey}' not found on device ${deviceId}: ${JSON.stringify(deviceObject)}`);
                     }
                     SetObjectValue(deviceObject, deviceStateKey, state.val);
-
-                    // TODO: remove -->
-                    const deviceStr = JSON.stringify(deviceObject);
-                    this.log.info(`DeviceStateKey: ${deviceStateKey}`);
-                    this.log.info(`Device: ${deviceStr}`);
-                    // TODO: remove <--
 
                     const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.isOn ? 1 : 0);
 
