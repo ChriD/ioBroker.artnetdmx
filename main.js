@@ -48,14 +48,26 @@ class Artnetdmx extends utils.Adapter {
         // channel of the device
         await this.buildDevicesArrayFromAdapterObjects();
 
+        {"nodeip":"10.0.0.25","nodeport":6454,"localInterface":"10.0.0.123","universe":0,"framesPerSec":44,"fullRefreshPeriod":5000,"defaultFadeTime":250}
+
         //
-        const artentConfiguration = this.config;
+        const artentConfiguration = {
+            host: this.config.nodeip,
+            port: this.config.nodeport,
+            universe: this.config.universe,            
+            net: 0,
+            subnet: 0,
+            localInterface: this.config.localInterface,
+            framesPerSec: this.config.framesPerSec,
+            refresh: this.config.fullRefreshPeriod
+        }
         this.log.info(JSON.stringify(artentConfiguration));
         // framesPerSec
         // host
         // universe
         // port
         // refresh
+        // localInterface
 
         // setup the artnet action buffer which will do the connection and action handling for us
         this.artnetActionBuffer = new ArtnetActionBuffer(artentConfiguration);
@@ -70,8 +82,8 @@ class Artnetdmx extends utils.Adapter {
         });
         this.artnetActionBuffer.startBufferUpdate();
 
-        // subscribe to all states in the adapter because we want some kind of cached state in this adapter
-        this.subscribeStates('*');
+        // subscribe to all states in the lights object because we want some kind of cached state in this adapter
+        this.subscribeStates('lights.*');
     }
 
     /**
@@ -98,6 +110,9 @@ class Artnetdmx extends utils.Adapter {
         {
             if (state)
             {
+                // 
+                //states that outside of the "lights" object should not be
+
                 // if isOn, brightness or a channel value changes, we have to build an action for the action buffer
                 // TODO:    when the action is finished we have to ack the values?!?! --> Buffer will have an ack event?!
                 // 	        state artnetdmx.0.lights.TEST.values.channel.blue changed: 10 (ack = false)
@@ -151,7 +166,8 @@ class Artnetdmx extends utils.Adapter {
                                 actionBuffer = {
                                     'action'  : 'fadeto',
                                     'channel' : objValue,
-                                    'value'   : deviceObject.values.channel[objKey] * brightnessMultiplicator
+                                    'value'   : deviceObject.values.channel[objKey] * brightnessMultiplicator,
+                                    'fadeTime': this.getBufferActionFadeTime(deviceObject.settings.fadeTime)
                                 };
                                 this.artnetActionBuffer.addAction(actionBuffer);
                             }
@@ -164,7 +180,8 @@ class Artnetdmx extends utils.Adapter {
                         actionBuffer = {
                             'action'  : 'fadeto',
                             'channel' : deviceObject.settings.channel[key],
-                            'value'   : state.val * brightnessMultiplicator
+                            'value'   : state.val * brightnessMultiplicator,
+                            'fadeTime': this.getBufferActionFadeTime(deviceObject.settings.fadeTime)
                         };
                         this.artnetActionBuffer.addAction(actionBuffer);
                     }
@@ -181,6 +198,13 @@ class Artnetdmx extends utils.Adapter {
         {
             this.log.error(_exception.message);
         }
+    }
+
+    getBufferActionFadeTime(_deviceObject)
+    {
+        if(!_deviceObject.settings.fadeTime)
+            _deviceObject.settings.fadeTime = -1;
+        return _deviceObject.settings.fadeTime == -1 ? this.config.defaultFadeTime : _deviceObject.settings.fadeTime;
     }
 
     /**
