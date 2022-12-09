@@ -21,8 +21,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ### Getting started
 
-* Install the adapter within the iobroker adapter manager dor a stable version or use the advanged git-hub installation method
-to get development branches
+* For a stable version install the adapter with the iobroker adapter manager or for development branches with the latest features use the advanged git-hub installation method `(not recommended)`
 
 * Set the artnet settings in the adapter to connect to a ARTNET node device
     * Connection settings
