@@ -48,8 +48,17 @@ class Artnetdmx extends utils.Adapter {
         // channel of the device
         await this.buildDevicesArrayFromAdapterObjects();
 
+        //
+        const artentConfiguration = this.config;
+        this.log.info(JSON.stringify(artentConfiguration));
+        // framesPerSec
+        // host
+        // universe
+        // port
+        // refresh
+
         // setup the artnet action buffer which will do the connection and action handling for us
-        this.artnetActionBuffer = new ArtnetActionBuffer();
+        this.artnetActionBuffer = new ArtnetActionBuffer(artentConfiguration);
         this.artnetActionBuffer.on('connectionStateChanged', (_connected) => {
             this.setState('info.connection', _connected, true);
         });
