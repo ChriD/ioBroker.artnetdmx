@@ -3,6 +3,8 @@
     * save empty as NULL (so objects are deleted)
     * add 'command' and/or 'control' property
     * ACK
+    * When tha adapter is not running, show this on the admin page because we can't save then?
+      Or check if we can save anyway?
 */
 
 'use strict';
