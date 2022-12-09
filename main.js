@@ -30,7 +30,6 @@ class Artnetdmx extends utils.Adapter {
 
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
-        this.on('objectChange', this.onObjectChange.bind(this));
         this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
     }
@@ -51,7 +50,7 @@ class Artnetdmx extends utils.Adapter {
 
         // setup the artnet action buffer which will do the connection and action handling for us
         this.artnetActionBuffer = new ArtnetActionBuffer();
-        this.artnetActionBuffer.on('connectionState', (_connected) => {
+        this.artnetActionBuffer.on('connectionStateChanged', (_connected) => {
             this.setState('info.connection', _connected, true);
         });
         this.artnetActionBuffer.on('error', (_exception) => {
