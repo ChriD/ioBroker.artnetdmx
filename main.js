@@ -1,10 +1,10 @@
 /*
     TODO:
     * save empty as NULL (so objects are deleted)
-    * add 'command' and/or 'control' property
     * ACK
     * When tha adapter is not running, show this on the admin page because we can't save then?
       Or check if we can save anyway?
+    * TYPE enumeration (boolean, number, ...)
 */
 
 'use strict';
@@ -101,76 +101,51 @@ class Artnetdmx extends utils.Adapter {
     onStateChange(id, state) {
         try
         {
-            if (state)
+            if (state && !state.ack)
             {
-                // 
-                //states that outside of the "lights" object should not be
+                // we have to get the deviceId out of the full path of the given state. I'll do this with some split, slice and join
+                // there may be a better approach but i am not that familiar with iobroker if there is a proper method for that.
+                const deviceId = this.getDeviceIdFromStateId(id);
+                const deviceStateKey = this.getDeviceStateKeyFromStateId(id);
+                const deviceStatePart = deviceStateKey.split('.')[0];
+                const deviceStatePartKey = deviceStateKey.split('.').slice(1).join('.');
+                const stateKey = id.split('.').pop();
 
-                // if isOn, brightness or a channel value changes, we have to build an action for the action buffer
-                // TODO:    when the action is finished we have to ack the values?!?! --> Buffer will have an ack event?!
-                // 	        state artnetdmx.0.lights.TEST.values.channel.blue changed: 10 (ack = false)
-                //          artnetdmx.0.lights.TEST.values.channel.blue
-                //          artnetdmx.0.lights.Kueche_Spots.values.isOn
-                if(this.artnetActionBuffer)
+                // update the internal object cache
+                // the adapter stores the device settings and values in an internal object. We will get the data for the device out
+                // of this object and we update this object with the new state, so we will have always 'up to date' data on this object
+                this.updateInternalDeviceCacheFromState(id, state);
+
+                // get the device settings and ist current state from the internal cache
+                const deviceObject = this.deviceMap[deviceId];
+
+                // if isOn, brightness or a channel value changes (stuff in the 'values' folder), we have to build an actions for the
+                // action buffer. We utilize the 'valuesObject' methods for that
+                if(this.artnetActionBuffer && deviceStatePart == 'values')
                 {
-                    let actionBuffer = null;
-                    const key = id.split('.').pop();
+                    const valuesObject = {};
+                    SetObjectValue(valuesObject, deviceStatePartKey, state.val);
+                    this.prepareValuesObjectForDevice(deviceObject, valuesObject);
+                    this.applyValuesObjectForDevice(deviceObject, valuesObject);
+                }
 
-                    // we have to get the deviceId out of the full path of the given state. I'll do this with some split, slice and join
-                    // there may be a better approach but i am not that familiar with iobroker if there is a proper method for that.
-                    const deviceId = (id.split('.').slice(0, 4)).join('.');
-                    const deviceStateKey = id.substring(deviceId.length + 1, id.length);
-
-                    // the adapter stores the device settings and values in an internal object. We will get the data for the device out
-                    // of this object and we update this object with the new state, so we will have always 'up to date' data on this object
-                    const deviceObject = this.deviceMap[deviceId];
-                    if(!deviceObject)
-                        throw new Error(`Device for id: ${deviceId} not found`);
-
-                    // if the key is not present in the object we do not process any further, the key has to be there
-                    if(GetObjectValue(deviceObject, deviceStateKey, undefined) == undefined)
+                // the adapter has the ability to set a 'state object' for a device
+                // that means you can set the overall state of a device by one command which is presented by the control state
+                if(this.artnetActionBuffer && deviceStatePart == 'control')
+                {
+                    // the control object can be used to set multiple states with one state
+                    if(stateKey == 'valuesObject' && state.val)
                     {
-                        throw new Error(`Device key '${deviceStateKey}' not found on device ${deviceId}: ${JSON.stringify(deviceObject)}`);
-                    }
-                    SetObjectValue(deviceObject, deviceStateKey, state.val);
-
-                    const brightnessMultiplicator = (deviceObject.values.brightness / 100) * (deviceObject.values.isOn ? 1 : 0);
-
-                    // if the 'on' or the 'brightness' value were changed, we have to set all the specific channels for the given device
-                    // a device may have mutliple channels according to its type
-                    if(key == 'isOn' || key == 'brightness')
-                    {
-                        // run through 'deviceObject.settings.channel' object prop's and if there is a non NULL value it means that the
-                        // channel is activce and we have to create an action buffer object for that channel to provide the new value to
-                        // the artnet backend
-                        for (const [objKey, objValue] of Object.entries(deviceObject.settings.channel))
-                        {
-                            if(objValue)
-                            {
-                                actionBuffer = {
-                                    'action'  : 'fadeto',
-                                    'channel' : objValue,
-                                    'value'   : deviceObject.values.channel[objKey] * brightnessMultiplicator,
-                                    'fadeTime': this.getBufferActionFadeTime(deviceObject)
-                                };
-                                this.artnetActionBuffer.addAction(actionBuffer);
-                            }
-                        }
-                    }
-                    // all other keys are channel values. Which channel id to use is defined in the 'settings.channel' path of the device
-                    // object, so we do lookup the channel value from there with the key we got (red, green, ...)
-                    else
-                    {
-                        actionBuffer = {
-                            'action'  : 'fadeto',
-                            'channel' : deviceObject.settings.channel[key],
-                            'value'   : state.val * brightnessMultiplicator,
-                            'fadeTime': this.getBufferActionFadeTime(deviceObject)
-                        };
-                        this.artnetActionBuffer.addAction(actionBuffer);
+                        const valuesObject = JSON.parse(state.val);
+                        this.prepareValuesObjectForDevice(deviceObject, valuesObject);
+                        this.applyValuesObjectForDevice(deviceObject, valuesObject);
                     }
                 }
+
                 this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+
+                // TODO: ACK the state value!!!!!!!!!!!!!!!!!
+                this.setStateAsync(id, { val: state.val, ack: true });
             }
             else
             {
@@ -183,6 +158,92 @@ class Artnetdmx extends utils.Adapter {
             this.log.error(_exception.message);
         }
     }
+
+    updateInternalDeviceCacheFromState(_stateId, _state)
+    {
+        const deviceId = this.getDeviceIdFromStateId(_stateId);
+        const deviceStateKey = this.getDeviceStateKeyFromStateId(_stateId);
+
+        const deviceObject = this.deviceMap[deviceId];
+        if(!deviceObject)
+            throw new Error(`Device for id: ${deviceId} not found`);
+
+        // if the key is not present in the object we do not process any further, the key has to be there
+        if(GetObjectValue(deviceObject, deviceStateKey, undefined) == undefined)
+            throw new Error(`Device key '${deviceStateKey}' not found on device ${deviceId}: ${JSON.stringify(deviceObject)}`);
+        SetObjectValue(deviceObject, deviceStateKey, _state.val);
+    }
+
+    getBrightnessMultiplicator(_deviceObject)
+    {
+        return (_deviceObject.values.brightness / 100) * (_deviceObject.values.isOn ? 1 : 0);
+    }
+
+    applyValuesObjectForDevice(_deviceObject, _valuesObject)
+    {
+        const deviceId = _deviceObject.id;
+        const brightnessMultiplicator = this.getBrightnessMultiplicator(_deviceObject);
+
+        // run through 'deviceObject.settings.channel' object prop's and if there is a non NULL value it means that the
+        // channel is activce and we have to create an action buffer object for that channel to provide the new value to
+        // the artnet backend
+        for (const [objKey, objValue] of Object.entries(_deviceObject.settings.channel))
+        {
+            if(objValue)
+            {
+                const actionBuffer = {
+                    'action'  : 'fadeto',
+                    'channel' : objValue,
+                    'value'   : _valuesObject.channel[objKey] * brightnessMultiplicator,
+                    'fadeTime': this.getBufferActionFadeTime(_deviceObject)
+                };
+                this.artnetActionBuffer.addAction(actionBuffer);
+            }
+        }
+
+        // set and ack the states
+        // TODO: check if correct!!!
+        this.setStateFromObjectAsync(_valuesObject, 'isOn', `${deviceId}.values.isOn`, 'boolean', true);
+        this.setStateFromObjectAsync(_valuesObject, 'brightness', `${deviceId}.values.brightness`, 'number', true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.main', `${deviceId}.values.channel.main`, 'number', true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.red', `${deviceId}.values.channel.red`, 'number', true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.green', `${deviceId}.values.channel.green`, 'number', true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.blue', `${deviceId}.values.channel.blue`, 'number', true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.white', `${deviceId}.values.channel.white`, 'number', true);
+    }
+
+    prepareValuesObjectForDevice(_deviceObject, _valuesObject)
+    {
+        _valuesObject.isOn = _valuesObject.isOn !== undefined ? _valuesObject.isOn : _deviceObject.values.isOn;
+        _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : _deviceObject.values.brightness;
+        _valuesObject.fadeTime = _valuesObject.fadeTime !== undefined ? _valuesObject.fadeTime : this.getBufferActionFadeTime(_deviceObject);
+        _valuesObject.channel = _valuesObject.channel !== undefined ? _valuesObject.channel : {};
+        _valuesObject.channel.main = _valuesObject.channel.main !== undefined ? _valuesObject.channel.main : _deviceObject.values.channel.main;
+        _valuesObject.channel.red = _valuesObject.channel.red !== undefined ? _valuesObject.channel.red : _deviceObject.values.channel.red;
+        _valuesObject.channel.green = _valuesObject.channel.green !== undefined ? _valuesObject.channel.green : _deviceObject.values.channel.green;
+        _valuesObject.channel.blue = _valuesObject.channel.blue !== undefined ? _valuesObject.channel.blue : _deviceObject.values.channel.blue;
+        _valuesObject.channel.white = _valuesObject.channel.white !== undefined ? _valuesObject.channel.white : _deviceObject.values.channel.white;
+    }
+
+    async setStateFromObjectAsync(_object, _objectPath, _statePath, _type, _ack = false)
+    {
+        const objectValue = GetObjectValue(_object, _objectPath, undefined);
+        if(objectValue == undefined)
+            return;
+        await this.setStateAsync(_statePath, { val: this.convertValue(objectValue, _type), ack: _ack });
+    }
+
+    getDeviceIdFromStateId(_stateId)
+    {
+        return (_stateId.split('.').slice(0, 4)).join('.');
+    }
+
+    getDeviceStateKeyFromStateId(_stateId)
+    {
+        const deviceId = this.getDeviceIdFromStateId(_stateId);
+        return _stateId.substring(deviceId.length + 1, _stateId.length);
+    }
+
 
     getBufferActionFadeTime(_deviceObject)
     {
@@ -257,7 +318,7 @@ class Artnetdmx extends utils.Adapter {
                     await this.buildDevicesArrayFromAdapterObjects();
 
                     // the callback here is some kind of mandatory, because otherwise the admin gui 'save' function
-                    // will not work correctly (it awaits the callback to not retsart the backend before save was
+                    // will not work correctly (it awaits the callback to not restart the backend before save was
                     // finished!)
                     if (_obj.callback) {
                         this.sendTo(_obj.from, _obj.command, {}, _obj.callback);
@@ -289,6 +350,7 @@ class Artnetdmx extends utils.Adapter {
                 device.settings.channel = {};
                 device.values = {};
                 device.values.channel = {};
+                device.control = {};
 
                 device.id = deviceObject._id;
                 device.deviceId = (deviceObject._id).split('.').pop();
@@ -302,7 +364,6 @@ class Artnetdmx extends utils.Adapter {
                 device.settings.channel.blue = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.blue', null);
                 device.settings.channel.white = this.getStateValueFromStatesObject(settingsStates, statePathDeviceSettings, 'channel.white', null);
 
-
                 const statePathDeviceValues = deviceObject._id + '.values';
                 const valuesStates = await this.getStatesAsync(statePathDeviceValues + '.*');
 
@@ -313,6 +374,11 @@ class Artnetdmx extends utils.Adapter {
                 device.values.channel.green = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues,'channel.green', null);
                 device.values.channel.blue = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues, 'channel.blue', null);
                 device.values.channel.white = this.getStateValueFromStatesObject(valuesStates, statePathDeviceValues, 'channel.white', null);
+
+                const statePathDeviceControl= deviceObject._id + '.control';
+                const controlStates = await this.getStatesAsync(statePathDeviceControl + '.*');
+
+                device.control.control = this.getStateValueFromStatesObject(controlStates, statePathDeviceControl, 'valuesObject', null);
 
                 this.devices.push(device);
                 this.deviceMap[device.id] = device;
@@ -387,6 +453,7 @@ class Artnetdmx extends utils.Adapter {
         await this.createObjectNotExists('lights.' + _device.deviceId + '.settings.channel', 'channel', 'channel');
         await this.createObjectNotExists('lights.' + _device.deviceId + '.values', 'values', 'channel');
         await this.createObjectNotExists('lights.' + _device.deviceId + '.values.channel', 'channel', 'channel');
+        await this.createObjectNotExists('lights.' + _device.deviceId + '.control', 'values', 'channel');
 
         // overall settings
         await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.fadeTime', 'fadeTime', 'number', _device.settings.fadeTime);
@@ -408,6 +475,10 @@ class Artnetdmx extends utils.Adapter {
         await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.green', 'green', 'number', null, false, false);
         await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.blue', 'blue', 'number', null, false, false);
         await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.white', 'white', 'number', null, false, false);
+
+        // control
+        // TODO is 'object' valid or do i have to use string?
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.control.valuesObject', 'valuesObject', 'object', null, false, false);
     }
 
     /**
@@ -430,7 +501,7 @@ class Artnetdmx extends utils.Adapter {
         };
 
         if(_forceOverwrite) {
-            await this.setObjectAsync(_id, objectContainer)
+            await this.setObjectAsync(_id, objectContainer);
         }
         else {
             await this.setObjectNotExistsAsync(_id, objectContainer);
