@@ -4,7 +4,11 @@
     * When tha adapter is not running, show this on the admin page because we can't save then
       Or check if we can save anyway?
     * TYPE enumeration (boolean, number, ...)
+    * adapter checker (https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices)
+    * multilanguage
+    * test scripts?
     * !!! TESTING !!!
+    * publish adapter
 */
 
 'use strict';
@@ -391,7 +395,6 @@ class Artnetdmx extends utils.Adapter {
     }
 
     /**
-     * TODO: @@@
      * this method will return the value of the object for the given path
      * @param  {Object} _object the object
      * @param  {String} _path the path of the property
