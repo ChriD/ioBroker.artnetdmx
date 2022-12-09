@@ -378,7 +378,7 @@ class Artnetdmx extends utils.Adapter {
                 const statePathDeviceControl= deviceObject._id + '.control';
                 const controlStates = await this.getStatesAsync(statePathDeviceControl + '.*');
 
-                device.control.control = this.getStateValueFromStatesObject(controlStates, statePathDeviceControl, 'valuesObject', null);
+                device.control.valuesObject = this.getStateValueFromStatesObject(controlStates, statePathDeviceControl, 'valuesObject', null);
 
                 this.devices.push(device);
                 this.deviceMap[device.id] = device;
