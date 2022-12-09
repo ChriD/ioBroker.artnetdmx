@@ -48,13 +48,11 @@ class Artnetdmx extends utils.Adapter {
         // channel of the device
         await this.buildDevicesArrayFromAdapterObjects();
 
-        {"nodeip":"10.0.0.25","nodeport":6454,"localInterface":"10.0.0.123","universe":0,"framesPerSec":44,"fullRefreshPeriod":5000,"defaultFadeTime":250}
-
         //
         const artentConfiguration = {
             host: this.config.nodeip,
             port: this.config.nodeport,
-            universe: this.config.universe,            
+            universe: this.config.universe,
             net: 0,
             subnet: 0,
             localInterface: this.config.localInterface,
