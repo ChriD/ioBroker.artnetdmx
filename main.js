@@ -1,10 +1,10 @@
 /*
     TODO:
     * save empty as NULL (so objects are deleted)
-    * ACK
-    * When tha adapter is not running, show this on the admin page because we can't save then?
+    * When tha adapter is not running, show this on the admin page because we can't save then
       Or check if we can save anyway?
     * TYPE enumeration (boolean, number, ...)
+    * !!! TESTING !!!
 */
 
 'use strict';
@@ -142,9 +142,9 @@ class Artnetdmx extends utils.Adapter {
                     }
                 }
 
-                this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-
-                // TODO: ACK the state value!!!!!!!!!!!!!!!!!
+                // if we come here, the desired value for the state was not set by the adapter itself, so we have to ACK it
+                // unfortunetally the ACK is only some kind of pseude ACK because we can not be sure the ARTNET module has
+                // set the value (ArtNet is UDP)
                 this.setStateAsync(id, { val: state.val, ack: true });
             }
             else
@@ -201,8 +201,8 @@ class Artnetdmx extends utils.Adapter {
             }
         }
 
-        // set and ack the states
-        // TODO: check if correct!!!
+        // set and ack the new states given by the valuesObject. due we have ACK set to true, the setState will not
+        // trigger any action inb the adapter (see 'onStateChanged' method)
         this.setStateFromObjectAsync(_valuesObject, 'isOn', `${deviceId}.values.isOn`, 'boolean', true);
         this.setStateFromObjectAsync(_valuesObject, 'brightness', `${deviceId}.values.brightness`, 'number', true);
         this.setStateFromObjectAsync(_valuesObject, 'channel.main', `${deviceId}.values.channel.main`, 'number', true);
