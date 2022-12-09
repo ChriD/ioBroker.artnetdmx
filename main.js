@@ -58,8 +58,8 @@ class Artnetdmx extends utils.Adapter {
             localInterface: this.config.localInterface,
             framesPerSec: this.config.framesPerSec,
             refresh: this.config.fullRefreshPeriod
-        }
-        this.log.info(JSON.stringify(artentConfiguration));
+        };
+        //this.log.info(JSON.stringify(artentConfiguration));
         // framesPerSec
         // host
         // universe
@@ -165,7 +165,7 @@ class Artnetdmx extends utils.Adapter {
                                     'action'  : 'fadeto',
                                     'channel' : objValue,
                                     'value'   : deviceObject.values.channel[objKey] * brightnessMultiplicator,
-                                    'fadeTime': this.getBufferActionFadeTime(deviceObject.settings.fadeTime)
+                                    'fadeTime': this.getBufferActionFadeTime(deviceObject)
                                 };
                                 this.artnetActionBuffer.addAction(actionBuffer);
                             }
@@ -179,7 +179,7 @@ class Artnetdmx extends utils.Adapter {
                             'action'  : 'fadeto',
                             'channel' : deviceObject.settings.channel[key],
                             'value'   : state.val * brightnessMultiplicator,
-                            'fadeTime': this.getBufferActionFadeTime(deviceObject.settings.fadeTime)
+                            'fadeTime': this.getBufferActionFadeTime(deviceObject)
                         };
                         this.artnetActionBuffer.addAction(actionBuffer);
                     }
@@ -201,7 +201,10 @@ class Artnetdmx extends utils.Adapter {
     getBufferActionFadeTime(_deviceObject)
     {
         if(!_deviceObject.settings.fadeTime)
+        {
             _deviceObject.settings.fadeTime = -1;
+            this.log.warn(`Fade time value on device ${_deviceObject.deviceId} not found, using standard value!`);
+        }
         return _deviceObject.settings.fadeTime == -1 ? this.config.defaultFadeTime : _deviceObject.settings.fadeTime;
     }
 
