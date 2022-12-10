@@ -282,8 +282,9 @@ class Artnetdmx extends utils.Adapter {
         _valuesObject.channel.white = _valuesObject.channel.white !== undefined ? _valuesObject.channel.white : _deviceObject.values.channel.white;
 
         // TODO: calc main and white value if temperature is set, if temperature is not set (null, undefined, or value lower than 0)
-        // the main and white channels stay the same. I f the user does not want to use the temperature setting, he has to set it to null
-        // TODO: make setting in admin for temperature (= enable color temperature)
+        // the main and white channels stay the same. If the user does not want to use the temperature setting, he has to disable it ?
+
+        // TODO: make setting in admin for temperature (= enable color temperature) ?
     }
 
     async setStateFromObjectAsync(_object, _objectPath, _statePath, _type, _ack = false)
