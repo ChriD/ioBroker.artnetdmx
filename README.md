@@ -79,11 +79,10 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 
 ### **WORK IN PROGRESS**
 
--   set init values to 0 in channel values
--   RGBTW - main and white channels not saved
+-   rename 'temperature' ?
+-   add 'level.color.temperature' for TW and RGBTW devices
 -   validate ID when saving in ADMIN
 -   info in admin id adapter is not started yet
--   add 'level.color.temperature' for TW and RGBTW devices
 -   multilanguage (english & german)
 
 ### 1.0.0 (2022-12-10)

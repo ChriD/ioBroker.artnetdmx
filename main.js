@@ -122,7 +122,7 @@ class Artnetdmx extends utils.Adapter {
                     }
                     else
                     {
-                        this.log.error(`Trying to set a value to the artnet buffer which is not a number on device ${deviceObject.deviceId}`);
+                        this.log.warn(`Trying to set a value to the artnet buffer which is not a number on device ${deviceObject.deviceId}`);
                     }
                 }
             }
@@ -260,6 +260,7 @@ class Artnetdmx extends utils.Adapter {
         // to update such 'bulk' data change
         this.setStateFromObjectAsync(_valuesObject, 'isOn', `${deviceId}.values.isOn`, DATATYPE.BOOLEAN, true);
         this.setStateFromObjectAsync(_valuesObject, 'brightness', `${deviceId}.values.brightness`, DATATYPE.NUMBER, true);
+        this.setStateFromObjectAsync(_valuesObject, 'temperature', `${deviceId}.values.temperature`, DATATYPE.NUMBER, true);
         this.setStateFromObjectAsync(_valuesObject, 'channel.main', `${deviceId}.values.channel.main`, DATATYPE.NUMBER, true);
         this.setStateFromObjectAsync(_valuesObject, 'channel.red', `${deviceId}.values.channel.red`, DATATYPE.NUMBER, true);
         this.setStateFromObjectAsync(_valuesObject, 'channel.green', `${deviceId}.values.channel.green`, DATATYPE.NUMBER, true);
@@ -271,6 +272,7 @@ class Artnetdmx extends utils.Adapter {
     {
         _valuesObject.isOn = _valuesObject.isOn !== undefined ? _valuesObject.isOn : _deviceObject.values.isOn;
         _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : _deviceObject.values.brightness;
+        _valuesObject.temperature = _valuesObject.temperature !== undefined ? _valuesObject.temperature : _deviceObject.values.temperature;
         _valuesObject.fadeTime = _valuesObject.fadeTime !== undefined ? _valuesObject.fadeTime : this.getBufferActionFadeTime(_deviceObject);
         _valuesObject.channel = _valuesObject.channel !== undefined ? _valuesObject.channel : {};
         _valuesObject.channel.main = _valuesObject.channel.main !== undefined ? _valuesObject.channel.main : _deviceObject.values.channel.main;
@@ -278,6 +280,10 @@ class Artnetdmx extends utils.Adapter {
         _valuesObject.channel.green = _valuesObject.channel.green !== undefined ? _valuesObject.channel.green : _deviceObject.values.channel.green;
         _valuesObject.channel.blue = _valuesObject.channel.blue !== undefined ? _valuesObject.channel.blue : _deviceObject.values.channel.blue;
         _valuesObject.channel.white = _valuesObject.channel.white !== undefined ? _valuesObject.channel.white : _deviceObject.values.channel.white;
+
+        // TODO: calc main and white value if temperature is set, if temperature is not set (null, undefined, or value lower than 0)
+        // the main and white channels stay the same. I f the user does not want to use the temperature setting, he has to set it to null
+        // TODO: make setting in admin for temperature (= enable color temperature)
     }
 
     async setStateFromObjectAsync(_object, _objectPath, _statePath, _type, _ack = false)
@@ -285,6 +291,7 @@ class Artnetdmx extends utils.Adapter {
         const objectValue = GetObjectValue(_object, _objectPath, undefined);
         if(objectValue == undefined)
             return;
+        // TODO: only set if exists?!
         await this.setStateAsync(_statePath, { val: this.convertValue(objectValue, _type), ack: _ack });
     }
 
@@ -511,6 +518,7 @@ class Artnetdmx extends utils.Adapter {
 
         // check if we are updateing a device or if its a new one. we need this information so we can set
         // default values on new devices when they are beeing created
+        // TODO: This won't work if we delete the object tree manually when in settings
         const isCreation = this.existingDevices.indexOf(_deviceDescription.deviceId) == -1 ? true : false;
 
         // main device and channel objects
@@ -525,26 +533,9 @@ class Artnetdmx extends utils.Adapter {
         await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.fadeTime', 'fadeTime', DATATYPE.NUMBER, '', _deviceDescription.settings.fadeTime);
         await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.type', 'type', DATATYPE.STRING, '', _deviceDescription.settings.type);
 
-        /*
-        // values and channel settings
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.main', 'main', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.main, true);
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.red', 'red', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.red, true);
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.green', 'green', DATATYPE.NUMBER, '', _deviceDescription.settings.channel.green, true);
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.blue', 'blue', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.blue, true);
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.white', 'white', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.white, true);
-        */
-
         // set some value objects/states for the devices but do not overwrite any values which are already present
-        // those are the states that are always present on every device, even if the device is not capable of that state!
         await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.isOn', 'isOn', DATATYPE.BOOLEAN, 'switch.light', false, false, isCreation);
         await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.brightness', 'brightness', DATATYPE.NUMBER, 'level.dimmer', 100, false, isCreation);
-        /*
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.red', 'red', DATATYPE.NUMBER, 'level.color.red', 0, false, isCreation);
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.green', 'green', DATATYPE.NUMBER, 'level.color.green', 0, false, isCreation);
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, 'level.color.blue', 0, false, isCreation);
-        await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
-        */
 
         if(hasMain)
         {
