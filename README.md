@@ -77,11 +77,13 @@ For later updates, the above procedure is not necessary. Just do the following:
 1. Execute `iobroker upload artnetdmx` on the ioBroker host
 
 
-## **WORK IN PROGRESS**
 
--   multilanguage (english & german)
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+
+-   multilanguage (english & german)
 
 ### 1.0.0 (2022-12-10)
 
