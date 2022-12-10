@@ -359,7 +359,7 @@ class Artnetdmx extends utils.Adapter {
                     }
 
                     // be sure the internal device array is up to date, and will be reloaded from the object db store
-                    // we completely rebuild the array, thats okay here
+                    // we completely rebuild the array, that's okay here
                     await this.buildDevicesArrayFromAdapterObjects();
 
                     // the callback here is some kind of mandatory, because otherwise the admin gui 'save' function
@@ -490,6 +490,9 @@ class Artnetdmx extends utils.Adapter {
     async addOrUpdateDevice(_device)
     {
         // TODO: verify before adding the device?!
+
+        // check if we are updateing a device or if its a new one
+        const isCreation = this.deviceMap.has(_device.deviceId) ? false : true;
  
         // main device and channel objects
         await this.createObjectNotExists('lights.' + _device.deviceId, _device.name, 'device', null, true);
@@ -512,16 +515,16 @@ class Artnetdmx extends utils.Adapter {
 
         // set some value objects/states for the devices but do not overwrite any values which are already present
         // those are the states that are always present on every device, even if the device is not capable of that state!
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.isOn', 'isOn', DATATYPE.BOOLEAN, 'switch.light', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.brightness', 'brightness', DATATYPE.NUMBER, 'level.dimmer', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, 'level.color.white', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.red', 'red', DATATYPE.NUMBER, 'level.color.red', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.green', 'green', DATATYPE.NUMBER, 'level.color.green', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, 'level.color.blue', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.isOn', 'isOn', DATATYPE.BOOLEAN, 'switch.light', false, false, isCreation);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.brightness', 'brightness', DATATYPE.NUMBER, 'level.dimmer', 100, false, isCreation);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.red', 'red', DATATYPE.NUMBER, 'level.color.red', 0, false, isCreation);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.green', 'green', DATATYPE.NUMBER, 'level.color.green', 0, false, isCreation);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, 'level.color.blue', 0, false, isCreation);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
 
         // control
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.control.valuesObject', 'valuesObject', DATATYPE.JSON, 'json', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.control.valuesObject', 'valuesObject', DATATYPE.JSON, 'json', null, false, isCreation);
     }
 
     /**
