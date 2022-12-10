@@ -79,6 +79,10 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 
 ### **WORK IN PROGRESS**
 
+-   RGBW - white channel is not beeing saved
+-   RGBTW - R G B channels not saved
+-   validate ID when saving in ADMIN
+-   info in admin id adapter is not started yet
 -   add 'level.color.temperature' for TW and RGBTW devices
 -   multilanguage (english & german)
 

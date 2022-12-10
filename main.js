@@ -26,14 +26,15 @@ const DATATYPE = {
     STRING: 'string',
     JSON: 'json',
 };
-  
+
 const DEVICETYPE = {
     DIMMABLE: 'dimmable',
     TW: 'TW',
     RGB: 'RGB',
     RGBW: 'RGBW',
-    RGBWTW: 'RGBTW'
+    RGBTW: 'RGBTW'
 };
+
 
 class Artnetdmx extends utils.Adapter {
 
@@ -501,8 +502,9 @@ class Artnetdmx extends utils.Adapter {
      */
     async addOrUpdateDevice(_deviceDescription)
     {
+        this.log.info(JSON.stringify(_deviceDescription));
         // TODO: verify before adding the device?!
-        const hasRGB = _deviceDescription.settings.type == DEVICETYPE.RGB || _deviceDescription.settings.type == DEVICETYPE.RGBW || _deviceDescription.settings.type == DEVICETYPE.RGBTW;               
+        const hasRGB = _deviceDescription.settings.type == DEVICETYPE.RGB || _deviceDescription.settings.type == DEVICETYPE.RGBW || _deviceDescription.settings.type == DEVICETYPE.RGBTW;
         const hasColorTemperature = _deviceDescription.settings.type == DEVICETYPE.RGBWTW || _deviceDescription.settings.type == DEVICETYPE.TW;
         const hasMain = _deviceDescription.settings.type == DEVICETYPE.DIMMABLE || hasColorTemperature;
 
@@ -563,7 +565,7 @@ class Artnetdmx extends utils.Adapter {
         {
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.white', 'white', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.white, true);
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
-            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.temperature', 'temperature', DATATYPE.NUMBER, 'level.color.temperature', 50, false, isCreation); 
+            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.temperature', 'temperature', DATATYPE.NUMBER, 'level.color.temperature', 50, false, isCreation);
         }
 
         // controlTW
