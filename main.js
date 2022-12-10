@@ -23,7 +23,8 @@ const GetObjectValue = require(path.resolve( __dirname, './lib/getObjectValue.js
 const DATATYPE = {
     BOOLEAN: 'boolean',
     NUMBER: 'number',
-    STRING: 'string'
+    STRING: 'string',
+    JSON: 'json',
 };
 
 class Artnetdmx extends utils.Adapter {
@@ -499,29 +500,28 @@ class Artnetdmx extends utils.Adapter {
         await this.createObjectNotExists('lights.' + _device.deviceId + '.control', 'values', 'channel');
 
         // overall settings
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.fadeTime', 'fadeTime', DATATYPE.NUMBER, _device.settings.fadeTime);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.type', 'type', DATATYPE.STRING, _device.settings.type);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.fadeTime', 'fadeTime', DATATYPE.NUMBER, '', _device.settings.fadeTime);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.type', 'type', DATATYPE.STRING, '', _device.settings.type);
 
         // channels
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.main', 'main', DATATYPE.NUMBER, _device.settings.channel.main, true);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.red', 'red', DATATYPE.NUMBER, _device.settings.channel.red, true);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.green', 'green', DATATYPE.NUMBER, _device.settings.channel.green, true);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', DATATYPE.NUMBER, _device.settings.channel.blue, true);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.white', 'white', DATATYPE.NUMBER, _device.settings.channel.white, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.main', 'main', DATATYPE.NUMBER, '',_device.settings.channel.main, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.red', 'red', DATATYPE.NUMBER, '',_device.settings.channel.red, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.green', 'green', DATATYPE.NUMBER, '', _device.settings.channel.green, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', DATATYPE.NUMBER, '',_device.settings.channel.blue, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.white', 'white', DATATYPE.NUMBER, '',_device.settings.channel.white, true);
 
         // set some value objects/states for the devices but do not overwrite any values which are already present
         // those are the states that are always present on every device, even if the device is not capable of that state!
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.isOn', 'isOn', DATATYPE.BOOLEAN, null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.brightness', 'brightness', DATATYPE.NUMBER, null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.red', 'red', DATATYPE.NUMBER, null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.green', 'green', DATATYPE.NUMBER, null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.isOn', 'isOn', DATATYPE.BOOLEAN, 'switch.light', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.brightness', 'brightness', DATATYPE.NUMBER, 'level.dimmer', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, 'level.color.white', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.red', 'red', DATATYPE.NUMBER, 'level.color.red', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.green', 'green', DATATYPE.NUMBER, 'level.color.green', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, 'level.color.blue', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', null, false, false);
 
         // control
-        // TODO is 'object' valid or do i have to use string?
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.control.valuesObject', 'valuesObject', 'object', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.control.valuesObject', 'valuesObject', DATATYPE.JSON, 'json', null, false, false);
     }
 
     /**
@@ -562,11 +562,11 @@ class Artnetdmx extends utils.Adapter {
      * @param  {Boolean} _allowSetValue indicates if the value given value will be set (mainly used for syncing the state object with admin)
      * @return {Promise}
      */
-    async createOrUpdateState(_id, _name, _stateType, _stateValue, _deleteStateOnNullValue = true, _allowSetValue = true)
+    async createOrUpdateState(_id, _name, _stateType, _stateRole, _stateValue, _deleteStateOnNullValue = true, _allowSetValue = true)
     {
         const commonObject = {
             type: _stateType,
-            role: 'state',
+            role: _stateRole ? _stateRole : 'state',
             read: true,
             write: true
         };
