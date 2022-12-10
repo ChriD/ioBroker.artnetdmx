@@ -493,6 +493,7 @@ class Artnetdmx extends utils.Adapter {
 
         // check if we are updateing a device or if its a new one
         const isCreation = this.deviceMap[_device.id] === undefined ? true : false;
+        this.log.warn(_device.id);
         this.log.warn(JSON.stringify(this.deviceMap));
         this.log.warn(this.deviceMap[_device.id]);
         this.log.warn(`${isCreation}`);
