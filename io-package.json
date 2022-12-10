@@ -1,12 +1,13 @@
 {
     "common": {
         "name": "artnetdmx",
-        "version": "0.0.1",
+        "version": "1.0.0",
         "news": {
-            "0.0.1": {
+            "1.0.0": {
                 "en": "initial release",
                 "de": "Erstveröffentlichung",
                 "ru": "Начальная версия",
+                "uk": "Начальная версия",
                 "pt": "lançamento inicial",
                 "nl": "Eerste uitgave",
                 "fr": "Première version",
@@ -16,11 +17,11 @@
                 "zh-cn": "首次出版"
             }
         },
-        "title": "Artnet-DMX",
         "titleLang": {
             "en": "Artnet-DMX",
             "de": "Artnet-DMX",
             "ru": "Артнет-DMX",
+            "uk": "Артнет-DMX",
             "pt": "Artnet-DMX",
             "nl": "Artnet-DMX",
             "fr": "Artnet-DMX",
@@ -33,6 +34,7 @@
             "en": "artnetdmx",
             "de": "artnetdmx",
             "ru": "артнетдмкс",
+            "uk": "артнетдмкс",
             "pt": "artnetdmx",
             "nl": "artnetdmx",
             "fr": "artnetdmx",
