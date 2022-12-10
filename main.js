@@ -159,7 +159,7 @@ class Artnetdmx extends utils.Adapter {
                 // of this object and we update this object with the new state, so we will have always 'up to date' data on this object
                 this.updateInternalDeviceCacheFromState(id, state);
 
-                // get the device settings and ist current state from the internal cache
+                // get the device settings and it's current state from the internal cache
                 const deviceObject = this.deviceMap[deviceId];
 
                 // if isOn, brightness or a channel value changes (stuff in the 'values' folder), we have to build an actions for the
@@ -493,6 +493,7 @@ class Artnetdmx extends utils.Adapter {
 
         // check if we are updateing a device or if its a new one
         const isCreation = this.deviceMap[_device.id] === undefined ? true : false;
+        this.log.warn(JSON.stringify(this.deviceMap));
         this.log.warn(this.deviceMap[_device.id]);
         this.log.warn(`${isCreation}`);
 
