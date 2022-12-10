@@ -493,6 +493,8 @@ class Artnetdmx extends utils.Adapter {
 
         // check if we are updateing a device or if its a new one
         const isCreation = this.deviceMap[_device.id] === undefined ? true : false;
+        this.log.warn(this.deviceMap[_device.id]);
+        this.log.warn(`${isCreation}`);
 
         // main device and channel objects
         await this.createObjectNotExists('lights.' + _device.deviceId, _device.name, 'device', null, true);
