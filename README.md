@@ -81,6 +81,8 @@ For later updates, the above procedure is not necessary. Just do the following:
 
 -   multilanguage (english & german)
 
+## Changelog
+
 ### 1.0.0 (2022-12-10)
 
 -   (ChriD) initial version
