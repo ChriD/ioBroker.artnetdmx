@@ -19,7 +19,7 @@ With this adapter you can control DMX devices via an ARTNET node.
 Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 
-### Getting started
+## Getting started
 
 * For a stable version install the adapter with the iobroker adapter manager or for development branches with the latest features use the advanged git-hub installation method `(not recommended)`
 
@@ -77,11 +77,13 @@ For later updates, the above procedure is not necessary. Just do the following:
 1. Execute `iobroker upload artnetdmx` on the ioBroker host
 
 
+
+
+## Changelog
+
 ### **WORK IN PROGRESS**
 
 -   multilanguage (english & german)
-
-## Changelog
 
 ### 1.0.0 (2022-12-10)
 
@@ -91,7 +93,7 @@ For later updates, the above procedure is not necessary. Just do the following:
 ## License
 MIT License
 
-Copyright (c) 2023 ChriD <chris_d85@hotmail.com>
+Copyright (c) 2022 ChriD <chris_d85@hotmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
