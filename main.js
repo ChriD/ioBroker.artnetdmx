@@ -495,9 +495,9 @@ class Artnetdmx extends utils.Adapter {
     {
         // TODO: verify before adding the device?!
 
-        // check if we are updateing a device or if its a new one
+        // check if we are updateing a device or if its a new one. we need this information so we can set
+        // default values on new devices when they are beeing created
         const isCreation = this.existingDevices.indexOf(_deviceDescription.deviceId) == -1 ? true : false;
-        this.log.warn(`${isCreation}`);
 
         // main device and channel objects
         await this.createObjectNotExists('lights.' + _deviceDescription.deviceId, _deviceDescription.name, 'device', null, true);
