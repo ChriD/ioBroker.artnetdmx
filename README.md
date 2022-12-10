@@ -76,15 +76,20 @@ For later updates, the above procedure is not necessary. Just do the following:
 1. Overwrite the changed files in the adapter directory (`/opt/iobroker/node_modules/iobroker.artnetdmx`)
 1. Execute `iobroker upload artnetdmx` on the ioBroker host
 
-## Changelog
 
 ### **WORK IN PROGRESS**
-* (ChriD) initial release
+
+-   multilanguage (english & german)
+
+### 1.0.0 (2022-12-10)
+
+-   (ChriD) initial version
+
 
 ## License
 MIT License
 
-Copyright (c) 2022 ChriD <chris_d85@hotmail.com>
+Copyright (c) 2023 ChriD <chris_d85@hotmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

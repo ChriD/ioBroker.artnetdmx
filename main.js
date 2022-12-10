@@ -1,10 +1,10 @@
 /*
     TODO:
     * save empty as NULL (so objects are deleted)
-    * When tha adapter is not running, show this on the admin page because we can't save then
+    * When the adapter is not running, show this on the admin page because we can't save then
       Or check if we can save anyway?
-    * TYPE enumeration (boolean, number, ...)
-    * adapter checker (https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices)
+    * adapter checker (https://adapter-check.iobroker.in/)
+    * (https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices)
     * multilanguage
     * test scripts?
     * !!! TESTING !!!
@@ -19,6 +19,12 @@ const ArtnetActionBuffer = require(path.resolve( __dirname, './lib/artnetActionB
 const SetObjectValue = require(path.resolve( __dirname, './lib/setObjectValue.js'));
 const GetObjectValue = require(path.resolve( __dirname, './lib/getObjectValue.js'));
 
+
+const DATATYPE = {
+    BOOLEAN: 'boolean',
+    NUMBER: 'number',
+    STRING: 'string'
+};
 
 class Artnetdmx extends utils.Adapter {
 
@@ -97,9 +103,16 @@ class Artnetdmx extends utils.Adapter {
             {
                 if(objValue)
                 {
-                    // TODO: check if objValue is an number
-                    // TODO: check if eviceObject.values.channel[objKey] is an number
-                    buffer[objValue] = deviceObject.values.channel[objKey];
+                    const channelValue = deviceObject.values.channel[objKey];
+                    if(typeof objValue === DATATYPE.NUMBER && !Number.isNaN(objValue) &&
+                       typeof channelValue === DATATYPE.NUMBER && !Number.isNaN(channelValue))
+                    {
+                        buffer[objValue] = channelValue;
+                    }
+                    else
+                    {
+                        this.log.error(`Trying to set a value to the artnet buffer which is not a number on device ${deviceObject.deviceId}`);
+                    }
                 }
             }
         }
@@ -173,6 +186,7 @@ class Artnetdmx extends utils.Adapter {
                 // if we come here, the desired value for the state was not set by the adapter itself, so we have to ACK it
                 // unfortunetally the ACK is only some kind of pseude ACK because we can not be sure the ARTNET module has
                 // set the value (ArtNet is UDP)
+                //this.extendObject(id, { val: state.val, ack: true });
                 this.setStateAsync(id, { val: state.val, ack: true });
             }
             else
@@ -230,14 +244,15 @@ class Artnetdmx extends utils.Adapter {
         }
 
         // set and ack the new states given by the valuesObject. due we have ACK set to true, the setState will not
-        // trigger any action inb the adapter (see 'onStateChanged' method)
-        this.setStateFromObjectAsync(_valuesObject, 'isOn', `${deviceId}.values.isOn`, 'boolean', true);
-        this.setStateFromObjectAsync(_valuesObject, 'brightness', `${deviceId}.values.brightness`, 'number', true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.main', `${deviceId}.values.channel.main`, 'number', true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.red', `${deviceId}.values.channel.red`, 'number', true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.green', `${deviceId}.values.channel.green`, 'number', true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.blue', `${deviceId}.values.channel.blue`, 'number', true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.white', `${deviceId}.values.channel.white`, 'number', true);
+        // trigger any action in the adapter (see 'onStateChanged' method). I am not dure if there is a better way
+        // to update such 'bulk' data change
+        this.setStateFromObjectAsync(_valuesObject, 'isOn', `${deviceId}.values.isOn`, DATATYPE.BOOLEAN, true);
+        this.setStateFromObjectAsync(_valuesObject, 'brightness', `${deviceId}.values.brightness`, DATATYPE.NUMBER, true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.main', `${deviceId}.values.channel.main`, DATATYPE.NUMBER, true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.red', `${deviceId}.values.channel.red`, DATATYPE.NUMBER, true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.green', `${deviceId}.values.channel.green`, DATATYPE.NUMBER, true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.blue', `${deviceId}.values.channel.blue`, DATATYPE.NUMBER, true);
+        this.setStateFromObjectAsync(_valuesObject, 'channel.white', `${deviceId}.values.channel.white`, DATATYPE.NUMBER, true);
     }
 
     prepareValuesObjectForDevice(_deviceObject, _valuesObject)
@@ -483,25 +498,25 @@ class Artnetdmx extends utils.Adapter {
         await this.createObjectNotExists('lights.' + _device.deviceId + '.control', 'values', 'channel');
 
         // overall settings
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.fadeTime', 'fadeTime', 'number', _device.settings.fadeTime);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.type', 'type', 'string', _device.settings.type);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.fadeTime', 'fadeTime', DATATYPE.NUMBER, _device.settings.fadeTime);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.type', 'type', DATATYPE.STRING, _device.settings.type);
 
         // channels
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.main', 'main', 'number', _device.settings.channel.main, true);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.red', 'red', 'number', _device.settings.channel.red, true);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.green', 'green', 'number', _device.settings.channel.green, true);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', 'number', _device.settings.channel.blue, true);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.white', 'white', 'number', _device.settings.channel.white, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.main', 'main', DATATYPE.NUMBER, _device.settings.channel.main, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.red', 'red', DATATYPE.NUMBER, _device.settings.channel.red, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.green', 'green', DATATYPE.NUMBER, _device.settings.channel.green, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.blue', 'blue', DATATYPE.NUMBER, _device.settings.channel.blue, true);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.settings.channel.white', 'white', DATATYPE.NUMBER, _device.settings.channel.white, true);
 
         // set some value objects/states for the devices but do not overwrite any values which are already present
         // those are the states that are always present on every device, even if the device is not capable of that state!
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.isOn', 'isOn', 'boolean', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.brightness', 'brightness', 'number', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.main', 'main', 'number', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.red', 'red', 'number', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.green', 'green', 'number', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.blue', 'blue', 'number', null, false, false);
-        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.white', 'white', 'number', null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.isOn', 'isOn', DATATYPE.BOOLEAN, null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.brightness', 'brightness', DATATYPE.NUMBER, null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.red', 'red', DATATYPE.NUMBER, null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.green', 'green', DATATYPE.NUMBER, null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, null, false, false);
+        await this.createOrUpdateState('lights.' + _device.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, null, false, false);
 
         // control
         // TODO is 'object' valid or do i have to use string?
@@ -586,10 +601,10 @@ class Artnetdmx extends utils.Adapter {
 
         switch(_type)
         {
-            case 'string':
+            case DATATYPE.STRING:
                 converted = _value.toString();
                 break;
-            case 'number':
+            case DATATYPE.NUMBER:
                 converted = Number(_value);
                 break;
             default:
