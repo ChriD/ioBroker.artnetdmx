@@ -502,7 +502,7 @@ class Artnetdmx extends utils.Adapter {
      */
     async addOrUpdateDevice(_deviceDescription)
     {
-        this.log.info(JSON.stringify(_deviceDescription));
+        
         // TODO: verify before adding the device?!
         const hasRGB = _deviceDescription.settings.type == DEVICETYPE.RGB || _deviceDescription.settings.type == DEVICETYPE.RGBW || _deviceDescription.settings.type == DEVICETYPE.RGBTW;
         const hasColorTemperature = _deviceDescription.settings.type == DEVICETYPE.RGBWTW || _deviceDescription.settings.type == DEVICETYPE.TW;
@@ -544,6 +544,8 @@ class Artnetdmx extends utils.Adapter {
         await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, 'level.color.blue', 0, false, isCreation);
         await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
         */
+        this.log.info(JSON.stringify(_deviceDescription));
+        this.log.info(`Main: ${hasMain}   RGB: ${hasRGB}  COLORTEMP: ${hasColorTemperature}`);
 
         if(hasMain)
         {
