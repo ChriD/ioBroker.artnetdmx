@@ -502,11 +502,11 @@ class Artnetdmx extends utils.Adapter {
      */
     async addOrUpdateDevice(_deviceDescription)
     {
-        
         // TODO: verify before adding the device?!
         const hasRGB = _deviceDescription.settings.type == DEVICETYPE.RGB || _deviceDescription.settings.type == DEVICETYPE.RGBW || _deviceDescription.settings.type == DEVICETYPE.RGBTW;
         const hasColorTemperature = _deviceDescription.settings.type == DEVICETYPE.RGBWTW || _deviceDescription.settings.type == DEVICETYPE.TW;
-        const hasMain = _deviceDescription.settings.type == DEVICETYPE.DIMMABLE || hasColorTemperature;
+        const hasMain = hasColorTemperature || _deviceDescription.settings.type == DEVICETYPE.DIMMABLE;
+        const hasWhite = hasColorTemperature || _deviceDescription.settings.type == DEVICETYPE.RGBW;
 
         // check if we are updateing a device or if its a new one. we need this information so we can set
         // default values on new devices when they are beeing created
@@ -563,10 +563,14 @@ class Artnetdmx extends utils.Adapter {
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, 'level.color.blue', 0, false, isCreation);
         }
 
-        if(hasColorTemperature)
+        if(hasWhite)
         {
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.white', 'white', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.white, true);
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
+        }
+
+        if(hasColorTemperature)
+        {
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.temperature', 'temperature', DATATYPE.NUMBER, 'level.color.temperature', 50, false, isCreation);
         }
 
