@@ -118,7 +118,7 @@ class Artnetdmx extends utils.Adapter {
         }
         this.artnetActionBuffer.setBuffer(buffer);
         this.artnetActionBuffer.transmitValues();
-        this.log.silly(`Set cache buffer of artnet transmiter to: ${JSON.stringify(buffer)}`);
+        this.log.debug(`Set cache buffer of artnet transmiter to: ${JSON.stringify(buffer)}`);
     }
 
     /**
