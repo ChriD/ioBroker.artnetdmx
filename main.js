@@ -280,11 +280,6 @@ class Artnetdmx extends utils.Adapter {
             _valuesObject.channel.white = 255 * (_valuesObject.temperature/100);
             _valuesObject.channel.main = 255 - _valuesObject.channel.white;
         }
-        // if the temperture value is not given in the object or its out of range, try to calculate the temperature
-        else
-        {
-            _valuesObject.temperature = (_valuesObject.channel.white  / 255) * 100;
-        }
 
         _valuesObject.isOn = _valuesObject.isOn !== undefined ? _valuesObject.isOn : _deviceObject.values.isOn;
         _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : _deviceObject.values.brightness;
