@@ -2,7 +2,7 @@
     TODO:
     * adapter checker (https://adapter-check.iobroker.in/)
     * (https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices)
-    * multilanguage
+    * multilanguage (https://forum.iobroker.net/topic/36660/trial-weblate-f%C3%BCr-iobroker-%C3%BCbersetzungen/9)
     * testscripts (iobroker)
     * !!! TESTING !!!
     * publish adapter

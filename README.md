@@ -81,7 +81,7 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 
 -   multilanguage (english & german)
 
-### 1.0.0 (2022-12-11)
+### 1.0.0 (2022-12-12)
 
 -   (ChriD) initial version
 
