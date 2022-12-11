@@ -65,11 +65,6 @@ class Artnetdmx extends utils.Adapter {
         // it will add/remove the devices or update the data in the settings folder
         await this.updateArtnetDevices();
 
-        // be sure the action buffer does have the same values as given in the iobroker object store,
-        // otherwise after an adapter restart the lights will all go out because the action buffer channel
-        // value cache was deleted
-        this.setArtnetActionBufferByDeviceData();
-
         // set the configuration values for the artnet action buffer from the adapter configuration
         const artnetConfiguration = {
             host: this.config.nodeip,
@@ -93,6 +88,13 @@ class Artnetdmx extends utils.Adapter {
         this.artnetActionBuffer.on('bufferChanged', (_idx) => {
             this.log.info(JSON.stringify(this.artnetActionBuffer.bufferAction));
         });
+
+        // be sure the action buffer does have the same values as given in the iobroker object store,
+        // otherwise after an adapter restart the lights will all go out because the action buffer channel
+        // value cache was deleted
+        this.setArtnetActionBufferByDeviceData();
+
+        // after the artnet buffer was synced with the current device values we can start transimitting the values
         this.artnetActionBuffer.startBufferUpdate();
 
         // subscribe to all states in the lights object because we want some kind of cached state in this adapter
