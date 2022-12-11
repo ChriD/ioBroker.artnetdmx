@@ -80,7 +80,6 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 ### **WORK IN PROGRESS**
 
 -   validate ID when saving in ADMIN
--   info in admin if adapter is not started yet
 -   multilanguage (english & german)
 -   backup devices via file
 

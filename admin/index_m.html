@@ -258,7 +258,7 @@
 
         // this function will update the value of the objectId control by the formatted name of the device
         // this will only happen if the objectIs is empty or we are forcing the function to do so (refresh objectId button)
-        async function updateObjectId(_rowIndex, _value, _forceUpdate = false)
+        function updateObjectId(_rowIndex, _value, _forceUpdate = false)
         {
             if(!_rowIndex)
                 return;
@@ -271,7 +271,7 @@
             if(!deviceId || _forceUpdate)
             {
                 if(_value != '') {
-                    deviceIdElement.value = await formatObjectId(_value);                                
+                    deviceIdElement.value = formatObjectId(_value);                                
                 }
             }
         }
@@ -344,17 +344,11 @@
         // in the backend. The format will be done in the adapter backend because there we have 'FORBIDDEN_CHARS' available
         function formatObjectId(_value)
         {    
-            //let validObjectId = _objectId.replace(this.FORBIDDEN_CHARS, '_');
-            let validObjectId = validObjectId.replace(/[\.\s\/]/g, '_');
-            return validObjectId;
-
-            /*
-            return new Promise((_resolve, _reject) => {                      
-                sendTo(null, 'formatObjectId', _value, function (_result) {
-                        _resolve(_result);                        
-                    });               
-            })      
-            */  
+            //[^._\-/ :!#$%&()+=@^{}|~\p{Ll}\p{Lu}\p{Nd}]+
+            var forbiddenChars = RegExp("[^._\-/ :!#$%&()+=@^{}|~\p{Ll}\p{Lu}\p{Nd}]");
+            let validObjectId = _objectId.replace(forbiddenChars, '_');
+            validObjectId = validObjectId.replace(/[\.\s\/]/g, '_');
+            return validObjectId;  
         }
 
         // this method stores the current devices and their settings (given in the html table) as objects in the backend
