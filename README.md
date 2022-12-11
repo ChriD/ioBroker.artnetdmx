@@ -80,7 +80,6 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 ### **WORK IN PROGRESS**
 
 -   multilanguage (english & german)
--   backup devices via file
 
 ### 1.0.0 (2022-12-11)
 
