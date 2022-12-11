@@ -270,6 +270,20 @@ class Artnetdmx extends utils.Adapter {
 
     prepareValuesObjectForDevice(_deviceObject, _valuesObject)
     {
+        // if the valuesObject contains the temperature property we have to calculate the main and white channel
+        // ist a very simple approach and the temperature is in the range of 0-100%. The temperature setting will override the main
+        // and white channel values
+        if(_valuesObject.temperature !== undefined && _valuesObject.temperature >= 0 && _valuesObject.temperature <= 100)
+        {
+            _valuesObject.channel.white = 255 * (_valuesObject.temperature/100);
+            _valuesObject.channel.main = 255 - _valuesObject.channel.white;
+        }
+        // if the temperture value is not given in the object or its out of range, try to calculate the temperatrure
+        else
+        {
+            _valuesObject.temperature = (_valuesObject.channel.white  / 255) * 100;
+        }
+
         _valuesObject.isOn = _valuesObject.isOn !== undefined ? _valuesObject.isOn : _deviceObject.values.isOn;
         _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : _deviceObject.values.brightness;
         _valuesObject.temperature = _valuesObject.temperature !== undefined ? _valuesObject.temperature : _deviceObject.values.temperature;
@@ -281,9 +295,6 @@ class Artnetdmx extends utils.Adapter {
         _valuesObject.channel.blue = _valuesObject.channel.blue !== undefined ? _valuesObject.channel.blue : _deviceObject.values.channel.blue;
         _valuesObject.channel.white = _valuesObject.channel.white !== undefined ? _valuesObject.channel.white : _deviceObject.values.channel.white;
 
-        // TODO: calc main and white value if temperature is set, if temperature is not set (null, undefined, or value lower than 0)
-        // the main and white channels stay the same. If the user does not want to use the temperature setting, he has to disable it ?
-
         // TODO: make setting in admin for temperature (= enable color temperature) ?
     }
 
@@ -293,7 +304,7 @@ class Artnetdmx extends utils.Adapter {
         if(objectValue == undefined)
             return;
         // TODO: only set if exists?!
-        await this.setStateAsync(_statePath, { val: this.convertValue(objectValue, _type), ack: _ack });
+        await this.setStateAsync(statePath, { val: this.convertValue(objectValue, _type), ack: _ack });
     }
 
     getDeviceIdFromStateId(_stateId)
