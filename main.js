@@ -292,6 +292,14 @@ class Artnetdmx extends utils.Adapter {
         {
             _valuesObject.channel.white = 255 * (_valuesObject.temperature/100);
             _valuesObject.channel.main = 255 - _valuesObject.channel.white;
+
+            // if the type of the device is RGBW, then set RGB values as 'main' values
+            if(_deviceObject.settings.type === DEVICETYPE.RGBW)
+            {
+                _valuesObject.channel.red = _valuesObject.channel.main;
+                _valuesObject.channel.green = _valuesObject.channel.main;
+                _valuesObject.channel.blue = _valuesObject.channel.main;
+            }
         }
 
         // set values which are not given in the values object from the device object
@@ -306,6 +314,7 @@ class Artnetdmx extends utils.Adapter {
         _valuesObject.channel.white = _valuesObject.channel.white !== undefined ? _valuesObject.channel.white : _deviceObject.values.channel.white;
 
         // default some values if they where not provided by the values object nor in the device object
+        // this is in fact only here to 'repair' corrupt devices with 'undefined' values present
         _valuesObject.isOn = _valuesObject.isOn !== undefined ? _valuesObject.isOn : false;
         _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : 100;
         _valuesObject.temperature = _valuesObject.temperature !== undefined ? _valuesObject.temperature : -1;
@@ -545,8 +554,8 @@ class Artnetdmx extends utils.Adapter {
         // TODO: verify before adding the device?!
 
         const hasRGB = _deviceDescription.settings.type == DEVICETYPE.RGB || _deviceDescription.settings.type == DEVICETYPE.RGBW || _deviceDescription.settings.type == DEVICETYPE.RGBTW;
-        const hasColorTemperature = _deviceDescription.settings.type == DEVICETYPE.RGBTW || _deviceDescription.settings.type == DEVICETYPE.TW;
-        const hasMain = hasColorTemperature || _deviceDescription.settings.type == DEVICETYPE.DIMMABLE;
+        const hasColorTemperature = _deviceDescription.settings.type == DEVICETYPE.RGBTW || _deviceDescription.settings.type == DEVICETYPE.TW || _deviceDescription.settings.type == DEVICETYPE.RGBW;
+        const hasMain = _deviceDescription.settings.type == DEVICETYPE.DIMMABLE || _deviceDescription.settings.type == DEVICETYPE.RGBTW || _deviceDescription.settings.type == DEVICETYPE.TW;
         const hasWhite = hasColorTemperature || _deviceDescription.settings.type == DEVICETYPE.RGBW;
 
         // check if we are updateing a device or if its a new one. we need this information so we can set
