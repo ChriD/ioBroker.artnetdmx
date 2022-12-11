@@ -1,12 +1,9 @@
 /*
     TODO:
-    * save empty as NULL (so objects are deleted)
-    * When the adapter is not running, show this on the admin page because we can't save then
-      Or check if we can save anyway?
     * adapter checker (https://adapter-check.iobroker.in/)
     * (https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices)
     * multilanguage
-    * test scripts?
+    * testscripts (iobroker)
     * !!! TESTING !!!
     * publish adapter
 */
@@ -53,12 +50,11 @@ class Artnetdmx extends utils.Adapter {
 
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
-        this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
     }
 
     /**
-     * Is called when databases are connected and adapter received configuration.
+     * onReady is called when databases are connected and adapter received configuration
      */
     async onReady() {
         // Reset the connection indicator during startup
@@ -69,7 +65,12 @@ class Artnetdmx extends utils.Adapter {
         // it will add/remove the devices or update the data in the settings folder
         await this.updateArtnetDevices();
 
-        // set the configuration values for the artnet action buffer
+        // be sure the action buffer does have the same values as given in the iobroker object store,
+        // otherwise after an adapter restart the lights will all go out because the action buffer channel
+        // value cache was deleted
+        this.setArtnetActionBufferByDeviceData();
+
+        // set the configuration values for the artnet action buffer from the adapter configuration
         const artnetConfiguration = {
             host: this.config.nodeip,
             port: this.config.nodeport,
@@ -96,13 +97,14 @@ class Artnetdmx extends utils.Adapter {
 
         // subscribe to all states in the lights object because we want some kind of cached state in this adapter
         this.subscribeStates('lights.*');
-
-        // be sure the action buffer does have the same values as given in the iobroker object store, otherwise after an adapter
-        // restart the lights will all go out because the action buffer channel value cache was deleted
-        this.setArtnetActionBufferByDeviceData();
     }
 
-    setArtnetActionBufferByDeviceData()
+    /**
+     * This method will update the action buffer of the underlaying artnet library.
+     * This is necessary after a restart of the adapter to get the artnet buffer in sync with the object values
+     * @param {string} _transmitValues if set the values will be forced to directly update the artnet values
+     */
+    setArtnetActionBufferByDeviceData(_transmitValues = false)
     {
         const buffer = new Array(512).fill(0);
         for(let idx=0; idx<this.devices.length; idx++)
@@ -126,7 +128,8 @@ class Artnetdmx extends utils.Adapter {
             }
         }
         this.artnetActionBuffer.setBuffer(buffer);
-        this.artnetActionBuffer.transmitValues();
+        if(_transmitValues)
+            this.artnetActionBuffer.transmitValues();
         this.log.debug(`Set cache buffer of artnet transmiter to: ${JSON.stringify(buffer)}`);
     }
 
@@ -211,6 +214,12 @@ class Artnetdmx extends utils.Adapter {
         }
     }
 
+    /**
+     * With this method the internal cache object will be updated with the value for the given state
+     * It is used to keep the cache of the adapter up to date when a state changes
+     * @param  {String} _stateId a state id (with full path)
+     * @param  {Object} _state state object
+     */
     updateInternalDeviceCacheFromState(_stateId, _state)
     {
         const deviceId = this.getDeviceIdFromStateId(_stateId);
@@ -226,12 +235,26 @@ class Artnetdmx extends utils.Adapter {
         SetObjectValue(deviceObject, deviceStateKey, _state.val);
     }
 
+
+    /**
+     * This method will return the current brightness multiplicator for the given device.
+     * It will check if the device is on or off. If the device is off it will always return 0
+     * @param  {Object} _deviceObject a device object
+     * @return  {Number}
+     */
     getBrightnessMultiplicator(_deviceObject)
     {
         return (_deviceObject.values.brightness / 100) * (_deviceObject.values.isOn ? 1 : 0);
     }
 
-    // Be sure to call 'prepareValuesObjectForDevice' on the _valuesObject before calling this method
+
+    /**
+     * This method will apply the values given in the values object to the device for the device object
+     * It will create an artnet action buffer and send it to the artnet/dmx library
+     * Be sure to call 'prepareValuesObjectForDevice' on the _valuesObject before calling this method
+     * @param  {Object} _deviceObject a device object
+     * @param  {Object} _valuesObject a values object
+     */
     applyValuesObjectForDevice(_deviceObject, _valuesObject)
     {
         const deviceId = _deviceObject.id;
@@ -282,7 +305,7 @@ class Artnetdmx extends utils.Adapter {
     /**
      * This method should be used to prepare the 'valuesObject' for the 'applyValuesObjectForDevice' method
      * It will set/default all neede values on the values object if not there. Furthermore it will clear up values which are not used
-     * by the device by it's type. (it will the those to 'undefined' so the value won't be set on a state which is not there)
+     * by the device by it's type. (it will the those to 'undefined' so the value wont be set on a state which is not there)
      * @param {Object} _deviceObject
      * @param {Object} _valuesObject
      */
@@ -342,20 +365,41 @@ class Artnetdmx extends utils.Adapter {
         _valuesObject.channel.white = clearWhite ? undefined : _valuesObject.channel.white;
     }
 
+
+    /**
+     * a helper method to set an iobroker state from an object property
+     * the state will only be set if the value of the property of the object is not 'unassigned'
+     * @param  {Object} _object an object
+     * @param  {String} _objectPath path to the property in the object
+     * @param  {String} _statePath path of the state we want to set
+     * @param  {String} _type type of the state we want to set
+     * @param  {Boolean} _ack if the state value should be acknowledged
+     */
     async setStateFromObjectAsync(_object, _objectPath, _statePath, _type, _ack = false)
     {
         const objectValue = GetObjectValue(_object, _objectPath, undefined);
         if(objectValue == undefined)
             return;
-        // TODO: only set if exists?! Otherwise we will get a warning!
         await this.setStateAsync(_statePath, { val: this.convertValue(objectValue, _type), ack: _ack });
     }
 
+
+    /**
+     * will return the device id path form the given state id
+     * @param  {String} _stateId a full state id
+     * @return {String}
+     */
     getDeviceIdFromStateId(_stateId)
     {
         return (_stateId.split('.').slice(0, 4)).join('.');
     }
 
+
+    /**
+     * will return the key path for the given state id (starting on device level)
+     * @param  {String} _stateId the full state id
+     * @return {String}
+     */
     getDeviceStateKeyFromStateId(_stateId)
     {
         const deviceId = this.getDeviceIdFromStateId(_stateId);
@@ -363,6 +407,11 @@ class Artnetdmx extends utils.Adapter {
     }
 
 
+    /**
+     * will return the fadeTime for changing values for the artnet device
+     * @param  {Object} _deviceObject a device object
+     * @return {Number}
+     */
     getBufferActionFadeTime(_deviceObject)
     {
         if(!_deviceObject.settings.fadeTime)
@@ -373,23 +422,6 @@ class Artnetdmx extends utils.Adapter {
         return _deviceObject.settings.fadeTime == -1 ? this.config.defaultFadeTime : _deviceObject.settings.fadeTime;
     }
 
-    /**
-     * Is called when a message is sent to the backend
-     * @param {Object} _obj message that was sent
-     */
-    onMessage(_obj)
-    {
-        this.handleMessages(_obj);
-        return true;
-    }
-
-    /**
-     * Is called when a message is sent to the backend
-     * @param {Object} _obj message that was sent
-     */
-    async handleMessages(_obj)
-    {
-    }
 
     /**
      * this method will sync the devices adden in the admin gui to the object tree
@@ -484,6 +516,7 @@ class Artnetdmx extends utils.Adapter {
         }
     }
 
+
     /**
      * this method will return the value of the object for the given path
      * @param  {Object} _object the object
@@ -519,6 +552,7 @@ class Artnetdmx extends utils.Adapter {
             }
         }
     }
+
 
     /**
      * adds or updates a device id object and all its child's by the given device description object
@@ -646,6 +680,7 @@ class Artnetdmx extends utils.Adapter {
         }
     }
 
+
     /**
      * conversion method for any value to the type given in the parameters
      * currently only 'string' and 'number' is a valid type
@@ -675,8 +710,6 @@ class Artnetdmx extends utils.Adapter {
     }
 
 }
-
-
 
 
 if (require.main !== module) {
