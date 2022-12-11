@@ -53,15 +53,7 @@
             _settings.defaultFadeTime = _settings.defaultFadeTime ? _settings.defaultFadeTime : 250;
            
             // load the settings from the _settings object into the html controls
-            loadSettings(_settings, _onChange);
-
-            // load the device settings into the table
-            let devices = new Array();
-            for (const device of _settings.devices)
-            {
-                devices.push(flattenObject(device));  
-            } 
-            values2table('devices', devices, _onChange, onDeviceTableReady);
+            loadSettings(_settings, _onChange);           
                        
             // reinitialize all the materialize labels on the page because we are adding inputs dynamically
             // in fact in our case this following line wont be of any effect i think
@@ -74,16 +66,10 @@
         // this one is beeing called wehn we hit SAVE or SAVE AND CLOSE and therfore we have to be sure the
         // 'callback' is only beeing called when the save of the devices has been done!
         function save(_callback) {  
-            if(validateSettings())
-            {
-                //updateArtnetDevices().then(()=>{
-                    saveSettings(_callback);            
-                //});
-            }
-            else
-            {
-                alert("Settings not correct!");
-            }
+            if(validateSettings())            
+                saveSettings(_callback);                        
+            else            
+                alert("Settings not correct!");            
         }
 
         function initFormValidation()
@@ -99,20 +85,30 @@
             
             Pristine.addValidator("ip", function(_value) {                     
                 const regex = new RegExp('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$');
-                if (regex.test(_value)) 
-                {  
-                    return true;
-                }
+                if (regex.test(_value))                 
+                    return true;                
                 return false;
             }, "The value must be a valid ip address");
 
             window.pristine = new Pristine(document.getElementById("form"), defaultConfig);
         }
 
-        
+        // this function will validate the settings and will return 'false' if one setting is not correct
         function validateSettings()
         {
-            return window.pristine.validate();           
+            let ok = true;
+
+            // check if every device has an id, maybe later we can do this with 'pristine'?
+            const devices = getDeviceObjectFromTable('devices');
+            for(let idx=0; idx < devices.length; idx++)
+            {
+                if(!devices[idx].id)
+                {
+                    ok = false;
+                    break;
+                }
+            }
+            return ok && window.pristine.validate();           
         }
 
         // this function will get the data from the form controls and pass it to the save callback of the adapter
@@ -164,11 +160,16 @@
                         .on('keyup', () => _onChange())
                         ;
                 }
-
-                // add 
-
-
             });
+
+            // load the device settings into the table
+            let devices = new Array();
+            for (const device of _settings.devices)
+            {
+                devices.push(flattenObject(device));  
+            } 
+            values2table('devices', devices, _onChange, onDeviceTableReady);
+
             _onChange(false);
         }
 
