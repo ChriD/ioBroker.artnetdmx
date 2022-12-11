@@ -223,7 +223,7 @@ class Artnetdmx extends utils.Adapter {
             throw new Error(`Device for id: ${deviceId} not found`);
 
         // if the key is not present in the object we do not process any further, the key has to be there
-        if(GetObjectValue(deviceObject, deviceStateKey, undefined) == undefined)
+        if(GetObjectValue(deviceObject, deviceStateKey, undefined) === undefined)
             throw new Error(`Device key '${deviceStateKey}' not found on device ${deviceId}: ${JSON.stringify(deviceObject)}`);
         SetObjectValue(deviceObject, deviceStateKey, _state.val);
     }
