@@ -43,6 +43,7 @@
 
             // set some standard values for the configuration            
             _settings = _settings ? _settings : {}
+            _settings.devices = _settings.devices ? _settings.devices : [];
             _settings.nodeport = _settings.nodeport ? _settings.nodeport : 6454;
             _settings.universe = _settings.universe ? _settings.universe : 0;
             _settings.net = _settings.net ? _settings.net : 0;
