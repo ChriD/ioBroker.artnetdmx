@@ -66,13 +66,9 @@ class Artnetdmx extends utils.Adapter {
         // The connection state of an Artnet connection is not really detectable because it used UDP
         this.setState('info.connection', false, true);
 
-        // TODO: create/update the devices from the device settings in the adapter ????
+        // whenever the adapter is restarting we create/update the artnet devices in the object tree
+        // it will add/remove the devices or update the data in the settings folder
         await this.updateArtnetDevices();
-
-        // build device settings object for the admin page (the device list will be created from the devices in the object list)
-        // the admin page will show the devices defined in the object list and the values of the settings given in the "settings"
-        // channel of the device
-        await this.buildDevicesArrayFromAdapterObjects();
 
         // set the configuration values for the artnet action buffer
         const artnetConfiguration = {
@@ -406,61 +402,24 @@ class Artnetdmx extends utils.Adapter {
                         this.sendTo(_obj.from, _obj.command, validObjectId, _obj.callback);
                     }
                     break;
-
-                // the admin gui reflects the devices in the object store and you can define some settings there
-                // for that to work it does need all the devices and their channels and state which can be received
-                // eith this type of message
-                /*
-                case 'requestArtnetDevices':
-                    if (_obj.callback) {
-                        this.sendTo(_obj.from, _obj.command, this.devices, _obj.callback);
-                    }
-                    break;
-                */
-
-                // in the state of saving the configuration (when the admin gui saves it's configuration) it will
-                // send us the array of artnet devices configured in the admin
-                /*
-                case 'updateArtnetDevices':
-                    try
-                    {
-                        const deviceIds = new Array();
-                        for (const device of _obj.message)
-                        {
-                            await this.addOrUpdateDevice(device);
-                            deviceIds.push(device.deviceId);
-                        }
-                        // we may have removed some devices in the admin view and those should be deleted from
-                        // the object store. Therefore we run through the current devices and check if they are
-                        await this.cleanupDevices(deviceIds);
-                    }
-                    catch(_exception)
-                    {
-                        this.log.error(_exception.message);
-                    }
-
-                    // be sure the internal device array is up to date, and will be reloaded from the object db store
-                    // we completely rebuild the array, that's okay here
-                    await this.buildDevicesArrayFromAdapterObjects();
-
-                    // the callback here is some kind of mandatory, because otherwise the admin gui 'save' function
-                    // will not work correctly (it awaits the callback to not restart the backend before save was
-                    // finished!)
-                    if (_obj.callback) {
-                        this.sendTo(_obj.from, _obj.command, {}, _obj.callback);
-                    }
-                    break;*/
             }
-
         }
     }
 
+    /**
+     * this method will sync the devices adden in the admin gui to the object tree
+     * it will add/remove devices and will update their settings
+     */
     async updateArtnetDevices()
     {
+        // before we are updating the devices from the settings we have to load the internal cache
+        // this is necessary to check wether a device is beeing added or updated. It's not the best approach but
+        // i do not have a better solution right now
+        //await this.buildDevicesArrayFromAdapterObjects();
+
         try
         {
             this.config.devices = this.config.devices ? this.config.devices : [];
-
             const deviceIds = new Array();
             for (const device of this.config.devices)
             {
@@ -484,7 +443,7 @@ class Artnetdmx extends utils.Adapter {
 
     /**
      * this method reads all devices (objects) from the object db store and some of its child objects/states
-     * this data will be stored (cached) in an array for passing it to the admin gui later on
+     * it's used as internal cache for all devices which are controled by this adapter
      */
     async buildDevicesArrayFromAdapterObjects()
     {
@@ -612,6 +571,9 @@ class Artnetdmx extends utils.Adapter {
         // check if we are updateing a device or if its a new one. we need this information so we can set
         // default values on new devices when they are beeing created
         // TODO: This won't work if we delete the object tree manually when in settings
+        const existingObject = await this.getObjectAsync(_deviceDescription.deviceId);
+        this.log.error(JSON.stringify(existingObject));
+
         const isCreation = this.existingDevices.indexOf(_deviceDescription.deviceId) == -1 ? true : false;
 
         // main device and channel objects
