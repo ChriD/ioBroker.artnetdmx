@@ -270,6 +270,8 @@ class Artnetdmx extends utils.Adapter {
 
     prepareValuesObjectForDevice(_deviceObject, _valuesObject)
     {
+        _valuesObject.channel = _valuesObject.channel !== undefined ? _valuesObject.channel : {};
+
         // if the valuesObject contains the temperature property we have to calculate the main and white channel
         // ist a very simple approach and the temperature is in the range of 0-100%. The temperature setting will override the main
         // and white channel values
@@ -288,7 +290,6 @@ class Artnetdmx extends utils.Adapter {
         _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : _deviceObject.values.brightness;
         _valuesObject.temperature = _valuesObject.temperature !== undefined ? _valuesObject.temperature : _deviceObject.values.temperature;
         _valuesObject.fadeTime = _valuesObject.fadeTime !== undefined ? _valuesObject.fadeTime : this.getBufferActionFadeTime(_deviceObject);
-        _valuesObject.channel = _valuesObject.channel !== undefined ? _valuesObject.channel : {};
         _valuesObject.channel.main = _valuesObject.channel.main !== undefined ? _valuesObject.channel.main : _deviceObject.values.channel.main;
         _valuesObject.channel.red = _valuesObject.channel.red !== undefined ? _valuesObject.channel.red : _deviceObject.values.channel.red;
         _valuesObject.channel.green = _valuesObject.channel.green !== undefined ? _valuesObject.channel.green : _deviceObject.values.channel.green;
