@@ -345,8 +345,9 @@
         function formatObjectId(_value)
         {    
             //FORBIDDEN_CHARS of iobroker: [^._\-/ :!#$%&()+=@^{}|~\p{Ll}\p{Lu}\p{Nd}]+
-            const forbiddenChars = RegExp(/[^._\-/ :!#$%&()+=@^{}|~\p{Ll}\p{Lu}\p{Nd}]/);
-            let validObjectId = _value.replace(forbiddenChars, '_');
+            //const forbiddenChars = RegExp(/[^._\-/ :!#$%&()+=@^{}|~\p{Ll}\p{Lu}\p{Nd}]/);
+            const allowedChars = replace(/[^\w\s]/gi, '')
+            let validObjectId = _value.replace(allowedChars, '');
             validObjectId = validObjectId.replace(/[\.\s\/]/g, '_');
             return validObjectId;  
         }
