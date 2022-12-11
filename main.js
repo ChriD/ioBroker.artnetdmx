@@ -67,7 +67,7 @@ class Artnetdmx extends utils.Adapter {
         this.setState('info.connection', false, true);
 
         // TODO: create/update the devices from the device settings in the adapter ????
-        this.updateArtnetDevices();
+        await this.updateArtnetDevices();
 
         // build device settings object for the admin page (the device list will be created from the devices in the object list)
         // the admin page will show the devices defined in the object list and the values of the settings given in the "settings"
@@ -449,13 +449,13 @@ class Artnetdmx extends utils.Adapter {
                     if (_obj.callback) {
                         this.sendTo(_obj.from, _obj.command, {}, _obj.callback);
                     }
-                    break;
+                    break;*/
             }
-            */
+
         }
     }
 
-    updateArtnetDevices()
+    async updateArtnetDevices()
     {
         try
         {
