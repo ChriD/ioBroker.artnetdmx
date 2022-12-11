@@ -79,7 +79,6 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 
 ### **WORK IN PROGRESS**
 
--   validate ID when saving in ADMIN
 -   multilanguage (english & german)
 -   backup devices via file
 
