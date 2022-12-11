@@ -305,7 +305,7 @@ class Artnetdmx extends utils.Adapter {
         if(objectValue == undefined)
             return;
         // TODO: only set if exists?!
-        await this.setStateAsync(statePath, { val: this.convertValue(objectValue, _type), ack: _ack });
+        await this.setStateAsync(_statePath, { val: this.convertValue(objectValue, _type), ack: _ack });
     }
 
     getDeviceIdFromStateId(_stateId)
