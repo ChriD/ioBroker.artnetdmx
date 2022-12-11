@@ -102,13 +102,49 @@
             const devices = getDeviceObjectFromTable('devices');
             for(let idx=0; idx < devices.length; idx++)
             {
-                if(!devices[idx].deviceId)
+                const device = devices[idx];
+                if(!device.deviceId)
                 {
                     ok = false;
                     break;
                 }
+
+                const colorChannels = this.getColorChannelsForType(device.settings.type);
+                for (const colorChannel of colorChannels)
+                {
+                    if(!device.settings.channel[colorChannel] || device.settings.channel[colorChannel] > 512 || device.settings.channel[colorChannel] < 1)
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
             }
             return ok && window.pristine.validate();           
+        }
+
+
+        function getColorChannelsForType(_type)
+        {
+            let availableChannels = [];
+            switch(_type)            
+            {
+                case 'dimmable':
+                    availableChannels.push('main');
+                    break;
+                case 'TW':
+                    availableChannels.push('main', 'white');
+                    break;
+                case 'RGB':
+                    availableChannels.push('red', 'green', 'blue');
+                    break;
+                case 'RGBW':
+                    availableChannels.push('red', 'green', 'blue', 'white');
+                    break; 
+                case 'RGBTW':
+                    availableChannels.push('main', 'red', 'green', 'blue', 'white');
+                    break;
+            }
+            return availableChannels;
         }
 
         // this function will get the data from the form controls and pass it to the save callback of the adapter
@@ -208,31 +244,11 @@
         {
             if(!_rowIndex)
                 return;
-
-            let availableChannels = [];            
+                    
             let deviceTableElement = document.querySelector('#deviceTable');
             let rowElement = deviceTableElement.querySelector('tr[data-index="' + _rowIndex + '"]');
-            let typeElement = rowElement.querySelector('select[data-name="settings.type"]');            
-
-            switch(typeElement.value)
-            {
-                case 'dimmable':
-                    availableChannels.push('main');
-                    break;
-                case 'TW':
-                    availableChannels.push('main', 'white');
-                    break;
-                case 'RGB':
-                    availableChannels.push('red', 'green', 'blue');
-                    break;
-                case 'RGBW':
-                    availableChannels.push('red', 'green', 'blue', 'white');
-                    break; 
-                case 'RGBTW':
-                    availableChannels.push('main', 'red', 'green', 'blue', 'white');
-                    break;                                                                                
-            }
-            
+            let typeElement = rowElement.querySelector('select[data-name="settings.type"]');
+            let availableChannels = this.getColorChannelsForType(typeElement.value);            
             const allChannelElements = rowElement.querySelectorAll('input[data-name^="settings.channel."]');          
             for (const channelElement of allChannelElements)
             {
