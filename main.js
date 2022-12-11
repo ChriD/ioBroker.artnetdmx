@@ -49,7 +49,6 @@ class Artnetdmx extends utils.Adapter {
 
         this.devices = [];
         this.deviceMap = {};
-        this.existingDevices = [];
         this.artnetActionBuffer = null;
 
         this.on('ready', this.onReady.bind(this));
@@ -412,11 +411,6 @@ class Artnetdmx extends utils.Adapter {
      */
     async updateArtnetDevices()
     {
-        // before we are updating the devices from the settings we have to load the internal cache
-        // this is necessary to check wether a device is beeing added or updated. It's not the best approach but
-        // i do not have a better solution right now
-        //await this.buildDevicesArrayFromAdapterObjects();
-
         try
         {
             this.config.devices = this.config.devices ? this.config.devices : [];
@@ -451,7 +445,6 @@ class Artnetdmx extends utils.Adapter {
         {
             this.devices = [];
             this.deviceMap = {};
-            this.existingDevices = [];
 
             const deviceObjects = await this.getDevicesAsync();
             for (const deviceObject of deviceObjects)
@@ -497,8 +490,6 @@ class Artnetdmx extends utils.Adapter {
 
                 this.devices.push(device);
                 this.deviceMap[device.id] = device;
-                // a 'short id' array without any prefixes, only with the plain device id
-                this.existingDevices.push(device.deviceId);
             }
         }
         catch(_error)
@@ -561,8 +552,6 @@ class Artnetdmx extends utils.Adapter {
      */
     async addOrUpdateDevice(_deviceDescription)
     {
-        // TODO: verify before adding the device?!
-
         const hasRGB = _deviceDescription.settings.type == DEVICETYPE.RGB || _deviceDescription.settings.type == DEVICETYPE.RGBW || _deviceDescription.settings.type == DEVICETYPE.RGBTW;
         const hasColorTemperature = _deviceDescription.settings.type == DEVICETYPE.RGBTW || _deviceDescription.settings.type == DEVICETYPE.TW || _deviceDescription.settings.type == DEVICETYPE.RGBW;
         const hasMain = _deviceDescription.settings.type == DEVICETYPE.DIMMABLE || _deviceDescription.settings.type == DEVICETYPE.RGBTW || _deviceDescription.settings.type == DEVICETYPE.TW;
@@ -570,11 +559,10 @@ class Artnetdmx extends utils.Adapter {
 
         // check if we are updateing a device or if its a new one. we need this information so we can set
         // default values on new devices when they are beeing created
-        // TODO: This won't work if we delete the object tree manually when in settings
         const existingObject = await this.getObjectAsync('lights.' + _deviceDescription.deviceId);
-        this.log.error(JSON.stringify(existingObject));
+        const isCreation = existingObject ? false : true;
 
-        const isCreation = this.existingDevices.indexOf(_deviceDescription.deviceId) == -1 ? true : false;
+        this.log.error(JSON.stringify(existingObject));
 
         // main device and channel objects
         await this.createObjectNotExists('lights.' + _deviceDescription.deviceId, _deviceDescription.name, 'device', null, true);
