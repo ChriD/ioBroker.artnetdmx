@@ -268,8 +268,8 @@ class Artnetdmx extends utils.Adapter {
         _deviceObject.values.channel.blue = _valuesObject.channel.blue;
 
         // set and ack the new states given by the valuesObject. due we have ACK set to true, the setState will not
-        // trigger any action in the adapter (see 'onStateChanged' method). I am not dure if there is a better way
-        // to update such 'bulk' data change
+        // trigger any action in the adapter (see 'onStateChanged' method). I am not sure if there is a better way
+        // to update such 'bulk' data change. we will keep it for now
         this.setStateFromObjectAsync(_valuesObject, 'isOn', `${deviceId}.values.isOn`, DATATYPE.BOOLEAN, true);
         this.setStateFromObjectAsync(_valuesObject, 'brightness', `${deviceId}.values.brightness`, DATATYPE.NUMBER, true);
         this.setStateFromObjectAsync(_valuesObject, 'temperature', `${deviceId}.values.temperature`, DATATYPE.NUMBER, true);
@@ -281,6 +281,13 @@ class Artnetdmx extends utils.Adapter {
     }
 
 
+    /**
+     * This method should be used to prepare the 'valuesObject' for the 'applyValuesObjectForDevice' method
+     * It will set/default all neede values on the values object if not there. Furthermore it will clear up values which are not used
+     * by the device by it's type. (it will the those to 'undefined' so the value won't be set on a state which is not there)
+     * @param {Object} _deviceObject
+     * @param {Object} _valuesObject
+     */
     prepareValuesObjectForDevice(_deviceObject, _valuesObject)
     {
         _valuesObject.channel = _valuesObject.channel !== undefined ? _valuesObject.channel : {};
@@ -324,7 +331,17 @@ class Artnetdmx extends utils.Adapter {
         _valuesObject.channel.blue = _valuesObject.channel.blue !== undefined ? _valuesObject.channel.blue : 0;
         _valuesObject.channel.white = _valuesObject.channel.white !== undefined ? _valuesObject.channel.white : 0;
 
-        // TODO: make setting in admin for temperature (= enable color temperature) ?
+        // set values to "undefined" if not available for the device
+        const clearRGB = _deviceObject.settings.type == DEVICETYPE.DIMMABLE || _deviceObject.settings.type == DEVICETYPE.TW;
+        const clearWhite = _deviceObject.settings.type == DEVICETYPE.DIMMABLE || _deviceObject.settings.type == DEVICETYPE.RGB;
+        const clearMain = _deviceObject.settings.type == DEVICETYPE.RGB || _deviceObject.settings.type == DEVICETYPE.RGBW;
+        const clearTemperature = _deviceObject.settings.type == DEVICETYPE.DIMMABLE || _deviceObject.settings.type == DEVICETYPE.RGB;
+        _valuesObject.temperature = clearTemperature ? undefined : _valuesObject.temperature;
+        _valuesObject.channel.main = clearMain ? undefined : _valuesObject.channel.main;
+        _valuesObject.channel.red = clearRGB ? undefined : _valuesObject.channel.red;
+        _valuesObject.channel.green = clearRGB  ? undefined : _valuesObject.channel.green;
+        _valuesObject.channel.blue = clearRGB  ? undefined : _valuesObject.channel.blue;
+        _valuesObject.channel.white = clearWhite ? undefined : _valuesObject.channel.white;
     }
 
     async setStateFromObjectAsync(_object, _objectPath, _statePath, _type, _ack = false)
@@ -332,7 +349,7 @@ class Artnetdmx extends utils.Adapter {
         const objectValue = GetObjectValue(_object, _objectPath, undefined);
         if(objectValue == undefined)
             return;
-        // TODO: only set if exists?!
+        // TODO: only set if exists?! Otherwise we will get a warning!
         await this.setStateAsync(_statePath, { val: this.convertValue(objectValue, _type), ack: _ack });
     }
 
