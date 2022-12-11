@@ -86,7 +86,6 @@
             }
         }
 
-
         function initFormValidation()
         {
             let defaultConfig = {                
@@ -345,11 +344,17 @@
         // in the backend. The format will be done in the adapter backend because there we have 'FORBIDDEN_CHARS' available
         function formatObjectId(_value)
         {    
+            //let validObjectId = _objectId.replace(this.FORBIDDEN_CHARS, '_');
+            let validObjectId = validObjectId.replace(/[\.\s\/]/g, '_');
+            return validObjectId;
+
+            /*
             return new Promise((_resolve, _reject) => {                      
                 sendTo(null, 'formatObjectId', _value, function (_result) {
                         _resolve(_result);                        
                     });               
-            })        
+            })      
+            */  
         }
 
         // this method stores the current devices and their settings (given in the html table) as objects in the backend

@@ -100,6 +100,8 @@ class Artnetdmx extends utils.Adapter {
         // be sure the action buffer does have the same values as given in the iobroker object store, otherwise after an adapter
         // restart the lights will all go out because the action buffer channel value cache was deleted
         this.setArtnetActionBufferByDeviceData();
+
+        this.log.error(this.FORBIDDEN_CHARS.source);
     }
 
     setArtnetActionBufferByDeviceData()
@@ -389,20 +391,6 @@ class Artnetdmx extends utils.Adapter {
      */
     async handleMessages(_obj)
     {
-        if (typeof _obj === 'object')
-        {
-            switch (_obj.command)
-            {
-                // the admin gui does need to convert user given object id's to valid object db store id's
-                // that means the have to remove special chars from the string so we can use it as an id
-                case 'formatObjectId':
-                    if (_obj.callback) {
-                        const validObjectId = this.formatObjectId(_obj.message.toString());
-                        this.sendTo(_obj.from, _obj.command, validObjectId, _obj.callback);
-                    }
-                    break;
-            }
-        }
     }
 
     /**
@@ -514,17 +502,6 @@ class Artnetdmx extends utils.Adapter {
         return _defaultValue;
     }
 
-    /**
-     * use this method to format a n 'on clean' objectId to a 'clean' (valid) objectId
-     * @param  {String} _objectId the non clean object id
-     * @return {String} _objectId as clean usable value in the object db store
-     */
-    formatObjectId(_objectId)
-    {
-        let validObjectId = _objectId.replace(this.FORBIDDEN_CHARS, '_');
-        validObjectId = validObjectId.replace(/[\.\s\/]/g, '_');
-        return validObjectId;
-    }
 
     /**
      * This method is usesd to remove unecessary devices which are not defined in given array of device id's
@@ -561,8 +538,6 @@ class Artnetdmx extends utils.Adapter {
         // default values on new devices when they are beeing created
         const existingObject = await this.getObjectAsync('lights.' + _deviceDescription.deviceId);
         const isCreation = existingObject ? false : true;
-
-        this.log.error(JSON.stringify(existingObject));
 
         // main device and channel objects
         await this.createObjectNotExists('lights.' + _deviceDescription.deviceId, _deviceDescription.name, 'device', null, true);
