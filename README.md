@@ -79,13 +79,12 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 
 ### **WORK IN PROGRESS**
 
--   rename 'temperature' ?
--   add 'level.color.temperature' for TW and RGBTW devices
 -   validate ID when saving in ADMIN
 -   info in admin id adapter is not started yet
 -   multilanguage (english & german)
+-   backup devices via file
 
-### 1.0.0 (2022-12-10)
+### 1.0.0 (2022-12-11)
 
 -   (ChriD) initial version
 
