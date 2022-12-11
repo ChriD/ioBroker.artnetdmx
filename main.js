@@ -294,6 +294,7 @@ class Artnetdmx extends utils.Adapter {
             _valuesObject.channel.main = 255 - _valuesObject.channel.white;
         }
 
+        // set values which are not given in the values object from the device object
         _valuesObject.isOn = _valuesObject.isOn !== undefined ? _valuesObject.isOn : _deviceObject.values.isOn;
         _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : _deviceObject.values.brightness;
         _valuesObject.temperature = _valuesObject.temperature !== undefined ? _valuesObject.temperature : _deviceObject.values.temperature;
@@ -303,6 +304,16 @@ class Artnetdmx extends utils.Adapter {
         _valuesObject.channel.green = _valuesObject.channel.green !== undefined ? _valuesObject.channel.green : _deviceObject.values.channel.green;
         _valuesObject.channel.blue = _valuesObject.channel.blue !== undefined ? _valuesObject.channel.blue : _deviceObject.values.channel.blue;
         _valuesObject.channel.white = _valuesObject.channel.white !== undefined ? _valuesObject.channel.white : _deviceObject.values.channel.white;
+
+        // default some values if they where not provided by the values object nor in the device object
+        _valuesObject.isOn = _valuesObject.isOn !== undefined ? _valuesObject.isOn : false;
+        _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : 100;
+        _valuesObject.temperature = _valuesObject.temperature !== undefined ? _valuesObject.temperature : -1;
+        _valuesObject.channel.main = _valuesObject.channel.main !== undefined ? _valuesObject.channel.main : 0;
+        _valuesObject.channel.red = _valuesObject.channel.red !== undefined ? _valuesObject.channel.red : 0;
+        _valuesObject.channel.green = _valuesObject.channel.green !== undefined ? _valuesObject.channel.green : 0;
+        _valuesObject.channel.blue = _valuesObject.channel.blue !== undefined ? _valuesObject.channel.blue : 0;
+        _valuesObject.channel.white = _valuesObject.channel.white !== undefined ? _valuesObject.channel.white : 0;
 
         // TODO: make setting in admin for temperature (= enable color temperature) ?
     }
