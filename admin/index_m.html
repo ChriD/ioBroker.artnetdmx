@@ -26,7 +26,7 @@
         function load(_settings, _onChange) {
             // due to the fact the our devices and their "settings" are stored as iobroker objects/states and not 
             // as a "config", we have to request the devices and their settings from the adapter
-            requestArtnetDevices(_onChange);
+            //requestArtnetDevices(_onChange);
 
             // we do connect to some kind of ArtnetDMX device so we need to have the selection which network interface
             // we should use when doing so. The standard 'adapter-settings.js' will help us with it's 'fillSelectIPs'
@@ -53,6 +53,14 @@
            
             // load the settings from the _settings object into the html controls
             loadSettings(_settings, _onChange);
+
+            // load the device settings into the table
+            let devices = new Array();
+            for (const device of _settings.devices)
+            {
+                devices.push(flattenObject(device));  
+            } 
+            values2table('devices', devices, _onChange, onDeviceTableReady);
                        
             // reinitialize all the materialize labels on the page because we are adding inputs dynamically
             // in fact in our case this following line wont be of any effect i think
@@ -68,9 +76,9 @@
         function save(_callback) {  
             if(validateSettings())
             {
-                updateArtnetDevices().then(()=>{
+                //updateArtnetDevices().then(()=>{
                     saveSettings(_callback);            
-                });
+                //});
             }
             else
             {
@@ -131,6 +139,9 @@
                     obj[$this.attr('id')] = $this.val();
                 }
             });
+
+            obj.devices = getDeviceObjectFromTable('devices');
+
             return obj;
         }
 

@@ -66,6 +66,8 @@ class Artnetdmx extends utils.Adapter {
         // The connection state of an Artnet connection is not really detectable because it used UDP
         this.setState('info.connection', false, true);
 
+        // TODO: create/update the devices from the device settings in the adapter ????
+
         // build device settings object for the admin page (the device list will be created from the devices in the object list)
         // the admin page will show the devices defined in the object list and the values of the settings given in the "settings"
         // channel of the device
@@ -447,6 +449,7 @@ class Artnetdmx extends utils.Adapter {
             }
         }
     }
+
 
     /**
      * this method reads all devices (objects) from the object db store and some of its child objects/states
