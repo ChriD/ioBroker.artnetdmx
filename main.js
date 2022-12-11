@@ -100,8 +100,6 @@ class Artnetdmx extends utils.Adapter {
         // be sure the action buffer does have the same values as given in the iobroker object store, otherwise after an adapter
         // restart the lights will all go out because the action buffer channel value cache was deleted
         this.setArtnetActionBufferByDeviceData();
-
-        this.log.error(this.FORBIDDEN_CHARS.source);
     }
 
     setArtnetActionBufferByDeviceData()
