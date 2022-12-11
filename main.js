@@ -233,6 +233,7 @@ class Artnetdmx extends utils.Adapter {
         return (_deviceObject.values.brightness / 100) * (_deviceObject.values.isOn ? 1 : 0);
     }
 
+    // Be sure to call 'prepareValuesObjectForDevice' on the _valuesObject before calling this method
     applyValuesObjectForDevice(_deviceObject, _valuesObject)
     {
         const deviceId = _deviceObject.id;
@@ -255,6 +256,17 @@ class Artnetdmx extends utils.Adapter {
             }
         }
 
+        // update the internal cache values  so they are up to date, this is necessary when the whole values object
+        // is beeing set via the 'valuesObject' state
+        _deviceObject.values.isOn = _valuesObject.isOn;
+        _deviceObject.values.brightness = _valuesObject.brightness;
+        _deviceObject.values.temperature = _valuesObject.temperature;
+        _deviceObject.values.channel.white = _valuesObject.channel.white;
+        _deviceObject.values.channel.main = _valuesObject.channel.main;
+        _deviceObject.values.channel.red = _valuesObject.channel.red;
+        _deviceObject.values.channel.green = _valuesObject.channel.green;
+        _deviceObject.values.channel.blue = _valuesObject.channel.blue;
+
         // set and ack the new states given by the valuesObject. due we have ACK set to true, the setState will not
         // trigger any action in the adapter (see 'onStateChanged' method). I am not dure if there is a better way
         // to update such 'bulk' data change
@@ -267,6 +279,7 @@ class Artnetdmx extends utils.Adapter {
         this.setStateFromObjectAsync(_valuesObject, 'channel.blue', `${deviceId}.values.channel.blue`, DATATYPE.NUMBER, true);
         this.setStateFromObjectAsync(_valuesObject, 'channel.white', `${deviceId}.values.channel.white`, DATATYPE.NUMBER, true);
     }
+
 
     prepareValuesObjectForDevice(_deviceObject, _valuesObject)
     {
