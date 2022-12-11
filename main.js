@@ -571,7 +571,7 @@ class Artnetdmx extends utils.Adapter {
         // check if we are updateing a device or if its a new one. we need this information so we can set
         // default values on new devices when they are beeing created
         // TODO: This won't work if we delete the object tree manually when in settings
-        const existingObject = await this.getObjectAsync(_deviceDescription.deviceId);
+        const existingObject = await this.getObjectAsync('lights.' + _deviceDescription.deviceId);
         this.log.error(JSON.stringify(existingObject));
 
         const isCreation = this.existingDevices.indexOf(_deviceDescription.deviceId) == -1 ? true : false;
