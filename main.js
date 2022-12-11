@@ -67,6 +67,7 @@ class Artnetdmx extends utils.Adapter {
         this.setState('info.connection', false, true);
 
         // TODO: create/update the devices from the device settings in the adapter ????
+        this.updateArtnetDevices();
 
         // build device settings object for the admin page (the device list will be created from the devices in the object list)
         // the admin page will show the devices defined in the object list and the values of the settings given in the "settings"
@@ -409,14 +410,17 @@ class Artnetdmx extends utils.Adapter {
                 // the admin gui reflects the devices in the object store and you can define some settings there
                 // for that to work it does need all the devices and their channels and state which can be received
                 // eith this type of message
+                /*
                 case 'requestArtnetDevices':
                     if (_obj.callback) {
                         this.sendTo(_obj.from, _obj.command, this.devices, _obj.callback);
                     }
                     break;
+                */
 
                 // in the state of saving the configuration (when the admin gui saves it's configuration) it will
                 // send us the array of artnet devices configured in the admin
+                /*
                 case 'updateArtnetDevices':
                     try
                     {
@@ -447,7 +451,34 @@ class Artnetdmx extends utils.Adapter {
                     }
                     break;
             }
+            */
         }
+    }
+
+    updateArtnetDevices()
+    {
+        try
+        {
+            this.config.devices = this.config.devices ? this.config.devices : [];
+
+            const deviceIds = new Array();
+            for (const device of this.config.devices)
+            {
+                await this.addOrUpdateDevice(device);
+                deviceIds.push(device.deviceId);
+            }
+            // we may have removed some devices in the admin view and those should be deleted from
+            // the object store. Therefore we run through the current devices and check if they are
+            await this.cleanupDevices(deviceIds);
+        }
+        catch(_exception)
+        {
+            this.log.error(_exception.message);
+        }
+
+        // be sure the internal device array is up to date, and will be reloaded from the object db store
+        // we completely rebuild the array, that's okay here
+        await this.buildDevicesArrayFromAdapterObjects();
     }
 
 
