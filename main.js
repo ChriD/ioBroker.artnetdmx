@@ -332,6 +332,13 @@ class Artnetdmx extends utils.Adapter {
             }
         }
 
+        // a dimmable device only has one channel and only one color, so mixing is not possible at all
+        // So we have to set the main value always to 255, no matter what happens. The brightness will do the dimming
+        if(_deviceObject.settings.type === DEVICETYPE.DIMMABLE)
+        {
+            _valuesObject.channel.main = 255;
+        }
+
         // set values which are not given in the values object from the device object
         _valuesObject.isOn = _valuesObject.isOn !== undefined ? _valuesObject.isOn : _deviceObject.values.isOn;
         _valuesObject.brightness = _valuesObject.brightness !== undefined ? _valuesObject.brightness : _deviceObject.values.brightness;
