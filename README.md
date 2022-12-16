@@ -12,7 +12,11 @@
 
 ## artnetdmx adapter for ioBroker
 
-With this adapter you can control DMX devices via an ARTNET node.
+With this adapter you can control DMX lights via an ARTNET node.<br>
+It was created to allow easy handling of dimmable, tunable white, rgb, rgbw, or rgbtw lights.<br>
+Each channel on the light device can be configured, even fade times can be set per device and you can
+override the device fade times and set light values directly via the 'valuesObject' state which is present 
+on each light device
 
 
 
@@ -80,6 +84,8 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 ### **WORK IN PROGRESS**
 
 -   multilanguage (english & german)
+-   valid tests for test automation
+-   npm adapter publishing
 
 ### 1.0.0 (2022-12-12)
 
