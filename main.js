@@ -123,6 +123,9 @@ class Artnetdmx extends utils.Adapter {
      */
     setArtnetActionBufferByDeviceData(_transmitValues = false)
     {
+        if(!this.artnetActionBuffer)
+            return;
+
         const buffer = new Array(512).fill(0);
         for(let idx=0; idx<this.devices.length; idx++)
         {
@@ -144,7 +147,7 @@ class Artnetdmx extends utils.Adapter {
                 }
             }
         }
-        this.artnetActionBuffer.setBuffer(buffer);
+        setBuffer.setBuffer(buffer);
         if(_transmitValues)
             this.artnetActionBuffer.transmitValues();
         this.log.debug(`Set cache buffer of artnet transmiter to: ${JSON.stringify(buffer)}`);

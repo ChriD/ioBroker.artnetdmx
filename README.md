@@ -67,6 +67,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 -   valid tests for test automation
 -   npm adapter publishing
+-   add to iobroker latest
 
 ### 1.0.0 (2022-12-12)
 
