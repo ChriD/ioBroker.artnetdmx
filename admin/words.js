@@ -4,14 +4,17 @@
 systemDictionary = {
     'artnetdmx adapter settings': {
         'en': 'Adapter settings for artnetdmx',
-        'de': 'Adaptereinstellungen für artnetdmx'
+        'de': 'Adaptereinstellungen für artnetdmx',
+        "ru": "Настройки адаптера для artnetdmx"
     },
     'Connection settings': {
         'en': 'Connection settings',
-        'de': 'Verbindungseinstellungen'
+        'de': 'Verbindungseinstellungen',
+        "ru": "Настройки подключения"
     },
     'Artnet/DMX Settings': {
         'en': 'Artnet/DMX Settings',
-        'de': 'Artnet/DMX Einstellungen'
+        'de': 'Artnet/DMX Einstellungen',
+        "ru": "Настройки Artnet/DMX"
     }
 };

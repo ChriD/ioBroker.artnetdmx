@@ -86,6 +86,7 @@ of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#req
 -   multilanguage (english & german)
 -   valid tests for test automation
 -   npm adapter publishing
+-   maybe change licence to BSD3
 
 ### 1.0.0 (2022-12-12)
 
