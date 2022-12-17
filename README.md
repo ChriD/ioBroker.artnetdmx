@@ -65,10 +65,8 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ### **WORK IN PROGRESS**
 
--   multilanguage (english & german)
 -   valid tests for test automation
 -   npm adapter publishing
--   maybe change licence to BSD3
 
 ### 1.0.0 (2022-12-12)
 
