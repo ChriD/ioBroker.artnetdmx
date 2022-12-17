@@ -3,7 +3,6 @@
     * adapter checker (https://adapter-check.iobroker.in/)
     * (https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices)
     * multilanguage (https://forum.iobroker.net/topic/36660/trial-weblate-f%C3%BCr-iobroker-%C3%BCbersetzungen/9)
-    * testscripts (iobroker)
     * !!! TESTING !!!
     * publish adapter (https://www.youtube.com/watch?v=7N8fsJcAdlE)
     * 
@@ -101,7 +100,7 @@ class Artnetdmx extends utils.Adapter {
             this.log.error(_exception.message);
         });
         this.artnetActionBuffer.on('bufferChanged', (_idx) => {
-            this.log.info(JSON.stringify(this.artnetActionBuffer.bufferAction));
+            this.log.silly(JSON.stringify(this.artnetActionBuffer.bufferAction));
         });
 
         // be sure the action buffer does have the same values as given in the iobroker object store,
