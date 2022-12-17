@@ -25,8 +25,6 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ## Getting started
 
-* For a stable version install the adapter with the iobroker adapter manager or for development branches with the latest features use the advanged git-hub installation method `(not recommended)`
-
 * Set the artnet settings in the adapter to connect to a ARTNET node device
     * Connection settings
         | Field | Description |
@@ -61,22 +59,6 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
         | `Ch. green` | The channel number for green  |
         | `Ch. blue` | The channel number for blue  |
         | `Fade time` | The fade time which is beeing used when changing the values of the channels to their new values  `default: -1` <br> If default value is used (-1) the fade time defined on the settings page will be used |
-
-
-### Publishing the adapter
-Using GitHub Actions, you can enable automatic releases on npm whenever you push a new git tag that matches the form 
-`v<major>.<minor>.<patch>`. We **strongly recommend** that you do. The necessary steps are described in `.github/workflows/test-and-release.yml`.
-
-Since you installed the release script, you can create a new
-release simply by calling:
-```bash
-npm run release
-```
-Additional command line options for the release script are explained in the
-[release-script documentation](https://github.com/AlCalzone/release-script#command-line).
-
-To get your adapter released in ioBroker, please refer to the documentation 
-of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#requirements-for-adapter-to-get-added-to-the-latest-repository).
 
 
 ## Changelog
