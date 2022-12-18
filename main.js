@@ -215,11 +215,13 @@ class Artnetdmx extends utils.Adapter {
                     }
                 }
 
+                // INFO: No need to ACK anything. this will be don in the "applyValuesObjectForDevice"
                 // if we come here, the desired value for the state was not set by the adapter itself, so we have to ACK it
                 // unfortunetally the ACK is only some kind of pseude ACK because we can not be sure the ARTNET module has
                 // set the value (ArtNet is UDP)
                 //this.extendObject(id, { val: state.val, ack: true });
-                this.setStateAsync(id, { val: state.val, ack: true });
+                //this.setStateAsync(id, { val: state.val, ack: true });
+                //this.log.debug(`Ack state ${id} with value ${state.val}`);
             }
             else
             {

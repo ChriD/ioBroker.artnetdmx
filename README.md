@@ -69,6 +69,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 -   npm adapter publishing
 -   add to iobroker latest
 -   changed some log levels
+-   Fixed some unecessary double state ACK
 
 ### 1.0.0 (2022-12-12)
 
