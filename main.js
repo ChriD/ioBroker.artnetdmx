@@ -327,7 +327,7 @@ class Artnetdmx extends utils.Adapter {
 
             // set and ack the new states given by the valuesObject. due we have ACK set to true, the setState will not
             // trigger any action in the adapter (see 'onStateChanged' method).
-            this.setStateFromObjectAsync(_valuesObject, _path, `${_deviceObject.Id}.values.${_path}`, _datatype, true);
+            this.setStateFromObjectAsync(_valuesObject, _path, `${_deviceObject.id}.values.${_path}`, _datatype, true);
         }
     }
 
