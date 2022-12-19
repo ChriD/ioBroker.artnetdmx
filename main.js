@@ -184,13 +184,17 @@ class Artnetdmx extends utils.Adapter {
                 const deviceStatePartKey = deviceStateKey.split('.').slice(1).join('.');
                 const stateKey = id.split('.').pop();
 
+                // TODO: Obsolete -->
                 // update the internal object cache
                 // the adapter stores the device settings and values in an internal object. We will get the data for the device out
                 // of this object and we update this object with the new state, so we will have always 'up to date' data on this object
-                this.updateInternalDeviceCacheFromState(id, state);
+                //this.updateInternalDeviceCacheFromState(id, state);
+                // TODO: Obsolete <--
 
                 // get the device settings and it's current state from the internal cache
                 const deviceObject = this.deviceMap[deviceId];
+                if(!deviceObject)
+                    throw new Error(`Device for id: ${deviceId} not found`);
 
                 // if isOn, brightness or a channel value changes (stuff in the 'values' folder), we have to build an actions for the
                 // action buffer. We utilize the 'valuesObject' methods for that
@@ -199,7 +203,7 @@ class Artnetdmx extends utils.Adapter {
                     const valuesObject = {};
                     SetObjectValue(valuesObject, deviceStatePartKey, state.val);
                     this.prepareValuesObjectForDevice(deviceObject, valuesObject);
-                    this.applyValuesObjectForDevice(deviceObject, valuesObject);
+                    this.applyValuesObjectForDevice(deviceObject, valuesObject, [deviceStatePartKey]);
                 }
 
                 // the adapter has the ability to set a 'state object' for a device
@@ -241,6 +245,7 @@ class Artnetdmx extends utils.Adapter {
      * @param  {String} _stateId a state id (with full path)
      * @param  {Object} _state state object
      */
+    /*
     updateInternalDeviceCacheFromState(_stateId, _state)
     {
         const deviceId = this.getDeviceIdFromStateId(_stateId);
@@ -254,7 +259,7 @@ class Artnetdmx extends utils.Adapter {
         if(GetObjectValue(deviceObject, deviceStateKey, undefined) === undefined)
             throw new Error(`Device key '${deviceStateKey}' not found on device ${deviceId}: ${JSON.stringify(deviceObject)}`);
         SetObjectValue(deviceObject, deviceStateKey, _state.val);
-    }
+    }*/
 
 
     /**
@@ -276,9 +281,8 @@ class Artnetdmx extends utils.Adapter {
      * @param  {Object} _deviceObject a device object
      * @param  {Object} _valuesObject a values object
      */
-    applyValuesObjectForDevice(_deviceObject, _valuesObject)
+    applyValuesObjectForDevice(_deviceObject, _valuesObject, _propKeyArrayChanged = [])
     {
-        const deviceId = _deviceObject.id;
         const brightnessMultiplicator = this.getBrightnessMultiplicator(_deviceObject);
 
         // run through 'deviceObject.settings.channel' object prop's and if there is a non NULL value it means that the
@@ -298,28 +302,33 @@ class Artnetdmx extends utils.Adapter {
             }
         }
 
-        // update the internal cache values  so they are up to date, this is necessary when the whole values object
-        // is beeing set via the 'valuesObject' state
-        _deviceObject.values.isOn = _valuesObject.isOn;
-        _deviceObject.values.brightness = _valuesObject.brightness;
-        _deviceObject.values.temperature = _valuesObject.temperature;
-        _deviceObject.values.channel.white = _valuesObject.channel.white;
-        _deviceObject.values.channel.main = _valuesObject.channel.main;
-        _deviceObject.values.channel.red = _valuesObject.channel.red;
-        _deviceObject.values.channel.green = _valuesObject.channel.green;
-        _deviceObject.values.channel.blue = _valuesObject.channel.blue;
+        this.applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, 'isOn', DATATYPE.BOOLEAN, _propKeyArrayChanged.includes('isOn'));
+        this.applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, 'brightness', DATATYPE.NUMBER, _propKeyArrayChanged.includes('brightness'));
+        this.applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, 'temperature', DATATYPE.NUMBER, _propKeyArrayChanged.includes('temperature'));
+        this.applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, 'channel.main', DATATYPE.NUMBER, _propKeyArrayChanged.includes('channel.main'));
+        this.applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, 'channel.red', DATATYPE.NUMBER, _propKeyArrayChanged.includes('channel.red'));
+        this.applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, 'channel.green', DATATYPE.NUMBER, _propKeyArrayChanged.includes('channel.green'));
+        this.applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, 'channel.blue', DATATYPE.NUMBER, _propKeyArrayChanged.includes('channel.blue'));
+        this.applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, 'channel.white', DATATYPE.NUMBER, _propKeyArrayChanged.includes('channel.white'));
+    }
 
-        // set and ack the new states given by the valuesObject. due we have ACK set to true, the setState will not
-        // trigger any action in the adapter (see 'onStateChanged' method). I am not sure if there is a better way
-        // to update such 'bulk' data change. we will keep it for now
-        this.setStateFromObjectAsync(_valuesObject, 'isOn', `${deviceId}.values.isOn`, DATATYPE.BOOLEAN, true);
-        this.setStateFromObjectAsync(_valuesObject, 'brightness', `${deviceId}.values.brightness`, DATATYPE.NUMBER, true);
-        this.setStateFromObjectAsync(_valuesObject, 'temperature', `${deviceId}.values.temperature`, DATATYPE.NUMBER, true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.main', `${deviceId}.values.channel.main`, DATATYPE.NUMBER, true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.red', `${deviceId}.values.channel.red`, DATATYPE.NUMBER, true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.green', `${deviceId}.values.channel.green`, DATATYPE.NUMBER, true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.blue', `${deviceId}.values.channel.blue`, DATATYPE.NUMBER, true);
-        this.setStateFromObjectAsync(_valuesObject, 'channel.white', `${deviceId}.values.channel.white`, DATATYPE.NUMBER, true);
+    applyValuesObjectForDeviceOnPath(_deviceObject, _valuesObject, _path, _datatype, _forceUpdate = false)
+    {
+        const devicePathValue = GetObjectValue(_deviceObject.values, _path);
+        const valuesPathValue = GetObjectValue(_valuesObject, _path);
+
+        if(devicePathValue != valuesPathValue || _forceUpdate)
+        {
+            // update the internal cache value so it's up to date
+            // if the key is not present in the object we do not process any further, the key has to be there
+            if(GetObjectValue(_deviceObject.values, _path, undefined) === undefined)
+                throw new Error(`Device key '${_path}' not found on device ${_deviceObject.id}: ${JSON.stringify(_deviceObject)}`);
+            SetObjectValue(_deviceObject.values, _path, valuesPathValue);
+
+            // set and ack the new states given by the valuesObject. due we have ACK set to true, the setState will not
+            // trigger any action in the adapter (see 'onStateChanged' method).
+            this.setStateFromObjectAsync(_valuesObject, _path, `${_deviceObject.Id}.values.${_path}`, _datatype, true);
+        }
     }
 
 
