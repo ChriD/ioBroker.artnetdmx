@@ -63,7 +63,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 1.0.1 (2022-12-20)
 
 -   changed some log levels
 -   fixed some unecessary double state ACK

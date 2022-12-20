@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "artnetdmx",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "news": {
+            "1.0.1": {
+                "en": "changed some log levels\nfixed some unecessary double state ACK\nfixed triggering state change event on \"unchanged\" states",
+                "de": "einige protokollebenen geändert\neinige unnötige doppelte Zustand ACK behoben\nfestes auslösezustandsänderungsereignis an unveränderten zuständen",
+                "ru": "изменили некоторые уровни лога\nисправлено необходимое двойное состояние ACK\nфиксированный запуск события изменения состояния на неизмененных государствах",
+                "pt": "mudou alguns níveis de log\nfixo algum estado duplo obstinado ACK\nevento de mudança de estado de gatilho fixo em estados inalterados",
+                "nl": "veranderde logniveaus\nvertaling:\nverandering van onveranderde staten",
+                "fr": "a changé certains niveaux de log\nfixe un état double incessaire ACK\nchangement d'état de déclenchement fixe sur les états inchangés",
+                "it": "ha cambiato alcuni livelli di log\nfisso qualche doppio stato non necessario\nevento di cambiamento dello stato di attivazione fisso sugli stati invariati",
+                "es": "cambiaron algunos niveles de registro\nfijado un poco inecesario estado doble ACK\nevento de cambio de estado de activación fijo en estados no cambiados",
+                "pl": "zmieniał się poziom logowania\nstan podwójny ACK\nzmiana ustawodawcza w stanach niezmienionych",
+                "uk": "змінено деякі рівні журналу\nфіксований деякі нерівномірний подвійний стан ACK\nфіксована подія змінення стану на незмінних станах",
+                "zh-cn": "某些逻辑水平的改变\n固定的双重国家ACK\na. 固定触发状态变化事件"
+            },
             "1.0.0": {
                 "en": "initial release",
                 "de": "Erstveröffentlichung",
