@@ -65,11 +65,9 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ### **WORK IN PROGRESS**
 
--   valid tests for test automation
--   npm adapter publishing
--   add to iobroker latest
 -   changed some log levels
--   Fixed some unecessary double state ACK
+-   fixed some unecessary double state ACK
+-   fixed triggering state change event on "unchanged" states
 
 ### 1.0.0 (2022-12-12)
 

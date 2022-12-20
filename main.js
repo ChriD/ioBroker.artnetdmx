@@ -1,26 +1,3 @@
-/*
-    TODO:
-    * adapter checker (https://adapter-check.iobroker.in/)
-    * (https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices)
-    * multilanguage (https://forum.iobroker.net/topic/36660/trial-weblate-f%C3%BCr-iobroker-%C3%BCbersetzungen/9)
-    * !!! TESTING !!!
-    * publish adapter (https://www.youtube.com/watch?v=7N8fsJcAdlE)
-    * 
-    * ### Publishing the adapter
-        Using GitHub Actions, you can enable automatic releases on npm whenever you push a new git tag that matches the form 
-        `v<major>.<minor>.<patch>`. We **strongly recommend** that you do. The necessary steps are described in `.github/workflows/test-and-release.yml`.
-
-        Since you installed the release script, you can create a new
-        release simply by calling:
-        ```bash
-        npm run release
-        ```
-        Additional command line options for the release script are explained in the
-        [release-script documentation](https://github.com/AlCalzone/release-script#command-line).
-
-        To get your adapter released in ioBroker, please refer to the documentation 
-        of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#requirements-for-adapter-to-get-added-to-the-latest-repository).
-*/
 
 'use strict';
 
