@@ -260,7 +260,7 @@ class Artnetdmx extends utils.Adapter {
      */
     applyValuesObjectForDevice(_deviceObject, _valuesObject, _propKeyArrayChanged = [])
     {
-        const brightnessMultiplicator = this.getBrightnessMultiplicator(_deviceObject);
+        const brightnessMultiplicator = this.getBrightnessMultiplicator(_valuesObject);
 
         // run through 'deviceObject.settings.channel' object prop's and if there is a non NULL value it means that the
         // channel is activce and we have to create an action buffer object for that channel to provide the new value to
