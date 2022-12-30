@@ -62,7 +62,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 1.0.2 (2022-12-30)
 
 -   (ChriD) updated readme
 -   (ChriD) fixed on/off problem which raised du to code rework

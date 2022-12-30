@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "artnetdmx",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "news": {
+            "1.0.2": {
+                "en": "updated readme\nfixed on/off problem which raised du to code rework\nfixed problem that on adapter (re)start the artnet buffer was not correct",
+                "de": "aktualisierte version\nproblem behoben, das bei code-rework angehoben wurde\nfestes problem, dass auf adapter (wieder)start der artnet puffer war nicht korrekt",
+                "ru": "обновленный readme\nисправлена проблема on/off, которая поднялась из-за переработок кода\nфиксированная проблема, что на адаптере (re)начать буфер artnet не был правильным",
+                "pt": "readme atualizado\nproblema fixo on/off que levantou du para retrabalho de código\nproblema fixo que no adaptador (re)iniciar o buffer de artnet não estava correto",
+                "nl": "vertaling:\nvertaling:\nhet probleem dat op de adapter begon was niet correct",
+                "fr": "mise à jour\nproblème fixe sur/off qui a soulevé du à code retravail\nproblème fixe que sur l'adaptateur (re)start le tampon artnet n'était pas correct",
+                "it": "aggiornato\nproblema fisso on/off che ha sollevato la rielaborazione del codice\nproblema fisso che sull'adattatore (re)avviare il buffer artnet non era corretto",
+                "es": "readme actualizado\nproblema fijo de encendido / apagado que planteó du a la recuperación del código\nproblema fijo que en el adaptador (re) iniciar el amortiguador de artnet no era correcto",
+                "pl": "uaktualniać\nokreślenie/off problemu, który podniósł du do ponownego kodowania\nstały problem, który na adapterie (re) wzrósł, nie był poprawny",
+                "uk": "оновлений зчитувач\nвиправлено / відключити проблему, яка піднялася до обробки коду\nвиправлена задача, яка на адаптері (re)починає буфер артнету, не було виправлено",
+                "zh-cn": "更新\na. 规范/抵消问题\n适应者(重新)启动艺术网缓冲的固定问题并不正确。"
+            },
             "1.0.1": {
                 "en": "changed some log levels\nfixed some unecessary double state ACK\nfixed triggering state change event on \"unchanged\" states",
                 "de": "einige protokollebenen geändert\neinige unnötige doppelte Zustand ACK behoben\nfestes auslösezustandsänderungsereignis an unveränderten zuständen",
