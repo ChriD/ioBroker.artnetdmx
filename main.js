@@ -242,12 +242,12 @@ class Artnetdmx extends utils.Adapter {
     /**
      * This method will return the current brightness multiplicator for the given device.
      * It will check if the device is on or off. If the device is off it will always return 0
-     * @param  {Object} _deviceObject a device object
+     * @param  {Object} _valuesObject a values object
      * @return  {Number}
      */
-    getBrightnessMultiplicator(_deviceObject)
+    getBrightnessMultiplicator(_valuesObject)
     {
-        return (_deviceObject.values.brightness / 100) * (_deviceObject.values.isOn ? 1 : 0);
+        return (_valuesObject.brightness / 100) * (_valuesObject.isOn ? 1 : 0);
     }
 
 

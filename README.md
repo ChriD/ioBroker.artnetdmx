@@ -43,10 +43,9 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
         | `Default fade time [ms]` | The default fadeing time which is used when setting a channel value |  
 
 
-* Define devices in the adapter settings
+* Define devices in the adapter settings<br>
     In the device page of the admin gui you can add, change or delete devices. Changes in this list will be mirrored in the object tree. So if you
-    delete a device here, it's corresponding states will be removed from the object tree. Therfore the adapter has to run when you make any changes
-    to the qadapter settings
+    delete a device here, it's corresponding states will be removed from the object tree. (on saving the state/restarting the adapter)
     * Device settings
         | Field | Description |
         |-------------|-------------|
@@ -63,11 +62,15 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+-   (ChriD) multilanguage
+-   (ChriD) updated readme
+
 ### 1.0.1 (2022-12-20)
 
--   changed some log levels
--   fixed some unecessary double state ACK
--   fixed triggering state change event on "unchanged" states
+-   (ChriD) changed some log levels
+-   (ChriD) fixed some unecessary double state ACK
+-   (ChriD) fixed triggering state change event on "unchanged" states
 
 ### 1.0.0 (2022-12-12)
 
