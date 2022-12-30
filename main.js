@@ -114,7 +114,8 @@ class Artnetdmx extends utils.Adapter {
                     if(typeof objValue === DATATYPE.NUMBER && !Number.isNaN(objValue) &&
                        typeof channelValue === DATATYPE.NUMBER && !Number.isNaN(channelValue))
                     {
-                        buffer[objValue] = channelValue;
+                        // we have to substract '1' from the channel to get the buffer index
+                        buffer[objValue-1] = channelValue;
                     }
                     else
                     {

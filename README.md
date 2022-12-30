@@ -66,7 +66,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 -   (ChriD) updated readme
 -   (ChriD) fixed on/off problem which raised du to code rework
--   (ChriD) fixed
+-   (ChriD) fixed problem that on adapter (re)start the artnet buffer was not correct
 
 ### 1.0.1 (2022-12-20)
 
