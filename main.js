@@ -191,9 +191,22 @@ class Artnetdmx extends utils.Adapter {
                     // the control object can be used to set multiple states with one state
                     if(stateKey == 'valuesObject' && state.val)
                     {
-                        const valuesObject = JSON.parse(state.val);
-                        this.prepareValuesObjectForDevice(deviceObject, valuesObject);
-                        this.applyValuesObjectForDevice(deviceObject, valuesObject);
+                        let valuesObject = state.val;
+
+                        // if the value was a string, try to make an JSON object from it
+                        if(typeof state.val === 'string')
+                            valuesObject = JSON.parse(state.val);
+
+                        // here the valueObject has to be an object
+                        if(Object.prototype.toString.call(valuesObject) === '[object Object]')
+                        {
+                            this.prepareValuesObjectForDevice(deviceObject, valuesObject);
+                            this.applyValuesObjectForDevice(deviceObject, valuesObject);
+                        }
+                        else
+                        {
+                            this.log.error(`valuesObject state value is not set with an object or parsable object string: ${ valuesObject ? valuesObject.toString() : 'null or undefined'} `);
+                        }
                     }
                 }
 
@@ -606,7 +619,7 @@ class Artnetdmx extends utils.Adapter {
         if(hasMain)
         {
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.main', 'main', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.main, true); 
-            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
+            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, 'level.color.white', 255, false, isCreation);
         }
 
         if(hasRGB)
@@ -614,15 +627,15 @@ class Artnetdmx extends utils.Adapter {
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.red', 'red', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.red, true);
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.green', 'green', DATATYPE.NUMBER, '', _deviceDescription.settings.channel.green, true);
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.blue', 'blue', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.blue, true);
-            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.red', 'red', DATATYPE.NUMBER, 'level.color.red', 0, false, isCreation);
-            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.green', 'green', DATATYPE.NUMBER, 'level.color.green', 0, false, isCreation);
-            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, 'level.color.blue', 0, false, isCreation);
+            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.red', 'red', DATATYPE.NUMBER, 'level.color.red', 255, false, isCreation);
+            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.green', 'green', DATATYPE.NUMBER, 'level.color.green', 255, false, isCreation);
+            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.blue', 'blue', DATATYPE.NUMBER, 'level.color.blue', 255, false, isCreation);
         }
 
         if(hasWhite)
         {
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.white', 'white', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.white, true);
-            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', 0, false, isCreation);
+            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.white', 'white', DATATYPE.NUMBER, 'level.color.white', 255, false, isCreation);
         }
 
         if(hasColorTemperature)
