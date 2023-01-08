@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "artnetdmx",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "news": {
+            "1.0.3": {
+                "en": "Standard channel values when creating a new device will be set to 255 instead of 0\nvaluesObject may now be a real object instead a parsable json string",
+                "de": "Standardkanalwerte bei der Erstellung eines neuen Geräts werden auf 255 anstatt 0 gesetzt\nwerte Objekt kann nun ein echtes Objekt sein, statt ein parsable json string",
+                "ru": "Стандартные значения каналов при создании нового устройства будут установлены до 255 вместо 0\nценности Объект теперь может быть реальным объектом, а парсабле json string",
+                "pt": "Valores de canal padrão ao criar um novo dispositivo será definido para 255 em vez de 0\nvalores O objeto pode agora ser um objeto real em vez de uma string json parsable",
+                "nl": "Standaard kanaalwaarden als het creëren van een nieuw apparaat naar 255 in plaats van 0\nwaarden Object kan nu een echt object zijn in plaats van een parsable Json string",
+                "fr": "Les valeurs standard de canal lors de la création d'un nouvel appareil seront fixées à 255 au lieu de 0\nvaleurs L'objet peut maintenant être un objet réel au lieu d'une chaîne json parsable",
+                "it": "I valori standard del canale quando si crea un nuovo dispositivo saranno impostati a 255 invece di 0\nvalori L'oggetto può ora essere un oggetto reale invece una stringa json parsable",
+                "es": "Valores de canal estándar al crear un nuevo dispositivo se establecerá a 255 en lugar de 0\nvalores El objeto ahora puede ser un objeto real en lugar de una cadena de json parable",
+                "pl": "Standardowe wartości kanału, gdy tworzenie nowego urządzenia będzie ustawione do 255 zamiast 0\nwartości Obiekt może teraz być prawdziwym obiektem, zamiast parsable json string",
+                "uk": "Стандартні значення каналів при створенні нового пристрою будуть встановлюватися на 255 замість 0\nзначення Об'єкт тепер може бути справжнім об'єктом, замість того, щоб парсable json string",
+                "zh-cn": "在建立新装置时,标准输送价值将达到255,而不是0.0%\n价值观 现在,目标可能是真正的目标,而只是一个合理的丛书。"
+            },
             "1.0.2": {
                 "en": "updated readme\nfixed on/off problem which raised du to code rework\nfixed problem that on adapter (re)start the artnet buffer was not correct",
                 "de": "aktualisierte version\nproblem behoben, das bei code-rework angehoben wurde\nfestes problem, dass auf adapter (wieder)start der artnet puffer war nicht korrekt",

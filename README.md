@@ -62,7 +62,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 1.0.3 (2023-01-08)
 
 -   (ChriD) Standard channel values when creating a new device will be set to 255 instead of 0
 -   (ChriD) valuesObject may now be a real object instead a parsable json string
