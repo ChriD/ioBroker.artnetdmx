@@ -62,6 +62,10 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+
+-   (ChriD) ??? https://github.com/ioBroker/ioBroker.repositories
+
 ### 1.0.3 (2023-01-08)
 
 -   (ChriD) Standard channel values when creating a new device will be set to 255 instead of 0
@@ -87,7 +91,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 ## License
 MIT License
 
-Copyright (c) 2022 ChriD <chris_d85@hotmail.com>
+Copyright (c) 2023 ChriD <chris_d85@hotmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
