@@ -312,7 +312,7 @@
                     updateObjectId(rowIndex, _event.target.value);
                 }
 
-                // inject the 'update objectId' button for refershing the object id from the device name
+                // inject the 'update objectId' button for refreshing the object id from the device name
                 let deviceIdElement = rowElement.querySelector('input[data-name="deviceId"]');
                 let columnElement = deviceIdElement.parentElement;                
                 var input = document.createElement("i");
@@ -355,9 +355,16 @@
         {    
             //FORBIDDEN_CHARS of iobroker: [^._\-/ :!#$%&()+=@^{}|~\p{Ll}\p{Lu}\p{Nd}]+
             //const forbiddenChars = RegExp(/[^._\-/ :!#$%&()+=@^{}|~\p{Ll}\p{Lu}\p{Nd}]/);
-            let validObjectId = _value.replace(/[^\w\s]/gi, '')
+            let validObjectId = _value.replace(/ä/g, 'ae');
+            validObjectId = validObjectId.replace(/ö/g, 'oe');
+            validObjectId = validObjectId.replace(/ü/g, 'ue');
+            validObjectId = validObjectId.replace(/ß/g, 'ss');
+            validObjectId = validObjectId.replace(/Ä/g, 'Ae');
+            validObjectId = validObjectId.replace(/Ö/g, 'Oe;');
+            validObjectId = validObjectId.replace(/Ü/g, 'Ue;');
+            validObjectId = validObjectId.replace(/[^\w\s]/gi, '')
             validObjectId = validObjectId.replace(/[\.\s\/]/g, '_');
-            return validObjectId;  
+            return validObjectId;
         }
 
         // this method stores the current devices and their settings (given in the html table) as objects in the backend
@@ -384,7 +391,7 @@
             let devices = new Array();
             for (const device of tableValues)
             {
-                devices.push(unflattenObject(device));  
+                devices.push(unflattenObject(device));
             }            
             return devices;
         }
@@ -395,7 +402,8 @@
 
 <body>
 
-    <div class="m adapter-container" id="form">
+    <div class="m adapter-container" id="form">     
+
         <div class="row">
 
             <div class="col s12">

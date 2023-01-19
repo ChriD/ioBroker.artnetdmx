@@ -65,6 +65,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 ### **WORK IN PROGRESS**
 
 -   (ChriD) ??? https://github.com/ioBroker/ioBroker.repositories
+-   (ChriD) Umlauts in id's are now beeing converted instead of being removed
 
 ### 1.0.3 (2023-01-08)
 
