@@ -61,11 +61,15 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
 
 
 ## Changelog
+<!--
+    Placeholder for the next version (at the beginning of the line):
+    ### **WORK IN PROGRESS**
+-->
 
 ### **WORK IN PROGRESS**
 
--   (ChriD) ??? https://github.com/ioBroker/ioBroker.repositories
 -   (ChriD) Umlauts in id's are now beeing converted instead of being removed
+-   (ChriD) Added Save/Load configuration buttons
 
 ### 1.0.3 (2023-01-08)
 

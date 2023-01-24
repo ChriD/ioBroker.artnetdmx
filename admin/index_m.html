@@ -45,7 +45,7 @@
             _settings.defaultFadeTime = _settings.defaultFadeTime ? _settings.defaultFadeTime : 250;
            
             // load the settings from the _settings object into the html controls
-            loadSettings(_settings, _onChange);           
+            loadSettings(_settings, _onChange);
                        
             // reinitialize all the materialize labels on the page because we are adding inputs dynamically
             // in fact in our case this following line wont be of any effect i think
@@ -57,25 +57,25 @@
         
         // this one is beeing called wehn we hit SAVE or SAVE AND CLOSE and therfore we have to be sure the
         // 'callback' is only beeing called when the save of the devices has been done!
-        function save(_callback) {  
-            if(validateSettings())            
-                saveSettings(_callback);                        
+        function save(_callback) {
+            if(validateSettings())
+                saveSettings(_callback);
             else            
-                alert("Settings not correct!");            
+                alert("Settings not correct!");
         }
 
         function initFormValidation()
         {
-            let defaultConfig = {                
+            let defaultConfig = {
                 classTo: 'input-field',
                 errorClass: 'has-danger',
-                successClass: 'has-success',                
-                errorTextParent: 'input-field',                
-                errorTextTag: 'div',                
-                errorTextClass: 'text-help' 
+                successClass: 'has-success',
+                errorTextParent: 'input-field',
+                errorTextTag: 'div',
+                errorTextClass: 'text-help'
             };
             
-            Pristine.addValidator("ip", function(_value) {                     
+            Pristine.addValidator("ip", function(_value) {
                 const regex = new RegExp('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$');
                 if (regex.test(_value))                 
                     return true;                
@@ -409,7 +409,20 @@
             <div class="col s12">
                 <ul class="tabs">
                     <li class="tab col s2"><a href="#tab-main" class="translate active">General</a></li>
-                    <li class="tab col s2"><a href="#tab-devices" class="translate">Devices</a></li>
+                    <li class="tab col s2"><a href="#tab-devices" class="translate">Devices</a></li>                
+                    <div>
+                        <div class="help-link">   
+                            <a class="btn-floating btn-small waves-effect waves-light" style="margin-top: 8px;" href="https://github.com/ChriD/iobroker.smartstate/blob/master/README.md" target="_blank" rel="noreferrer">       
+                                <i class="material-icons">live_help</i>
+                            </a>
+                            <a class="btn-floating btn-small waves-effect waves-light adapter-config-load" style="margin-top: 8px;" title="Load configuration from file">
+                                <i class="material-icons">file_upload</i>
+                            </a>
+                            <a class="btn-floating btn-small waves-effect waves-light adapter-config-save" style="margin-top: 8px;" title="Save configuration to file">
+                                <i class="material-icons">file_download</i>
+                            </a>
+                        </div>
+                    </div>
                 </ul>
             </div>
 
