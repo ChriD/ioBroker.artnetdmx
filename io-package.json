@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "artnetdmx",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "news": {
+            "1.0.4": {
+                "en": "Umlauts in id's are now beeing converted instead of being removed\nAdded Save/Load configuration buttons",
+                "de": "Umlauts in ids werden nun konvertiert statt entfernt\nHinzugefügt Speichern / Speichern Konfiguration Tasten",
+                "ru": "Umlauts in id's теперь beeing преобразованы вместо удаления\nДобавлены кнопки конфигурации Save/Load",
+                "pt": "Umlauts em id's agora estão sendo convertidos em vez de serem removidos\nAdicionados botões de configuração Salvar/Load",
+                "nl": "Umlauts in ID's zijn nu omgebouwd in plaats van verwijderd te worden\nVoeg Save/Load configuatie knoppen toe",
+                "fr": "Umlauts in id's are now beeing converted instead of being removed\nAjout des boutons de configuration Save/Load",
+                "it": "Umlauts in id's sono ora apeing convertito invece di essere rimosso\nAggiunti i pulsanti di configurazione Save/Load",
+                "es": "Umlauts en id's ahora se están convirtiendo en lugar de ser eliminado\nBotones de configuración de Guardar/Cargar",
+                "pl": "Umlauty w id'ach są obecnie przekształcone zamiast usunąć\nAdded Save/Load (ang.)",
+                "uk": "Umlauts в id's тепер beeing перетворюється замість того, щоб видалити\nДодано кнопки налаштування Зберегти/Load",
+                "zh-cn": "被怀疑的乌果现在正被转换,而不是被删除。\n增加Save/Load配置,但州"
+            },
             "1.0.3": {
                 "en": "Standard channel values when creating a new device will be set to 255 instead of 0\nvaluesObject may now be a real object instead a parsable json string",
                 "de": "Standardkanalwerte bei der Erstellung eines neuen Geräts werden auf 255 anstatt 0 gesetzt\nwerte Objekt kann nun ein echtes Objekt sein, statt ein parsable json string",

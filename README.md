@@ -66,7 +66,7 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 1.0.4 (2023-01-24)
 
 -   (ChriD) Umlauts in id's are now beeing converted instead of being removed
 -   (ChriD) Added Save/Load configuration buttons
