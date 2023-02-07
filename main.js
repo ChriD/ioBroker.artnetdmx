@@ -106,6 +106,11 @@ class Artnetdmx extends utils.Adapter {
         for(let idx=0; idx<this.devices.length; idx++)
         {
             const deviceObject = this.devices[idx];
+
+            // of course the channel value we set have to consider the brightness of the light and the on/off state
+            const valuesObject = { brightness: deviceObject.values.brightness, isOn: deviceObject.values.isOn };
+            const brightnessMultiplicator = this.getBrightnessMultiplicator(valuesObject);
+
             for (const [objKey, objValue] of Object.entries(deviceObject.settings.channel))
             {
                 if(objValue)
@@ -115,7 +120,7 @@ class Artnetdmx extends utils.Adapter {
                        typeof channelValue === DATATYPE.NUMBER && !Number.isNaN(channelValue))
                     {
                         // we have to substract '1' from the channel to get the buffer index
-                        buffer[objValue-1] = channelValue;
+                        buffer[objValue-1] = channelValue * brightnessMultiplicator;
                     }
                     else
                     {
