@@ -65,6 +65,9 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+
+-   (ChriD) fixed problem that on adapter (re)start the artnet buffer was not consideering the on/off and brightness value
 
 ### 1.0.4 (2023-01-24)
 
