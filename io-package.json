@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "artnetdmx",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "news": {
+            "1.0.5": {
+                "en": "fixed problem that on adapter (re)start the artnet buffer was not consideering the on/off and brightness value",
+                "de": "festes problem, dass auf adapter (wieder)start der artnet-puffer den ein-/aus- und helligkeitswert nicht abdeckt",
+                "ru": "фиксированная проблема, что на адаптере (re)начать буфер artnet не был consideering on/off и brightness значение",
+                "pt": "problema fixo que no adaptador (re)iniciar o buffer de artnet não estava considerando o valor de ligar/desligar e brilho",
+                "nl": "het probleem dat op adapter (re) start de artnet buffer niet beschouwde de on/off and brightness waarde",
+                "fr": "problème fixe que sur l'adaptateur (re)start le tampon d'artnet n'était pas considérant la valeur de marche/arrêt et de luminosité",
+                "it": "problema fisso che sull'adattatore (re)avviare il buffer artnet non era aderente al valore di on/off e luminosità",
+                "es": "problema fijo que en el adaptador (re) iniciar el buffer de artnet no estaba considerando el valor encendido / apagado y brillo",
+                "pl": "stały problem, który na adapterze (re) rozpoczyna bufor artnetowy, nie był konsekrowany na/off i jasności",
+                "uk": "виправлена проблема, яка на адаптері (re)починає буфер артмережі, не обмежує значення",
+                "zh-cn": "适应者(重新)启动艺术网缓冲的固定问题,并没有设想在/抵消和光明价值方面。"
+            },
             "1.0.4": {
                 "en": "Umlauts in id's are now beeing converted instead of being removed\nAdded Save/Load configuration buttons",
                 "de": "Umlauts in ids werden nun konvertiert statt entfernt\nHinzugefügt Speichern / Speichern Konfiguration Tasten",
