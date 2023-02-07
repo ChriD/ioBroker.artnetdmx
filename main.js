@@ -618,7 +618,7 @@ class Artnetdmx extends utils.Adapter {
 
         if(hasMain)
         {
-            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.main', 'main', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.main, true); 
+            await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.settings.channel.main', 'main', DATATYPE.NUMBER, '',_deviceDescription.settings.channel.main, true);
             await this.createOrUpdateState('lights.' + _deviceDescription.deviceId + '.values.channel.main', 'main', DATATYPE.NUMBER, 'level.color.white', 255, false, isCreation);
         }
 
@@ -699,11 +699,13 @@ class Artnetdmx extends utils.Adapter {
         {
             if(_deleteStateOnNullValue && _stateValue === null)
             {
+                this.log.debug(`Delete state: ${_id}`);
                 await this.delStateAsync(_id);
                 await this.delObjectAsync(_id);
             }
             else
             {
+                this.log.debug(`Set state value: ${_id} : ${_stateValue}`);
                 await this.setStateAsync(_id, { val: this.convertValue(_stateValue, _stateType), ack: true });
             }
         }
