@@ -348,12 +348,14 @@ class Artnetdmx extends utils.Adapter {
             _valuesObject.channel.main = 255 * (_valuesObject.temperature/100);
             _valuesObject.channel.white = 255 - _valuesObject.channel.main;
 
-            // if the type of the device is RGBW, then set RGB values as 'main' values
+            // if the type of the device is RGBW, mostly the RGB values will be like cold white, so we have to interchange the
+            // values here
             if(_deviceObject.settings.type === DEVICETYPE.RGBW)
             {
-                _valuesObject.channel.red = _valuesObject.channel.main;
-                _valuesObject.channel.green = _valuesObject.channel.main;
-                _valuesObject.channel.blue = _valuesObject.channel.main;
+                _valuesObject.channel.red = _valuesObject.channel.white;
+                _valuesObject.channel.green = _valuesObject.channel.white;
+                _valuesObject.channel.blue = _valuesObject.channel.white;
+                _valuesObject.channel.white = _valuesObject.channel.main;
             }
         }
 
