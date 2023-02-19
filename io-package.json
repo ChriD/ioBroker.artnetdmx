@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "artnetdmx",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "news": {
+            "1.0.6": {
+                "en": "lowerd cpu load of adapter by stopping the buffer update when no buffer actions are pending",
+                "de": "cpu-last des adapters reduziert, indem das pufferupdate beendet wird, wenn keine pufferaktionen anhängig sind",
+                "ru": "снижение нагрузки cpu адаптера, остановив обновление буфера, когда никаких буферных действий не будет ожидаться",
+                "pt": "carga cpu inferior do adaptador, parando a atualização do buffer quando nenhuma ação do buffer está pendente",
+                "nl": "laag gedroogde cpu lading adapter door de buffer update te stoppen als er geen buffer acties zijn",
+                "fr": "abaissé la charge cpu de l'adaptateur en arrêtant la mise à jour tampon quand aucune action tampon n'est en instance",
+                "it": "abbassato il carico cpu dell'adattatore impedendo l'aggiornamento del buffer quando non sono in sospeso azioni buffer",
+                "es": "baja la carga cpu del adaptador parando la actualización del buffer cuando no hay acciones de amortiguación pendientes",
+                "pl": "dolny cpu obciążenie adapterem poprzez zatrzymanie aktualizacji bufora, kiedy nie ma żadnych działań buforowych",
+                "uk": "знижений cpu навантаження адаптера, припинивши оновлення буфера при відсутності буферних дій, згинання",
+                "zh-cn": "如果不采取缓冲行动,通过停止缓减缓缓缓缓冲情况,降低适应能力。"
+            },
             "1.0.5": {
                 "en": "fixed problem that on adapter (re)start the artnet buffer was not consideering the on/off and brightness value",
                 "de": "festes problem, dass auf adapter (wieder)start der artnet-puffer den ein-/aus- und helligkeitswert nicht abdeckt",
