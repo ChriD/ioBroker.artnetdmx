@@ -65,6 +65,9 @@ Art-Net™ Designed by and Copyright Artistic Licence Holdings Ltd"
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
++   (Lowadeth) fixed a bug so that actions can be added to channel one
+
 ### 1.0.6 (2023-02-19)
 -   (ChriD) lowerd cpu load of adapter by stopping the buffer update when no buffer actions are pending
 
